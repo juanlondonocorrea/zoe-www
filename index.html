@@ -31,11 +31,12 @@ function onDeviceReady()
         }
 
       window.html2pdf.create($("#indexPage").html(),
-            "test.pdf", 
+            "/sdcard/Download/test.pdf", 
             success,
             error
         );
 		
+		window.open('/sdcard/Download/test.pdf', '_system');
 }		
 
 </script>
