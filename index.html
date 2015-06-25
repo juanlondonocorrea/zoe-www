@@ -20,24 +20,24 @@
 		});
 		
 document.addEventListener('deviceready', onDeviceReady);
-function onDeviceReady()
-{
-        var success = function(status) {
-            alert('Message: ' + status);
-        }
 
-        var error = function(status) {
-            alert('Error: ' + status);
-        }
+document.addEventListener("deviceready", onDeviceReady, false);
 
-      window.html2pdf.create($("#indexPage").html(),
-            "/sdcard/Download/test.pdf", 
-            success,
-            error
-        );
-		
-		window.open('/sdcard/Download/test.pdf', '_system');
-}		
+// Cordova Device Ready.
+function onDeviceReady() {
+
+cordova.plugins.printer.isAvailable(
+    //Check whether the printer is available or not.
+    function (isAvailable) {
+         //Enter the page location.
+         var page = location.href;
+         cordova.plugins.printer.print(page, 'Document.html', function () {
+         alert('printing finished or canceled')
+});
+    }
+);
+
+}	
 
 </script>
 </head> 
