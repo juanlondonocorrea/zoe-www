@@ -1,0 +1,546 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Customers</title>
+
+		<link rel="stylesheet" href="css/themes/zoe.min.css" />
+		<link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+		<link rel="stylesheet" href="js/jquery-mobile/jquery.mobile.structure-1.4.5.min.css" />
+		<link rel="stylesheet" href="js/jqm-inlinetabs/jqm-inlinetabs.min.css" />
+
+		<!--  <link rel="stylesheet" href="js/jquery-mobile/jquery.mobile-1.4.5.min.css" />  -->
+		<script src="js/jquery-mobile/jquery-2.1.4.js"></script>
+		<script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+		<script type="text/javascript" src="cordova.js"></script>
+		<script src="js/jqm-inlinetabs/jqm-inlinetabs.min.js"></script>        
+		<script src="js/zoe/zoe.js"></script>
+		<script src="js/zoe/customerDAO.js"></script>
+        <script src="js/zoe/termDAO.js"></script>
+        <script src="js/zoe/pricelevelDAO.js"></script>
+		<script> 
+
+			$(document).bind("pagebeforecreate", function(event) {
+				initAnyPage(event.target);
+				initThisPage(event);
+			});
+			
+			function initThisPage(event){ 
+				CreateCustomer(); 
+			}
+
+			// BEGIN Functions on error case
+			function errReceiveTerms(err){
+				alert("DB Error terms: "+JSON.stringify(err));
+			}
+			
+			function errPriceLevel(err){
+				alert("DB Error Price Level: "+JSON.stringify(err));
+			}
+			// END functions on error case
+			
+			$(document).bind('pagechange', function() {
+				$('.ui-page-active .ui-listview').listview('refresh');
+				$('.ui-page-active :jqmData(role=content)').trigger('create');
+			});	
+
+			// Copy bill fileds to ship fields in adding operation to customer
+			function copyBillIntoShip(){
+				var copyState = $('#copyBillToShip').is(':checked');
+				logZoe("copyState: ========> "+copyState);
+				if (copyState == true) { // Copy Bill to Ship
+					$('#shipAddress1').val($('#billAddress1').val());
+					$('#shipAddress2').val($('#billAddress2').val());
+					$('#shipAddress3').val($('#billAddress3').val());
+					$('#shipCity').val($('#billCity').val());
+					$('#shipState').val($('#billState').val());
+					$('#shipZipCode').val($('#billZipCode').val());
+					$('#shipCountry').val($('#billCountry').val());
+				}
+				else if (copyState == false) {
+					$('#shipAddress1').val('');
+					$('#shipAddress2').val('');
+					$('#shipAddress3').val('');
+					$('#shipCity').val('');
+					$('#shipState').val('');
+					$('#shipZipCode').val('');
+					$('#shipCountry').val('');
+				}
+			}
+			 
+			function routeDayChecked(rDay){
+				logZoe("rDay: ===1====> "+rDay);
+				rDay = "'#"+rDay+"'";
+				logZoe("rDay: ===2====> "+rDay);
+				if ($(rDay).is(':checked')){
+					$(rDay).val('1');
+				}
+				else {
+					$(rDay).val('0');
+				}
+				logZoe("rDay: ===3====> "+$(rDay).val());
+			}
+
+			var selectedIndex;
+			function receiveTerms(arrayTerms){
+				//$('#Terms').empty();
+				//var toSelectIndex = 0;
+				for (var i in arrayTerms) {
+					//	toSelectIndex=i;
+					var option='<option value="'+arrayTerms[i].id_term+'">'+arrayTerms[i].name+'</option>'
+					$('#Terms').append(option);					
+				}
+				//$('#Terms')[0].selectedIndex = toSelectIndex;
+				$('#Terms').selectmenu('refresh');
+				$('#Terms').trigger("chosen:updated");
+			}
+
+			function receivePriceLevel(arrayPriceList){
+				//$('#priceLevel').empty();
+				//var toSelectIndex = 0;
+				for (var i in arrayPriceList) {
+					//	toSelectIndex=i;
+					var option='<option value="'+arrayPriceList[i].ListID+'">'+arrayPriceList[i].name+'</option>'
+					$('#priceLevel').append(option);
+				}
+				//$('#priceLevel')[0].selectedIndex = toSelectIndex;
+				$('#priceLevel').selectmenu('refresh');
+				$('#priceLevel').trigger("chosen:updated");
+			}
+
+			function CreateCustomer(){
+				termDAO.list(receiveTerms,errReceiveTerms);
+				pricelevelDAO.list(receivePriceLevel,errPriceLevel);				
+			}
+			function AddCustomer(){
+				var customersVO = [];
+								
+				var customerVO = {
+					id_salesrep:$('#SalesRep').val(),
+
+					ListID:$('#ListID').val(generateKey()),
+					IsActive:$('#IsActive').val(),
+					FullName:$('#FullName').val(),
+					name:$('#Name').val(),
+					companyName:$('#CompanyName').val(),
+
+					workPhone:$('#Phone').val(),
+					cellPhone:$('#Cell').val(),
+					Fax:$('#Fax').val(),
+					email:$('#Email').val(),
+
+					billAddress1:$('#billAddress1').val(),
+					billAddress2:$('#billAddress2').val(),
+					billAddress3:$('#billAddress3').val(),
+					billAddresCity:$('#billCity').val(),
+					billAddressState:$('#billState').val(),
+					billAddresZipcode:$('#billZipCode').val(),
+					billAddressCountry:$('#billCountry').val(),
+
+					shipAddress1:$('#shipAddress1').val(),
+					shipAddress2:$('#shipAddress2').val(),
+					shipAddress3:$('#shipAddress3').val(),
+					shipAddressCity:$('#shipCity').val(),
+					shipAddressState:$('#shipState').val(),
+					shipAddressZipcode:$('#shipZipCode').val(),
+					shipAddressCountry:$('#shipCountry').val(),
+			
+					openBalance:$('#openBalance').val(),
+					overdueBalance:$('#overdueBalance').val(),
+
+					id_term:$('#Terms').val(),
+					otherDetails:$('#OtherDetails').val(),
+
+					routeDay1:$('#routeDay1').val(),
+					routeDay2:$('#routeDay2').val(),
+					routeDay3:$('#routeDay3').val(),
+					routeDay4:$('#routeDay4').val(),
+					routeDay5:$('#routeDay5').val(),
+					routeDay6:$('#routeDay6').val(),
+					routeDay7:$('#routeDay7').val(),
+
+					pricelevel_ListID:$('#priceLevel').val()
+				};
+				logZoe("ListID ========> " +$('#ListID').val());
+				logZoe("FullName ========> " +$('#FullName').val());
+				logZoe("Phone ========> " +$('#Phone').val());
+				logZoe("Terms ========> " +$('#Terms').val());
+				logZoe("routeDay1 ========> " +$('#routeDay1').val());
+				logZoe("routeDay2 ========> " +$('#routeDay2').val());
+				logZoe("routeDay3 ========> " +$('#routeDay3').val());
+				logZoe("routeDay4 ========> " +$('#routeDay4').val());
+				logZoe("routeDay5 ========> " +$('#routeDay5').val());
+				logZoe("routeDay6 ========> " +$('#routeDay6').val());
+				logZoe("routeDay7 ========> " +$('#routeDay7').val());
+				logZoe("PriceLevel ========> " +$('#priceLevel').val());			
+				logZoe("customerVO ========> " + JSON.stringify(customerVO));
+				customersVO[0] = customerVO;
+				//customerDAO.store(customersVO, errCustomerCreation, successCustomerCreation, "local");
+			}
+
+			function successCustomerCreation(){
+					customerDAO.markToSync($('#ListID').val(), errCustomermarkToSync);
+					alert("Customer was successful updated");
+			}
+			
+			function errCustomerCreation(err){
+				alert("DB Error on update customers: "+JSON.stringify(err));
+			}
+			
+			function errCustomermarkToSync(err){
+				alert("DB Error on mark to Sync update customers: "+JSON.stringify(err));
+			}
+		</script>
+		<style type="text/css">
+			thead {color:black;}
+			tbody {color:gray;}
+			tfoot {
+				color:#ff770f;
+				font-weight:bolder;
+			}
+			table, th, td {
+				border: 1px solid black;
+			}
+			.control-group {
+				margin-bottom: 9px;
+				background-color:#FFFFFF;
+				border-color:#000000;
+				border-width:medium;
+				border:thick;
+			
+				box-shadow: inset 2px 2px 1px 1px rgba(50, 50, 50, 0.75);
+			}
+			
+			/* ADD 6(e) and 7(f) column grid */
+			.ui-grid-e, .ui-grid-f { overflow: hidden; }
+			
+			/* grid e: 16/16/16/16/16/16 */
+			.ui-grid-e .ui-block-a, .ui-grid-e .ui-block-b, .ui-grid-e .ui-block-c, .ui-grid-e .ui-block-d, .ui-grid-e .ui-block-e, .ui-grid-e .ui-block-f { width: 16.59166666666667%; }
+			.ui-grid-e > :nth-child(n) { width: 16.66666666666667%; }
+			.ui-grid-e .ui-block-a { clear: left; }
+			
+			/* grid f: 14/14/14/14/14 */
+			.ui-grid-f .ui-block-a, .ui-grid-f .ui-block-b, .ui-grid-f .ui-block-c, .ui-grid-f .ui-block-d, .ui-grid-f .ui-block-e, .ui-grid-f .ui-block-f, .ui-grid-f .ui-block-g { width: 14.21071428571429%; }
+			.ui-grid-f > :nth-child(n) { width: 14.28571428571429%; }
+			.ui-grid-f .ui-block-a { clear: left; }
+			
+			/* ADD 6th (f) and 7th (g) blocks in grid */
+			.ui-header .ui-navbar .ui-grid-e li.ui-block-f .ui-btn,
+			.ui-footer .ui-navbar .ui-grid-e li.ui-block-f .ui-btn { margin-right: -3px; }/* NOT TESTED */
+			
+			.ui-header .ui-navbar .ui-grid-f li.ui-block-g .ui-btn,
+			.ui-footer .ui-navbar .ui-grid-f li.ui-block-g .ui-btn { margin-right: -2px; }/* NOT TESTED */
+			
+			.ui-grid-e .ui-btn, .ui-grid-f .ui-btn { margin-right: 5px; margin-left: 5px; }
+			
+			.ui-block-f, .ui-block-g { margin: 0; padding: 0; border: 0; float: left; min-height: 1px; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; }
+			
+			.ui-header .ui-navbar .ui-grid-e li.ui-block-f .ui-btn-icon-right .ui-icon,
+			.ui-footer .ui-navbar .ui-grid-f li.ui-block-g .ui-btn-icon-right .ui-icon { right: 8px; }
+		</style> 
+	</head>
+
+	<body>
+		<!-- BEGIN CUSTOMERS CREATION-->
+		<div data-role="page" id="CustomerCreate"  data-title="Customers Creation" data-theme="a">
+			<div data-role="content" >
+				<!-- CUSTOMERS FIELDS (TO ADD) -->
+				<form id="formulario" >
+					<!-- Relational Info --> 
+					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+						<legend><h4>Sales Representant Info</h4></legend>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="ListID">Sales Representant:</label>
+							</div>
+							<input class="myFormsControl" type="text" data-theme="b" name="SalesRep" id="SalesRep" value=""/>
+						</div>
+					</fieldset>    
+					<!-- Identification Info -->
+					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+						<legend><h4>Identification Info</h4></legend>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="ListID">ListID:</label>
+							</div>
+							<input type="text" data-theme="b" name="ListID" id="ListID" value=""/>
+							<input type="text" data-theme="b" name="IsActive" id="IsActive" value=""/>
+						</div>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="FullName">Full Name:</label>
+							</div>
+							<input  class="myFormsControl" type="text" data-theme="b" name="FullName" id="FullName" value=""/>
+						</div>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="Name">Name:</label>
+							</div>
+							<input type="text" data-theme="b" name="Name" id="Name" value=""  />
+						</div>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="CompanyName">Company Name:</label>
+							</div>
+							<input type="text" data-theme="b" name="CompanyName" id="CompanyName" value=""  />
+						</div>
+					</fieldset> 
+					<!-- Contact Info -->
+					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px"> 
+						<legend><h4>Contact Info</h4></legend>                       
+						<div data-role="fieldcontain">
+							<div>
+								<label for="Phone">Phone:</label>
+							</div>
+							<input type="tel" data-theme="b" name="Phone" id="Phone" value=""  />              
+						</div>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="Cell">Cell:</label>
+							</div>
+							<input type="tel" data-theme="b" name="Cell" id="Cell" value=""  />              
+						</div>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="Fax">Fax:</label>
+							</div>
+							<input type="text" data-theme="b" name="Fax" id="Fax" value=""  />              
+						</div>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="Email">Email:</label>
+							</div>
+							<input type="email" data-theme="b" name="Email" id="Email" value=""  />              
+						</div>
+					</fieldset>
+					<!-- Billing Address -->
+					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+						<legend><h4>Billing Address</h4></legend>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="billAddress1">Bill Address Line 1:</label>
+							</div>
+							<input type="text" data-theme="b" name="billAddress1" id="billAddress1" value=""  />
+						</div>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="billAddress2">Bill Address Line 2:</label>
+							</div>
+							<input type="text" data-theme="b" name="billAddress2" id="billAddress2" value=""  />
+						</div>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="billAddress3">Bill Address Line 3:</label>
+							</div>
+							<input type="text" data-theme="b" name="billAddress3" id="billAddress3" value=""  />
+						</div>
+						
+						<div data-role="fieldcontain">
+							<div>
+								<label for="billCity">City:</label>
+							</div>
+							<input type="text" data-theme="b" name="billCity" id="billCity" value=""  />
+						</div>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="billState">State:</label>
+							</div>
+							<input type="text" data-theme="b" name="billState" id="billState" value=""  />
+						</div>
+						<div class="ui-grid-a" style="height:95px">
+							<div class="ui-block-a" style="height:100%"> 
+								<div data-role="fieldcontain">
+									<div>
+										<label for="billZipCode">Zip Code:</label>
+									</div>
+									<input type="number" data-theme="b" name="billZipCode" id="billZipCode" value=""  />
+								</div>                    
+							</div>
+							<div class="ui-block-b" style="height:100%">            
+                                <div data-role="fieldcontain">
+                                    <div>
+                                        <label for="billCountry">Country:</label>
+                                    </div>
+                                    <input type="text" data-theme="b" name="billCountry" id="billCountry" value=""  />
+                                </div>                      
+							</div>
+						</div>
+                        <div data-role="fieldcontain">
+                            <div>
+                                <label for="copyBillToShip">Copy billing to shipping</label>
+                            </div>
+                            <input class="myFormsControl" type="checkbox" data-theme="b" name="copyBillToShip" id="copyBillToShip" value="" onchange="copyBillIntoShip();" />
+                        </div>
+					</fieldset>
+					<!-- Shiping Address -->
+					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+						<legend><h4>Shiping Address</h4></legend>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="shipAddress1">Ship Address Line 1:</label>
+							</div>
+							<input type="text" data-theme="b" name="shipAddress1" id="shipAddress1" value=""  />
+						</div>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="shipAddress2">Ship Address Line 2:</label>
+							</div>
+							<input type="text" data-theme="b" name="shipAddress2" id="shipAddress2" value=""  />
+						</div>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="shipAddress3">Ship Address Line 3:</label>
+							</div>
+							<input type="text" data-theme="b" name="shipAddress3" id="shipAddress3" value=""  />
+						</div>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="shipCity">Ship City:</label>
+							</div>
+							<input type="text" data-theme="b" name="shipCity" id="shipCity" value=""  />
+						</div>
+						<div data-role="fieldcontain">
+							<div>
+								<label for="shipState">Ship State:</label>
+							</div>
+							<input type="text" data-theme="b" name="shipState" id="shipState" value=""  />
+						</div>
+						<div class="ui-grid-a" style="height:95px">
+							<div class="ui-block-a" style="height:100%"> 
+								<div data-role="fieldcontain">
+									<div>
+										<label for="shipZipCode">Ship Zip Code:</label>
+									</div>
+									<input type="number" data-theme="b" name="shipZipCode" id="shipZipCode" value=""  />
+								</div>
+							</div>
+							<div class="ui-block-b" style="height:100%">            
+								<div data-role="fieldcontain">
+									<div>
+										<label for="shipCountry">Ship Country:</label>
+									</div>
+									<input type="text" data-theme="b" name="shipCountry" id="shipCountry" value=""  />
+								</div>
+							</div>  
+						</div>
+					</fieldset> 
+					<!-- Balance Info -->
+					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+						<legend><h4>Balance Info</h4></legend>
+						<div class="ui-grid-a" style="height:95px">
+							<div class="ui-block-a" style="height:100%"> 
+								<div data-role="fieldcontain">
+									<div>
+										<label for="openBalance">Open:</label>
+									</div>
+									<input type="text" data-theme="b" name="openBalance" id="openBalance" value=""  onClick="overdueBalanceRed();"/>
+								</div>                    
+							</div>
+							<div class="ui-block-b" style="height:100%">            
+								<div data-role="fieldcontain">
+									<div>
+										<label for="overdueBalance">Overdue:</label>
+									</div>
+									<input type="text" data-theme="b" name="overdueBalance" id="overdueBalance" value=""  />
+								</div>                      
+							</div>  
+						</div>
+					</fieldset>           
+					<!-- Terms Info --> 
+					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+						<div data-role="fieldcontain" id="CustomerTerms">
+						  <div>
+							<label for="Terms" class="select">Terms:</label>
+						  </div>
+						  <select  class="myFormsControl"  name="Terms" id="Terms" data-theme="a">
+							<option value="option1">Choose a term</option>
+						  </select>
+						</div>
+					</fieldset> 
+					<!-- Other Info -->                       
+					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+						<div data-role="fieldcontain">
+							<div>
+								<label for="OtherDetails">Other Details:</label>
+							</div>
+							<input type="text" data-theme="b" name="OtherDetails" id="OtherDetails" value=""  />
+						</div> 
+					</fieldset> 
+
+					<!-- Route days info -->
+					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+						<legend><h4>Route Info</h4></legend>
+
+                            <div data-role="fieldcontain">
+                                <div>
+                                    <label for="routeDay1">Sunday</label>
+                                </div>
+                                <input  class="myFormsControl"  type="checkbox" data-theme="b" name="routeDay1" id="routeDay1" value="" onchange="routeDayChecked('routeDay1');"/>
+                            </div>
+
+                            <div data-role="fieldcontain">
+                                <div>
+                                    <label for="routeDay2">Monday</label>
+                                </div>
+                                <input class="myFormsControl"  type="checkbox" data-theme="b" name="routeDay2" id="routeDay2" value=""  onchange="routeDayChecked('routeDay2');"/>
+                            </div>                
+                            <div data-role="fieldcontain">
+                                <div>
+                                    <label for="routeDay3">Tuesday</label>
+                                </div>
+                                <input class="myFormsControl"  type="checkbox" data-theme="b" name="routeDay3" id="routeDay3" value=""  onchange="routeDayChecked('routeDay3');"/>
+                            </div>                
+                            <div data-role="fieldcontain">
+                                <div>
+                                    <label for="routeDay4">Wednesday</label>
+                                </div>
+                                <input  class="myFormsControl" type="checkbox" data-theme="b" name="routeDay4" id="routeDay4" value=""  onchange="routeDayChecked('routeDay4');"/>
+                            </div>                
+                            <div data-role="fieldcontain">
+                                <div>
+                                    <label for="routeDay5">Thursday</label>
+                                </div>
+                                <input  class="myFormsControl" type="checkbox" data-theme="b" name="routeDay5" id="routeDay5" value=""  onchange="routeDayChecked('routeDay5');"/>
+                            </div>                
+                            <div data-role="fieldcontain">
+                                <div>
+                                    <label for="routeDay6">Friday</label>
+                                </div>
+                                <input class="myFormsControl"  type="checkbox" data-theme="b" name="routeDay6" id="routeDay6" value=""  onchange="routeDayChecked('routeDay6');"/>
+                            </div>                
+                            <div data-role="fieldcontain">
+                                <div>
+                                    <label for="routeDay7">Saturday</label>
+                                </div>
+                                <input class="myFormsControl"  type="checkbox" data-theme="b" name="routeDay7" id="routeDay7" value=""  onchange="routeDayChecked('routeDay7');"/>
+                            </div> 
+					</fieldset>
+					<!-- Price Level Info -->                       
+					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+						<div data-role="fieldcontain" id="CustomerPriceLevel">
+						  <div>
+							<label for="priceLevel" class="select">Price Level:</label>
+						  </div>
+						  <select name="priceLevel" id="priceLevel" data-theme="a">
+							<option value="option1">Choose a price level</option>
+						  </select> 
+						</div>
+					</fieldset>                                                         
+					<!-- Done and Cancel Buttons -->
+                    <fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px;">
+                        <div class="ui-grid-a" style="height:45px">
+                            <div class="ui-block-a ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="cancel" data-add-back-btn="true" data-theme="b">Cancel</button></div>
+                            <div class="ui-block-b ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="btnUpdateCustomer"  onClick="AddCustomer();" data-theme="c">Done</button></div>	
+                        </div>
+                    </fieldset>
+				</form>		
+			</div>
+			<!-- END CUSTOMERS CREATE--> 
+			<!-- divs de header, menu y footer-->
+			<div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
+			<div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
+			<div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
+			<!-- fin divs -->    
+		</div>
+	</body>
+</html>

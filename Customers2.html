@@ -1,0 +1,751 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Customers</title>
+
+		<link rel="stylesheet" href="css/themes/zoe.min.css" />
+		<link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+		<link rel="stylesheet" href="js/jquery-mobile/jquery.mobile.structure-1.4.5.min.css" />
+		<link rel="stylesheet" href="js/jqm-inlinetabs/jqm-inlinetabs.min.css" />
+
+		<!--  <link rel="stylesheet" href="js/jquery-mobile/jquery.mobile-1.4.5.min.css" />  -->
+		<script src="js/jquery-mobile/jquery-2.1.4.js"></script>
+		<script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+		<script src="js/jqm-inlinetabs/jqm-inlinetabs.min.js"></script>        
+		<script src="js/zoe/zoe.js"></script>
+		<script src="js/zoe/customerDAO.js"></script>
+		<script> 
+			// var htmlString1=''; 
+			$(document).bind("pagebeforecreate", function(event) {
+				console.log("Cargar Clientes");
+				initAnyPage(event.target);
+				
+				//$(".linkDetail").on(click,showDetail);
+				//logZoe("this.activeElement: " + JSON.stringify(this.activeElement));
+				if (this.activeElement && this.activeElement.id){
+				  logZoe("this.activeElement.id: " + this.activeElement.id);
+					/*
+					logZoe("activeElement.id: "+this.activeElement.id)
+					var index =  this.activeElement.id;
+					logZoe("index: "+index)
+					index = index.substring(index.indexOf("_")+1);
+					renderDetail(index);*/
+				}else{
+					receiveCustomers();
+					//customerDAO.list(receiveCustomers, errReceiveCustomers);
+				}
+			});
+
+			function errReceiveCustomers(err){
+				alert("DB Error customers: "+JSON.stringify(err));
+			}
+			
+			$(document).bind('pagechange', function() {
+				logZoe("customers on pagechange");
+				$('.ui-page-active .ui-listview').listview('refresh');
+				$('.ui-page-active :jqmData(role=content)').trigger('create');
+			});	
+
+			$( function() {
+			  $( "#the-search-input" ).textinput();
+
+			});
+			
+			function BillToShipCopy(){
+				copyState = $('#copyBillToShip').is(':checked');
+				if (copyState == true) { // Copy Bill to Ship
+					$('#shipAddress1').val($('#billAddress1').val());
+					$('#shipAddress2').val($('#billAddress2').val());
+					$('#shipAddress3').val($('#billAddress3').val());
+					$('#shipCity').val($('#billCity').val());
+					$('#shipState').val($('#billState').val());
+					$('#shipZipCode').val($('#billZipCode').val());
+					$('#shipCountry').val($('#billCountry').val());
+				}
+			}
+
+
+/*			
+			$(document).ready(function(){ 
+			$("td .ms-vb2").each(function () {
+			   if($(this).val().indexof('-') > -1)
+				{
+				  $(this).css("color", "Crimson");
+				}
+			})  
+			});			
+*/
+			$(document).ready(function(){ 
+			$("#custList .li").each(function () {
+			   if($(this).val().indexof('-') > -1)
+				{
+				  $(this).css("color", "Crimson");
+				}
+			})  
+			});			
+
+			function openBalanceRed(){ // Colocar valor en rojo para openBalance en la lista
+				if ($('#openBalance').val() < 0) {
+					$("#openBalance").css("color", "Crimson");
+				} else {
+					$("#openBalance").css("color", "black");
+				}
+			}
+			
+			function overdueBalanceRed(){ // Colocar valor en rojo para overdueBalance en Customers Details
+				if ($('#openBalance').val() < 0) {
+					$("#openBalance").css("color", "Crimson");
+				} else {
+					$("#openBalance").css("color", "black");
+				}
+			}
+
+/*
+			$(document).ready(function(){
+				$("#boton").on("click",function(){
+					$("#parrafo").css("color", "#000000");
+				});
+			});
+	*/		
+			var state;
+			function ChangeEditState()
+			{
+				state = $('#FlipSwithEdit').is(':checked');
+				console.log("state=" + state);
+				if (state == true) { // Enable Edit
+						enableEdit()
+					}
+					else if (state == false){ // Disable Edit
+						disableEdit() 
+					}		
+			}
+
+			function enableEdit(){
+				$(".myFormsControl").prop("disabled",false).change();
+				console.log("enableEdit");
+				
+//				$("select").closest("#CustomerTerms").removeClass("ui-state-disabled");
+//				$("select").closest("#CustomerPriceLevel").removeClass("ui-state-disabled");
+//				$("checkbox").closest("#routeDays").removeClass("ui-state-disabled");
+				//$('#TabCustomerDetails :input').prop('readonly',false);
+				
+				//$('#TabCustomerDetails :checkbox').prop('readonly',false);
+				//$('#routeDays *').prop('disabled',false);
+				//$('.readonly input:checkbox').click(function(){return false;});
+        		//$('.readonly input:checkbox').keydown(function () { return false; });
+				//:checkbox[readonly=readonly]
+				//'.readonly input:checkbox'
+			}
+			function disableEdit(){
+				$(".myFormsControl").prop("disabled",true).change();
+				console.log("disableEdit");
+	//			$("select").closest("#CustomerTerms").addClass("ui-state-disabled");
+	//			$("select").closest("#CustomerPriceLevel").addClass("ui-state-disabled");
+	//			$("checkbox").closest("routeDays").addClass("ui-state-disabled");
+				//$( "li.item-a" ).closest( "#one", listItemII )
+				//$('#TabCustomerDetails :input').prop('readonly',true);
+				
+				//$('#TabCustomerDetails input:checkbox').prop('checked',true);
+				//$('#routeDays *').prop('disabled',true);
+				//$('.readonly input:checkbox').click(function(){return true;});
+        		//$('.readonly input:checkbox').keydown(function () { return true; });				
+			}
+
+			var listCustomers = new Array();
+			var selectedIndex;
+			function receiveCustomers(arrayCustomers){
+				var arrayCustomers = new Array();
+				arrayCustomers[0] = {ListId:'1',FullName:'Juan', openBalance:'1000.00'};
+				arrayCustomers[1] = {ListId:'2',FullName:'Lina', openBalance:'10000.00'};
+				arrayCustomers[2] = {ListId:'3',FullName:'Jose', openBalance:'100000.00'};
+				arrayCustomers[3] = {ListId:'4',FullName:'Lisa', openBalance:'1000000.00'};
+				arrayCustomers[4] = {ListId:'5',FullName:'Cris', openBalance:'10000000.00'};
+				arrayCustomers[5] = {ListId:'6',FullName:'Isa',  openBalance:'-100000000.00'};
+				arrayCustomers[6] = {ListId:'7',FullName:'Ana',  openBalance:'1000000000.00'};
+				arrayCustomers[7] = {ListId:'8',FullName:'Tati', openBalance:'10000000000.00'};
+				arrayCustomers[8] = {ListId:'9',FullName:'Yeny', openBalance:'100000000000.00'};
+				arrayCustomers[9] = {ListId:'10',FullName:'Juli', openBalance:'1000000000000.00'};
+				arrayCustomers[10] = {ListId:'11',FullName:'Xime', openBalance:'10000000000000.00'};
+			
+				 listCustomers = arrayCustomers;
+
+				var htmlString1 = '<ol id="custList" data-role="listview" data-filter="true" data-filter-placeholder="Search customers..." data-inset="true">';
+				for(var i=0; i< arrayCustomers.length; i++) {
+					logZoe("ArrayCustomer: "+ JSON.stringify(arrayCustomers[i]));
+					if (arrayCustomers[i].openBalance < 0) {
+						$("#openB").css("color", "Crimson");
+					}
+					else {
+						$("#openB").css("color", "black");
+					}
+					htmlString1 += '<li data-filtertext="' + arrayCustomers[i].FullName + '"><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '" ><h3>'+arrayCustomers[i].FullName+'</h3><p>Balance</p><span id="openB" class="ui-li-count">'+arrayCustomers[i].openBalance+'</span></a><a href="CustomersDetails.html">Predet.</a></li>';
+					
+					}
+					htmlString1 += '</ol>';
+					logZoe("htmlString1="+htmlString1);
+					$('#CustomersList').html(htmlString1);
+					$(".linkDetail").click(goDetail);
+					//$( ".selector" ).listview( "refresh" );
+			}
+			
+			function goDetail(event){
+				var index =  event.currentTarget.id;
+				logZoe("index: "+index)
+				index = index.substring(index.indexOf("_")+1);
+				renderDetail(index);
+			}
+			
+			function renderDetail(index){
+				logZoe("renderDetail index=" + index);
+				logZoe("renderDetail =" + JSON.stringify(listCustomers[index]));
+				// Trae los datos del "registro" del servidor de QuickBooks
+				
+				
+				$('#lblFullName').val(listCustomers[index].FullName);
+				$('#lblOpenBalance1').val(listCustomers[index].openBalance);
+				$('#lblOverdueBalance1').val(listCustomers[index].overdueBalance);
+				
+				$('#SalesRep').val(listCustomers[index].id_salesrep);
+				$('#ListID').val(listCustomers[index].ListID);
+				$('#IsActive').val(listCustomers[index].IsActive);
+				$('#FullName').val(listCustomers[index].FullName);
+				$('#openBalance').val(listCustomers[index].openBalance);
+				$('#Name').val(listCustomers[index].name);
+				$('#CompanyName').val(listCustomers[index].companyName);
+				
+				$('#Phone').val(listCustomers[index].workPhone);
+				$('#Cell').val(listCustomers[index].cellPhone);
+				$('#Fax').val(listCustomers[index].Fax);
+				$('#Email').val(listCustomers[index].email);
+				
+				$('#billAddress1').val(listCustomers[index].billAddress1);
+				$('#billAddress2').val(listCustomers[index].billAddress2);
+				$('#billAddress3').val(listCustomers[index].billAddress3);
+				$('#billCity').val(listCustomers[index].billAddresCity);
+				$('#billState').val(listCustomers[index].billAddressState);
+				$('#billZipCode').val(listCustomers[index].billAddresZipcode);
+				$('#billCountry').val(listCustomers[index].billAddressCountry);
+				
+				$('#shipAddress1').val(listCustomers[index].shipAddress1);
+				$('#shipAddress2').val(listCustomers[index].shipAddress2);
+				$('#shipAddress3').val(listCustomers[index].shipAddress3);
+				$('#shipCity').val(listCustomers[index].shipAddressCity);
+				$('#shipState').val(listCustomers[index].shipAddressState);
+				$('#shipZipCode').val(listCustomers[index].shipAddressZipcode);
+				$('#shipCountry').val(listCustomers[index].shipAddressCountry);
+				
+				$('#openBalance').val(listCustomers[index].openBalance);
+				$('#overdueBalance').val(listCustomers[index].overdueBalance);
+					
+				$('#Terms').val(listCustomers[index].id_term);
+				$('#OtherDetails').val(listCustomers[index].otherDetails);
+			
+				$('#routeDay1').val(listCustomers[index].routeDay1);
+				$('#routeDay2').val(listCustomers[index].routeDay2);	
+				$('#routeDay3').val(listCustomers[index].routeDay3);
+				$('#routeDay4').val(listCustomers[index].routeDay4);
+				$('#routeDay5').val(listCustomers[index].routeDay5);
+				$('#routeDay6').val(listCustomers[index].routeDay6);
+				$('#routeDay7').val(listCustomers[index].routeDay7);
+				$('#pricelevel_ListID').val(listCustomers[index].pricelevel_ListID);
+			}
+		</script>
+		<style type="text/css">
+			thead {color:black;}
+			tbody {color:gray;}
+			tfoot {
+				color:#ff770f;
+				font-weight:bolder;
+			}
+			table, th, td {
+				border: 1px solid black;
+			}
+			.control-group {
+				margin-bottom: 9px;
+				background-color:#FFFFFF;
+				border-color:#000000;
+				border-width:medium;
+				border:thick;
+			
+				box-shadow: inset 2px 2px 1px 1px rgba(50, 50, 50, 0.75);
+			}
+			
+			/* ADD 6(e) and 7(f) column grid */
+			.ui-grid-e, .ui-grid-f { overflow: hidden; }
+			
+			/* grid e: 16/16/16/16/16/16 */
+			.ui-grid-e .ui-block-a, .ui-grid-e .ui-block-b, .ui-grid-e .ui-block-c, .ui-grid-e .ui-block-d, .ui-grid-e .ui-block-e, .ui-grid-e .ui-block-f { width: 16.59166666666667%; }
+			.ui-grid-e > :nth-child(n) { width: 16.66666666666667%; }
+			.ui-grid-e .ui-block-a { clear: left; }
+			
+			/* grid f: 14/14/14/14/14 */
+			.ui-grid-f .ui-block-a, .ui-grid-f .ui-block-b, .ui-grid-f .ui-block-c, .ui-grid-f .ui-block-d, .ui-grid-f .ui-block-e, .ui-grid-f .ui-block-f, .ui-grid-f .ui-block-g { width: 14.21071428571429%; }
+			.ui-grid-f > :nth-child(n) { width: 14.28571428571429%; }
+			.ui-grid-f .ui-block-a { clear: left; }
+			
+			/* ADD 6th (f) and 7th (g) blocks in grid */
+			.ui-header .ui-navbar .ui-grid-e li.ui-block-f .ui-btn,
+			.ui-footer .ui-navbar .ui-grid-e li.ui-block-f .ui-btn { margin-right: -3px; }/* NOT TESTED */
+			
+			.ui-header .ui-navbar .ui-grid-f li.ui-block-g .ui-btn,
+			.ui-footer .ui-navbar .ui-grid-f li.ui-block-g .ui-btn { margin-right: -2px; }/* NOT TESTED */
+			
+			.ui-grid-e .ui-btn, .ui-grid-f .ui-btn { margin-right: 5px; margin-left: 5px; }
+			
+			.ui-block-f, .ui-block-g { margin: 0; padding: 0; border: 0; float: left; min-height: 1px; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; }
+			
+			.ui-header .ui-navbar .ui-grid-e li.ui-block-f .ui-btn-icon-right .ui-icon,
+			.ui-footer .ui-navbar .ui-grid-f li.ui-block-g .ui-btn-icon-right .ui-icon { right: 8px; }
+
+			#lblFullName {color:black; font-weight:bolder; font-size:large;}
+			#lblOpenBalance1 {color:black; font-weight:bolder; font-size:large;}
+			#lblOpenBalance2 {color:grey; font-weight:bolder; font-size:medium;}
+			#lblOverdueBalance1 {color:Crimson; font-weight:bolder; font-size:large;}
+			#lblOverdueBalance2 {color:grey; font-weight:bolder; font-size:medium;}
+			#Invoice {color:black; font-weight:bolder; font-size:large;}
+			#overdueBal {color:Crimson; font-weight:bolder; font-size:large;}
+			#OberdueBy {color:white; font-weight:bolder; background-color:Crimson; font-size:medium;}
+			#AddedMonthsAgo {color:grey; font-size:medium;}
+		</style> 
+	</head>
+
+	<body onLoad="disableEdit();">
+
+        <!-- CUSTOMERS LIST (ALPHABETIC BY NAME AND OVERDUE BALANCE IN RED) -->
+		<div data-role="page" id="Customers" data-theme="a">
+			<div data-role="content" id="CustomersList">
+				<!-- Injection-->
+			</div>
+			<!-- divs de header, menu y footer-->
+			<div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
+			<div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
+			<div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
+		<!-- fin divs -->
+		</div> 
+
+		<!-- BEGIN CUSTOMERS DETAILS-->
+		<div data-role="page" id="CustomersDetails"  data-title=="Customers' Detail" data-theme="a">
+			<div data-role="content" >
+				<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+                    <div class="ui-grid-a" style="height:70px">
+                        <div class="ui-block-a" style="height:100%"> 
+                            <div align="left">
+                                <label id="lblFullName">Leticia Amezcua</label>
+                            </div>
+                        </div>
+                        <div class="ui-block-b" style="height:100%">            
+                            <div align="right">
+                                <label id="lblOpenBalance1">$ 177.27</label>
+                                <label id="lblOpenBalance2">OPEN</label>
+                            </div>
+                        </div>  
+                    </div>
+                    <div class="ui-grid-a" style="height:80px">
+                        <div class="ui-block-a" style="height:100%"> 
+                            <div align="left">
+                                <div class="ui-grid-b">
+                                    <div class="ui-block-a">
+                                        <a href="tel:+496170961709" class="ui-btn ui-btn-icon-notext ui-icon-phone"></a>
+                                    </div>
+                                    <div class="ui-block-b">
+                                        <a href="mailto:webmaster@example.com" class="ui-btn ui-btn-icon-notext ui-icon-mail"></a> 
+                                    </div>
+                                    <div class="ui-block-c">
+                                        <address>
+											<a href="http://maps.google.com/maps?q=11555%20Bellerive%20Dr%20Houston%20TX%2077072-1322" target="_blank" class="ui-btn ui-btn-icon-notext ui-icon-location"></a>
+                                        </address>                                       
+                                    </div>
+                                </div><!-- /grid-b -->
+                            </div>
+                        </div>
+                        <div class="ui-block-b" style="height:100%">            
+                            <div align="right">
+                                <label id="lblOverdueBalance1">$ 177.27</label>
+                                <label id="lblOverdueBalance2">OVERDUE</label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+				<!-- CUSTOMERS DETAILS (LIST DETAILS, EDIT, ADD/ACTIVITIES) -->
+				<div data-role="inlinetabs"  data-theme="a" > <!-- inlinetabs -->
+					<ul>
+						<li data-tab="1">Details</li>
+						<li data-tab="2">Activities</li>
+					</ul>
+					<!-- CUSTOMERS DETAILS CONTENT  - TAB 1 -->
+					<div data-tab="1" id="TabCustomerDetails">
+						<div data-role="fieldcontain">
+							<div>
+								<label for="FlipSwithEdit">Edit enable:</label>
+							</div>
+						<input type="checkbox" data-role="flipswitch" name="flip-checkbox-3" id="FlipSwithEdit" data-on-text="On" data-off-text="Off" data-wrapper-class="custom-size-flipswitch" onChange="ChangeEditState();">
+                        <a href="#" class="ui-shadow ui-btn ui-corner-all ui-btn-inline ui-icon-plus ui-btn-icon-notext ui-btn-b ui-mini">Add Customer</a>
+						</div>
+						<form id="formulario" >
+							<!-- Relational Info --> 
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+								<legend><h4>Sales Representant Info</h4></legend>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="ListID">Sales Representant:</label>
+									</div>
+									<input type="text" class="myFormsControl" data-theme="b" name="SalesRep" id="SalesRep" value=""/>
+								</div>
+							</fieldset>    
+							<!-- Identification Info -->
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+								<legend><h4>Identification Info</h4></legend>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="ListID">ListID:</label>
+									</div>
+									<input type="text" data-theme="b" name="ListID" id="ListID" value=""/>
+									<input type="text" data-theme="b" name="IsActive" id="IsActive" value=""/>
+								</div>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="FullName">Full Name:</label>
+									</div>
+									<input type="text" data-theme="b" name="FullName" id="FullName" value=""/>
+								</div>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="Name">Name:</label>
+									</div>
+									<input type="text" data-theme="b" name="Name" id="Name" value=""  />
+								</div>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="CompanyName">Company Name:</label>
+									</div>
+									<input type="text" data-theme="b" name="CompanyName" id="CompanyName" value=""  />
+								</div>
+							</fieldset> 
+							<!-- Contact Info -->
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px"> 
+								<legend><h4>Contact Info</h4></legend>                       
+								<div data-role="fieldcontain">
+									<div>
+										<label for="Phone">Phone:</label>
+									</div>
+									<input type="tel" data-theme="b" name="Phone" id="Phone" value=""  />              
+								</div>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="Cell">Cell:</label>
+									</div>
+									<input type="tel" data-theme="b" name="Cell" id="Cell" value=""  />              
+								</div>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="Fax">Fax:</label>
+									</div>
+									<input type="text" data-theme="b" name="Fax" id="Fax" value=""  />              
+								</div>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="Email">Email:</label>
+									</div>
+									<input type="email" data-theme="b" name="Email" id="Email" value=""  />              
+								</div>
+							</fieldset>
+							<!-- Billing Address -->
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+								<legend><h4>Billing Address</h4></legend>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="billAddress1">Bill Address Line 1:</label>
+									</div>
+									<input type="text" data-theme="b" name="billAddress1" id="billAddress1" value=""  />
+								</div>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="billAddress2">Bill Address Line 2:</label>
+									</div>
+									<input type="text" data-theme="b" name="billAddress2" id="billAddress2" value=""  />
+								</div>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="billAddress3">Bill Address Line 3:</label>
+									</div>
+									<input type="text" data-theme="b" name="billAddress3" id="billAddress3" value=""  />
+								</div>
+								
+								<div data-role="fieldcontain">
+									<div>
+										<label for="billCity">City:</label>
+									</div>
+									<input type="text" data-theme="b" name="billCity" id="billCity" value=""  />
+								</div>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="billState">State:</label>
+									</div>
+									<input type="text" data-theme="b" name="billState" id="billState" value=""  />
+								</div>
+								<div class="ui-grid-a" style="height:95px">
+									<div class="ui-block-a" style="height:100%"> 
+										<div data-role="fieldcontain">
+											<div>
+												<label for="billZipCode">Zip Code:</label>
+											</div>
+											<input type="number" data-theme="b" name="billZipCode" id="billZipCode" value=""  />
+										</div>                    
+									</div>
+									<div class="ui-block-b" style="height:100%">            
+                                        <div data-role="fieldcontain">
+                                            <div>
+                                                <label for="billCountry">Country:</label>
+                                            </div>
+                                            <input type="text" data-theme="b" name="billCountry" id="billCountry" value=""  />
+                                        </div>                      
+									</div>
+								</div>
+                                <div data-role="fieldcontain">
+                                    <div>
+                                        <label for="copyBillToShip">Copy billing to shipping</label>
+                                    </div>
+                                    <input type="checkbox" data-theme="b" name="copyBillToShip" id="copyBillToShip" value=""  onChange="BillToShipCopy();"/>
+                                </div>
+							</fieldset>
+							<!-- Shiping Address -->
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+								<legend><h4>Shiping Address</h4></legend>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="shipAddress1">Ship Address Line 1:</label>
+									</div>
+									<input type="text" data-theme="b" name="shipAddress1" id="shipAddress1" value=""  />
+								</div>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="shipAddress2">Ship Address Line 2:</label>
+									</div>
+									<input type="text" data-theme="b" name="shipAddress2" id="shipAddress2" value=""  />
+								</div>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="shipAddress3">Ship Address Line 3:</label>
+									</div>
+									<input type="text" data-theme="b" name="shipAddress3" id="shipAddress3" value=""  />
+								</div>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="shipCity">Ship City:</label>
+									</div>
+									<input type="text" data-theme="b" name="shipCity" id="shipCity" value=""  />
+								</div>
+								<div data-role="fieldcontain">
+									<div>
+										<label for="shipState">Ship State:</label>
+									</div>
+									<input type="text" data-theme="b" name="shipState" id="shipState" value=""  />
+								</div>
+								<div class="ui-grid-a" style="height:95px">
+									<div class="ui-block-a" style="height:100%"> 
+										<div data-role="fieldcontain">
+											<div>
+												<label for="shipZipCode">Ship Zip Code:</label>
+											</div>
+											<input type="number" data-theme="b" name="shipZipCode" id="shipZipCode" value=""  />
+										</div>
+									</div>
+									<div class="ui-block-b" style="height:100%">            
+										<div data-role="fieldcontain">
+											<div>
+												<label for="shipCountry">Ship Country:</label>
+											</div>
+											<input type="text" data-theme="b" name="shipCountry" id="shipCountry" value=""  />
+										</div>
+									</div>  
+								</div>
+							</fieldset> 
+							<!-- Balance Info -->
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+								<legend><h4>Balance Info</h4></legend>
+								<div class="ui-grid-a" style="height:95px">
+									<div class="ui-block-a" style="height:100%"> 
+										<div data-role="fieldcontain">
+											<div>
+												<label for="openBalance">Open Balance:</label>
+											</div>
+											<input type="text" data-theme="b" name="openBalance" id="openBalance" value=""  onClick="overdueBalanceRed();"/>
+										</div>                    
+									</div>
+									<div class="ui-block-b" style="height:100%">            
+										<div data-role="fieldcontain">
+											<div>
+												<label for="overdueBalance">Overdue Balance:</label>
+											</div>
+											<input type="text" data-theme="b" name="overdueBalance" id="overdueBalance" value=""  />
+										</div>                      
+									</div>  
+								</div>
+							</fieldset>           
+							<!-- Terms Info --> 
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+								<div data-role="fieldcontain" id="CustomerTerms">
+								  <div>
+									<label for="Terms" class="select">Terms:</label>
+								  </div>
+								  <select class="myFormsControl" name="Terms" id="Terms" data-theme="a">
+									<option value="option1">Terms 1</option>
+									<option value="option2">Terms 2</option>
+									<option value="option3">Terms 3</option>
+									<option value="option4">Terms 4</option>
+									<option value="option5">Terms 5</option>
+									<option value="option6">Terms 6</option>      
+								  </select>
+								</div>
+							</fieldset> 
+							<!-- Other Info -->                       
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+								<div data-role="fieldcontain">
+									<div>
+										<label for="OtherDetails">Other Details:</label>
+									</div>
+									<input type="text" data-theme="b" name="OtherDetails" id="OtherDetails" value=""  />
+								</div> 
+							</fieldset> 
+							
+							<!-- Route days info -->
+							<fieldset class="myFormsControl" data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+								<legend><h4>Route Info</h4></legend>
+
+                                    <div class="myFormsControl" data-role="fieldcontain" >
+                                        <div>
+                                            <label class="myFormsControl" for="routeDay1">Sunday</label>
+                                        </div>
+                                        <input type="checkbox" class="myFormsControl" data-theme="b" name="routeDay1" id="routeDay1" value=""  />
+                                    </div>
+    
+                                    <div data-role="fieldcontain">
+                                        <div>
+                                            <label for="routeDay2">Monday</label>
+                                        </div>
+                                        <input type="checkbox"  class="myFormsControl"   data-theme="b" name="routeDay2" id="routeDay2" value=""  />
+                                    </div>                
+                                    <div data-role="fieldcontain">
+                                        <div>
+                                            <label for="routeDay3">Tuesday</label>
+                                        </div>
+                                        <input type="checkbox"  class="myFormsControl" data-theme="b" name="routeDay3" id="routeDay3" value=""  />
+                                    </div>                
+                                    <div data-role="fieldcontain">
+                                        <div>
+                                            <label for="routeDay4">Wednesday</label>
+                                        </div>
+                                        <input type="checkbox"  class="myFormsControl" data-theme="b" name="routeDay4" id="routeDay4" value=""  />
+                                    </div>                
+                                    <div data-role="fieldcontain">
+                                        <div>
+                                            <label for="routeDay5">Thursday</label>
+                                        </div>
+                                        <input type="checkbox"  class="myFormsControl" data-theme="b" name="routeDay5" id="routeDay5" value=""  />
+                                    </div>                
+                                    <div data-role="fieldcontain">
+                                        <div>
+                                            <label for="routeDay6">Friday</label>
+                                        </div>
+                                        <input type="checkbox"  class="myFormsControl" data-theme="b" name="routeDay6" id="routeDay6" value=""  />
+                                    </div>                
+                                    <div data-role="fieldcontain">
+                                        <div>
+                                            <label for="routeDay7">Saturday</label>
+                                        </div>
+                                        <input type="checkbox"  class="myFormsControl" data-theme="b" name="routeDay7" id="routeDay7" value=""  />
+                                    </div> 
+							</fieldset>
+							<!-- Price Level Info -->                       
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+								<div data-role="fieldcontain" id="CustomerPriceLevel">
+								  <div>
+									<label for="pricelevel_ListID" class="select">Price Level:</label>
+								  </div>
+								  <select name="pricelevel_ListID" id="pricelevel_ListID" data-theme="a">
+									<option value="option1">Price Level 1</option>
+									<option value="option2">Price Level 2</option>
+									<option value="option3">Price Level 3</option>
+									<option value="option4">Price Level 4</option>
+									<option value="option5">Price Level 5</option>
+									<option value="option6">Price Level 6</option>      
+								  </select>
+								</div>
+							</fieldset>                                                         
+							<!-- Done and Cancel Buttons -->
+                            <fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px;">
+                                <div class="ui-grid-a" style="height:45px">
+                                    <div class="ui-block-a ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="cancel" data-add-back-btn="true" data-theme="b">Cancel</button></div>
+                                    <div class="ui-block-b ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="submit" data-theme="c">Done</button></div>	
+                                </div>
+                            </fieldset>
+						</form>		
+												
+					</div>
+					<!-- ACTIVITIES CONTENT - TAB 2 -->
+					<div data-tab="2" id="TabActivities">
+						<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<div data-role="fieldcontain">
+							  <div>
+								<label for="selActivities" class="select">Select Activities:</label>
+							  </div>
+							  <select name="selActivities" id="selActivities" data-theme="a">
+								<option value="option1">All Activities</option>
+								<option value="option2">Invoices last month</option>
+								<option value="option3">Credit memos last month</option>
+							  </select>
+							</div>
+							<div data-role="collapsible">
+							<h4>Add a Note</h4>
+							<p>Add a note to the invoice</p>
+								<div data-role="fieldcontain">					
+									<div>
+										<label for="creditMemo">Credit memo:</label>
+									</div>
+									<input type="text" data-theme="b" name="creditMemo" id="creditMemo" value=""  />
+								</div>
+							</div>
+							<br/><hr>
+                            <!-- BEGIN Invoices List and overdue -->
+							<div class="ui-grid-a" style="height:30px">
+								<div class="ui-block-a" style="height:100%"> 
+                                    <div align="left">
+                                        <label id="Invoice">Invoice # 240</label>
+                                    </div>
+								</div>
+								<div class="ui-block-b" style="height:100%">            
+                                    <div align="right">
+                                        <label id="overdueBal">$ 177.27</label>
+                                    </div>
+								</div>  
+							</div>
+							<div class="ui-grid-a" style="height:30px">
+								<div class="ui-block-a" style="height:100%"> 
+                                    <div align="left">
+                                        <label id="OberdueBy">Overdue by 240 days</label>
+                                    </div>
+								</div>
+								<div class="ui-block-b" style="height:100%">            
+                                    <div align="right">
+                                        <label id="AddedMonthsAgo">Added 8 months ago</label>
+                                    </div>
+								</div>  
+							</div>
+                            <hr><br/>
+                            <!-- END Invoices List and overdue -->							
+					</fieldset> 
+					</div>
+				</div>				
+
+			</div>
+
+			<!-- divs de header, menu y footer-->
+			<div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
+			<div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
+			<div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
+			<!-- fin divs -->    
+		</div>
+		<!-- END CUSTOMERS DETAILS--> 
+	</body>
+</html>

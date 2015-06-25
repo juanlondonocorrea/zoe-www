@@ -1,0 +1,274 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Customers</title>
+
+		<link rel="stylesheet" href="css/themes/zoe.min.css" />
+		<link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+		<link rel="stylesheet" href="js/jquery-mobile/jquery.mobile.structure-1.4.5.min.css" />
+		<link rel="stylesheet" href="js/jqm-inlinetabs/jqm-inlinetabs.min.css" />
+
+		<!--  <link rel="stylesheet" href="js/jquery-mobile/jquery.mobile-1.4.5.min.css" />  -->
+		<script src="js/jquery-mobile/jquery-2.1.4.js"></script>
+		<script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+		<script type="text/javascript" src="cordova.js"></script>
+		<script src="js/jqm-inlinetabs/jqm-inlinetabs.min.js"></script>        
+		<script src="js/zoe/zoe.js"></script>
+		<script src="js/zoe/customerDAO.js"></script>
+        <script src="js/zoe/termDAO.js"></script>
+        <script src="js/zoe/pricelevelDAO.js"></script>
+        <script src="js/zoe/invoiceDAO.js"></script>
+		<script src="js/zoe/salesRepDAO.js"></script>
+		<script src="js/zoe/invoiceDAO.js"></script>
+		<script src="js/zoe/inventoryDAO.js"></script>
+		<script src="js/zoe/taxDAO.js"></script>
+		<script src="js/zoe/customerMsgDAO.js"></script>
+
+		<script>
+			$(document).bind("pagebeforecreate", function(event) {
+				initAnyPage(event.target);
+				initThisPage(event);
+			});
+			
+			function initThisPage(event){ 
+				invoiceDAO.getById('789D9-1430760041',true,receiveInvoiceDetails,errReceiveInvoiceDetails);
+			}
+
+			// BEGIN Functions on error case
+			function errReceiveInvoiceDetails(err){
+				alert("DB Error Invoice Details: "+JSON.stringify(err));
+			}
+			// END functions on error case
+
+			function receiveInvoiceDetails(InvoiceVO){
+				if (InvoiceVO) {
+				// id_term, customerMsg_ListID 
+				// term_name	customer_msg_FullName
+				
+				logZoe("InvoiceVO: ============> "+InvoiceVO);
+				
+				$('#refNumber').val(InvoiceVO.refNumber);
+			//	$('#id_invoice').val(InvoiceVO.id_invoice);
+			//	$('#ListID').val(InvoiceVO.ListID);
+				$('#po_number').val(InvoiceVO.po_number);
+				$('#shipDate').val(InvoiceVO.shipDate);
+				$('#Date').val(InvoiceVO.shipDate);
+			//	$('#dueDate').val(InvoiceVO.dueDate);
+				
+				$('#billAddress_addr1').val(InvoiceVO.billAddress_addr1);
+				$('#billAddress_addr2').val(InvoiceVO.billAddress_addr2);
+				$('#billAddress_addr3').val(InvoiceVO.billAddress_addr3);
+			//	$('#billAddress_city').val(InvoiceVO.billAddress_city);
+			//	$('#billAddress_state').val(InvoiceVO.billAddress_state);
+			//	$('#billAddress_postalcode').val(InvoiceVO.billAddress_postalcode);
+				
+				$('#shipAddress_addr1').val(InvoiceVO.shipAddress_addr1);
+				$('#shipAddress_addr2').val(InvoiceVO.shipAddress_addr2);
+				$('#shipAddress_addr3').val(InvoiceVO.shipAddress_addr3);
+			//	$('#shipAddress_city').val(InvoiceVO.shipAddress_city);
+			//	$('#shipAddress_state').val(InvoiceVO.shipAddress_state);
+			//	$('#shipAddress_postalcode').val(InvoiceVO.shipAddress_postalcode);
+				
+			//	$('#isPaid').val(InvoiceVO.isPaid);
+			//	$('#isPending').val(InvoiceVO.isPending);
+			//	$('#salesTaxPercentage').val(InvoiceVO.salesTaxPercentage);
+			//	$('#salesTaxTotal').val(InvoiceVO.salesTaxTotal);
+				$('#subtotal').val(InvoiceVO.subtotal);
+				$('#appliedAmount').val(InvoiceVO.appliedAmount);
+				$('#balanceRemaining').val(InvoiceVO.balanceRemaining);				
+				$('#term_name').val(InvoiceVO.term_name);
+				$('#id_salesrep').val(InvoiceVO.id_salesrep);
+			//	$('#customer_msg_FullName').val(InvoiceVO.customer_msg_FullName);
+			//	$('total').val();
+				}
+			} 
+			
+		</script>
+		<style type="text/css">
+			.BigFont {color:black; font-weight:bolder; font-size:large;}
+			.MediumFont {color:black; font-weight:bolder; font-size:medium;}
+			.SmallFont {color:black; font-weight:bolder; font-size:small;}
+			.SmallerFont {color:black; font-weight:bolder; font-size:smaller;}
+			.TinyFont {color:black; font-weight:bolder; font-size:x-small;}
+			
+			th, td { padding: 0px; }
+			
+			table { border-collapse: separate; }
+			2table { 
+			border-collapse: collapse;
+			border-spacing: 0px;
+			padding: 0px;
+			width:600px;  }
+
+			th, td { vertical-align: top; }
+			
+			table { margin: 0 auto; border:none; }
+			.tblCabecera {
+				width:500px;
+				border:1px;
+			}
+		</style> 
+	</head> 
+
+	<body>
+	<div data-role="page" id="InvoicePreview" data-theme="a">
+		<div data-role="content" >
+                <table width="100%" border="1" cellspacing="0" cellpadding="0">
+                  <tbody>
+                    <tr>
+                      <td width="22%"><h1>Invoice</h1></td>
+                      <td width="22%">&nbsp;</td>
+                      <td width="32%">&nbsp;</td>
+                      <td width="24%">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td rowspan="2"><table width="98%" border="0" cellspacing="0" cellpadding="0">
+                        <tbody>
+                          <tr>
+                            <td class="TinyFont">DATE <br>
+                              <input class="SmallFont" type="text" name="Date" id="Date" value=""  /></td>
+                          </tr>
+                          <tr>
+                            <td class="TinyFont">INVOICE # <br>
+                              <input class="SmallFont" type="text" name="refNumber" id="refNumber" value=""  /></td>
+                          </tr>
+                        </tbody>
+                      </table></td>
+                      <td>&nbsp;</td>
+                      <td><span class="TinyFont">
+                        BILL TO<br>
+                        <textarea name="billAddress_addr" class="SmallFont" id="billAddress_addr1"></textarea>
+                      </span></td>
+                      <td><span class="TinyFont">
+                        SHIP TO <br>
+                        <textarea name="shipAddress_addr" class="SmallFont" id="shipAddress_addr2"></textarea>
+                      </span></td>
+                    </tr>
+                    <tr>
+                      <td>&nbsp;</td>
+                      <td><span class="TinyFont">
+                        <textarea name="billAddress_addr2" class="SmallFont" id="billAddress_addr2"></textarea>
+                      </span></td>
+                      <td><span class="TinyFont">
+                        <textarea name="shipAddress_addr2" class="SmallFont" id="shipAddress_addr3"></textarea>
+                      </span></td>
+                    </tr>
+                    <tr>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td><span class="TinyFont">
+                        <textarea name="billAddress_addr3" class="SmallFont" id="billAddress_addr3"></textarea>
+                      </span></td>
+                      <td><span class="TinyFont">
+                        <textarea name="shipAddress_addr3" class="SmallFont" id="shipAddress_addr1"></textarea>
+                      </span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="TinyFont">P.O NUMBER<br>
+                        <input class="SmallFont" type="text" name="po_number" id="po_number" value=""  />
+                      </span></td>
+                      <td><span class="TinyFont">TERMS<br>
+                        <input class="SmallFont" type="text" name="term_name" id="term_name" value=""  />
+                      </span></td>
+                      <td><span class="TinyFont">REP<br>
+                        <input class="SmallFont" type="text" name="id_salesrep" id="id_salesrep" value=""  />
+                      </span></td>
+                      <td><span class="TinyFont">SHIP<br>
+                        <input class="SmallFont" type="text" name="shipDate" id="shipDate" value=""  />
+                      </span></td>
+                    </tr>
+                    <tr>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div id="identity">
+  <div id="logo">
+  <div id="logohelp">
+          <input id="imageloc" type="text" size="50" value="" /><br />
+                            (max width: 540px, max height: 100px)
+                          </div>
+                          <img id="image" src="images/logo.png" alt="logo" />
+                      </div>
+                  </div>
+                    
+					<div style="clear:both"></div>
+                    <div id="customer">
+                        <textarea id="customer-title">Widget Corp.
+            c/o Steve Widget</textarea>
+                        <table>
+                            <tr>
+                                <td class="meta-head">Amount Due</td>
+                                <td><div class="due">$875.00</div></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <table id="items">
+                    
+                      <tr>
+                          <th>Item</th>
+                          <th>Description</th>
+                          <th>Unit Cost</th>
+                          <th>Quantity</th>
+                          <th>Price</th>
+                      </tr>
+                      
+                      <tr class="item-row">
+                          <td class="item-name"><div class="delete-wpr"><textarea>Web Updates</textarea></div></td>
+                          <td class="description"><textarea>Monthly web updates for http://widgetcorp.com (Nov. 1 - Nov. 30, 2009)</textarea></td>
+                          <td><textarea class="cost">$650.00</textarea></td>
+                          <td><textarea class="qty">1</textarea></td>
+                          <td><span class="price">$650.00</span></td>
+                      </tr>
+                      
+                      <tr class="item-row">
+                          <td class="item-name"><div class="delete-wpr"><textarea>SSL Renewals</textarea></div></td>
+            
+                          <td class="description"><textarea>Yearly renewals of SSL certificates on main domain and several subdomains</textarea></td>
+                          <td><textarea class="cost">$75.00</textarea></td>
+                          <td><textarea class="qty">3</textarea></td>
+                          <td><span class="price">$225.00</span></td>
+                      </tr>
+                      
+                      <tr id="hiderow">
+                        <td colspan="5"></td>
+                      </tr>
+                      
+                      <tr>
+                          <td colspan="2" class="blank"> </td>
+                          <td colspan="2" class="total-line">Subtotal</td>
+                          <td class="total-value">$<label id="subtotal"></label></td>
+                      </tr>
+                      <tr>
+            
+                          <td colspan="2" class="blank"> </td>
+                          <td colspan="2" class="total-line">Total</td>
+                          <td class="total-value"><div id="total">$875.00</div></td>
+                      </tr>
+                      <tr>
+                          <td colspan="2" class="blank"> </td>
+                          <td colspan="2" class="total-line">Payment applied</td>
+            
+                          <td class="total-value"><div id="appliedAmount">$</div></td>
+                      </tr>
+                      <tr>
+                          <td colspan="2" class="blank"> </td>
+                          <td colspan="2" class="total-line balance"> Due Balance</td>
+                          <td class="total-value balance"><div id="balanceRemaining">$</div></td>
+                      </tr>
+                    
+                    </table>
+
+                <div id="terms">
+                  <h5>Terms</h5>
+                  <textarea>NET 30 Days. Finance Charge of 1.5% will be made on unpaid balances after 30 days.</textarea>
+                </div>                        		
+	  </div>
+		</div>				
+	</body>
+</html>			

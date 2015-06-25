@@ -1,0 +1,74 @@
+<!DOCTYPE html> 
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>User Validation</title>
+  <link rel="stylesheet" href="css/themes/zoe.min.css" />
+  <link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+  <link rel="stylesheet" href="js/jquery-mobile/jquery.mobile.structure-1.4.5.min.css" />
+
+  <!--link rel="stylesheet" href="js/jquery-mobile/jquery.mobile-1.4.5.min.css" /-->  
+  <script src="js/jquery-mobile/jquery-2.1.4.js"></script>
+  <script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+  <script src="js/zoe/zoe.js"></script>
+  <script src="js/zoe/salesRepDAO.js"></script>
+  <script>
+  		
+		$(document).bind("pagebeforecreate", function(event) {
+			logZoe("en localpageinit Login.html");
+			initAnyPage(event.target);
+			$('#login').val(window.localStorage.getItem("salesRepName"));	
+			$('#btnLogin').click(submitLogin);	
+		});
+		
+	function submitLogin(){
+		salesRepDAO.getByName($('#login').val(),receiveSalesRep,errReceiveSalesRep);
+	}
+	
+	function receiveSalesRep(salesRepVO){
+		if (salesRepVO){
+			logZoe("receiveSalesRep Password=" + salesRepVO.Password);
+			logZoe("receiveSalesRep password val=" + $('#password').val());
+			if (salesRepVO.Password == $('#password').val()){
+				window.localStorage.setItem("currentUser",$('#login').val());
+				window.localStorage.setItem("lastAccess",Date.now());
+				window.location ="index.html";
+			}else{
+				alert("invalid user or password");
+				window.localStorage.setItem("currentUser",null);
+				window.localStorage.setItem("lastAccess",null);
+			}
+		}
+		
+	}
+	function errReceiveSalesRep(err){
+		logZoe("login error:"+JSON.stringify(err));
+		alert("Cannot login due a database error:"+JSON.stringify(err));
+	}
+  </script>
+</head>
+ 
+<body> 
+<div data-role="page" id="Login">
+ 
+	<div data-role="header">
+		<h1>User Authentication</h1>
+	</div>
+    
+	<div data-role="content">	
+		<form id="formulario" >
+      			<label> Username </label>
+      			<input type="text" id="login" name="login">
+      			<label> Password </label>
+     			<input type="password" id="password" name="password" >
+      			<input type="submit" value="Login" id="btnLogin">
+                <a href="config.html" data-role="button" data-ajax="false" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear" >Config</a>
+    		</form>		
+	</div>
+</div>
+ 
+ 
+
+ 
+</body>
+</html>
