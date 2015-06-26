@@ -30,9 +30,23 @@
 				initAnyPage(event.target);
 				initThisPage(event);
 			});
-			
-			function initThisPage(event){ // 7A600-1430865979
-				invoiceDAO.getById('7A615-1430865999',true,receiveInvoiceDetails,errReceiveInvoiceDetails);
+
+			function initThisPage(event){ // 7A600-1430865979	'7A615-1430865999'
+				console.log("initThisPage invoice event.currentTarget.URL=" + event.currentTarget.URL);
+				if (event.currentTarget.URL && event.currentTarget.URL.indexOf("?")>-1){
+					var parameters = event.currentTarget.URL.split("?")[1].split("&");
+					console.log("parameters=" + parameters);
+					for (var i in parameters){
+						var parameterDupla = parameters[i].split("=");
+						if (parameterDupla[0]=="id_invoice"){
+							id_invoice = parameterDupla[1];
+						}
+					}
+					
+				}				
+				if (id_invoice){
+					invoiceDAO.getById(id_invoice,true,receiveInvoiceDetails,errReceiveInvoiceDetails);
+				}
 			}
 
 		//document.addEventListener('deviceready', onDeviceReady);
