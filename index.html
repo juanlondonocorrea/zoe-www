@@ -23,21 +23,6 @@ document.addEventListener('deviceready', onDeviceReady);
 
 document.addEventListener("deviceready", onDeviceReady, false);
 
-// Cordova Device Ready.
-function onDeviceReady() {
-
-cordova.plugins.printer.isAvailable(
-    //Check whether the printer is available or not.
-    function (isAvailable) {
-         //Enter the page location.
-         var page = location.href;
-         cordova.plugins.printer.print(page, 'Document.html', function () {
-         alert('printing finished or canceled')
-});
-    }
-);
-
-}	
 
 </script>
 </head> 

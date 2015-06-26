@@ -44,8 +44,8 @@ function consumeWS(mensaje, format, receiveFunction, cache, xpathExp){
 		jsonp: "callback",
         data: dataToSend,
         dataType: "text",
-        success: recibeSyncResponse
-//        error: errSync,
+        success: recibeSyncResponse,
+        error: errSync,
     });
 
 
