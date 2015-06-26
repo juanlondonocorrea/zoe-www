@@ -31,8 +31,8 @@
 				initThisPage(event);
 			});
 			
-			function initThisPage(event){ 
-				invoiceDAO.getById('789D9-1430760041',true,receiveInvoiceDetails,errReceiveInvoiceDetails);
+			function initThisPage(event){ // 7A600-1430865979
+				invoiceDAO.getById('7A615-1430865999',true,receiveInvoiceDetails,errReceiveInvoiceDetails);
 			}
 
 			// BEGIN Functions on error case
@@ -43,44 +43,86 @@
 
 			function receiveInvoiceDetails(InvoiceVO){
 				if (InvoiceVO) {
-				// id_term, customerMsg_ListID 
-				// term_name	customer_msg_FullName
-				
 				logZoe("InvoiceVO: ============> "+InvoiceVO);
+
+				$('#refNumber').html(InvoiceVO.refNumber);
+				$('#Date').html(InvoiceVO.txnDate);
+				$('#shipDate').html(InvoiceVO.shipDate);
+				$('#dueDate').html(InvoiceVO.dueDate);				
+			//	$('#id_invoice').html(InvoiceVO.id_invoice);
+			//	$('#ListID').html(InvoiceVO.ListID);
+			
+				$('#vendor_name').html(InvoiceVO.vendor_name);
+				$('#vendor_addr1').html(InvoiceVO.vendor_addr1);
+				$('#vendor_addr2').html(InvoiceVO.vendor_addr2);
+				$('#vendor_addr3').html(InvoiceVO.vendor_addr3);
+				$('#vendor_city').html(InvoiceVO.vendor_city);
+				$('#vendor_state').html(InvoiceVO.vendor_state);
+				$('#vendor_country').html(InvoiceVO.vendor_country);
+			
+				$('#po_number').html(InvoiceVO.po_number);
+				$('#term_name').html(InvoiceVO.term_name);
+				$('#salesrep_Name').html(InvoiceVO.salesrep_Name);
+
+				$('#customer_companyName').html(InvoiceVO.customer_companyName);
 				
-				$('#refNumber').val(InvoiceVO.refNumber);
-			//	$('#id_invoice').val(InvoiceVO.id_invoice);
-			//	$('#ListID').val(InvoiceVO.ListID);
-				$('#po_number').val(InvoiceVO.po_number);
-				$('#shipDate').val(InvoiceVO.shipDate);
-				$('#Date').val(InvoiceVO.shipDate);
-			//	$('#dueDate').val(InvoiceVO.dueDate);
+				$('#billAddress_addr1').html(InvoiceVO.billAddress_addr1);
+				$('#billAddress_addr2').html(InvoiceVO.billAddress_addr2);
+				$('#billAddress_addr3').html(InvoiceVO.billAddress_addr3);
+				$('#billAddress_city').html(InvoiceVO.billAddress_city);
+				$('#billAddress_state').html(InvoiceVO.billAddress_state);
+				$('#billAddress_postalcode').html(InvoiceVO.billAddress_postalcode);
 				
-				$('#billAddress_addr1').val(InvoiceVO.billAddress_addr1);
-				$('#billAddress_addr2').val(InvoiceVO.billAddress_addr2);
-				$('#billAddress_addr3').val(InvoiceVO.billAddress_addr3);
-			//	$('#billAddress_city').val(InvoiceVO.billAddress_city);
-			//	$('#billAddress_state').val(InvoiceVO.billAddress_state);
-			//	$('#billAddress_postalcode').val(InvoiceVO.billAddress_postalcode);
+				$('#shipAddress_addr1').html(InvoiceVO.shipAddress_addr1);
+				$('#shipAddress_addr2').html(InvoiceVO.shipAddress_addr2);
+				$('#shipAddress_addr3').html(InvoiceVO.shipAddress_addr3);
+				$('#shipAddress_city').html(InvoiceVO.shipAddress_city);
+				$('#shipAddress_state').html(InvoiceVO.shipAddress_state);
+				$('#shipAddress_postalcode').html(InvoiceVO.shipAddress_postalcode);
 				
-				$('#shipAddress_addr1').val(InvoiceVO.shipAddress_addr1);
-				$('#shipAddress_addr2').val(InvoiceVO.shipAddress_addr2);
-				$('#shipAddress_addr3').val(InvoiceVO.shipAddress_addr3);
-			//	$('#shipAddress_city').val(InvoiceVO.shipAddress_city);
-			//	$('#shipAddress_state').val(InvoiceVO.shipAddress_state);
-			//	$('#shipAddress_postalcode').val(InvoiceVO.shipAddress_postalcode);
-				
-			//	$('#isPaid').val(InvoiceVO.isPaid);
-			//	$('#isPending').val(InvoiceVO.isPending);
-			//	$('#salesTaxPercentage').val(InvoiceVO.salesTaxPercentage);
-			//	$('#salesTaxTotal').val(InvoiceVO.salesTaxTotal);
-				$('#subtotal').val(InvoiceVO.subtotal);
-				$('#appliedAmount').val(InvoiceVO.appliedAmount);
-				$('#balanceRemaining').val(InvoiceVO.balanceRemaining);				
-				$('#term_name').val(InvoiceVO.term_name);
-				$('#id_salesrep').val(InvoiceVO.id_salesrep);
-			//	$('#customer_msg_FullName').val(InvoiceVO.customer_msg_FullName);
-			//	$('total').val();
+				$('#isPending').html(InvoiceVO.isPending);
+				$('#isPaid').html(InvoiceVO.isPaid);
+
+				$('#salesTaxPercentage').html(InvoiceVO.salesTaxPercentage);
+				$('#salesTaxTotal').html(InvoiceVO.salesTaxTotal);
+				$('#subtotal').html(InvoiceVO.subtotal);
+				$('#appliedAmount').html(InvoiceVO.appliedAmount);
+				$('#balanceRemaining').html(InvoiceVO.balanceRemaining);				
+
+				$('#customer_msg_FullName').html(InvoiceVO.customer_msg_FullName);
+
+				var invoiceItems = '<table class="3table" width="100%" border="1" cellspacing="0" cellpadding="10">'
+				  +'<tbody>'
+					+'<tr>'
+					  +'<td><div class="SmallFont">Code</div></td>'
+					  +'<td><div class="SmallFont">Description</div></td>'
+					  +'<td><div class="SmallFont">Unit Cost</div></td>'
+					  +'<td><div class="SmallFont">Quantity</div></td>'
+					  +'<td><div class="SmallFont">Amount</div></td>'
+					  +'<td><div class="SmallFont">Tax</div></td>'
+					+'</tr>';
+
+				// id_invoice
+				// Inventory_ListID
+				// SalesTax_ListID
+				$("#tableBodyItems").html("");
+
+				for (var i=0; i < InvoiceVO.items.length; i++) {
+
+					invoiceItems +=
+					'<tr>'
+					  +'<td><div align="right" class="SmallFont">'+InvoiceVO.items[i].LineID+'</div></td>'
+					  +'<td><div class="SmallFont">'+InvoiceVO.items[i].Desc+'</div></td>'
+					  +'<td><div align="right" class="SmallFont">$ '+InvoiceVO.items[i].Rate+'</div></td>'
+					  +'<td><div align="right" class="SmallFont">'+InvoiceVO.items[i].Quantity+'</div></td>'
+					  +'<td><div align="right" class="SmallFont">$ '+InvoiceVO.items[i].Amount+'</div></td>'
+					  +'<td><div class="SmallFont">'+InvoiceVO.items[i].salesTax_Name+'</div></td>'
+					+'</tr>';
+					logZoe("invoiceItems: ===========> "+invoiceItems);
+					}
+					invoiceItems += '</tbody></table>';
+					logZoe("invoiceItems: ======> "+JSON.stringify(invoiceItems));
+					$("#tableBodyItems").html(invoiceItems); 
 				}
 			} 
 			
@@ -94,7 +136,9 @@
 			
 			th, td { padding: 0px; }
 			
-			table { border-collapse: separate; }
+			.3table { border-collapse: separate; 
+			padding: 5px;
+			}
 			2table { 
 			border-collapse: collapse;
 			border-spacing: 0px;
@@ -112,163 +156,132 @@
 	</head> 
 
 	<body>
-	<div data-role="page" id="InvoicePreview" data-theme="a">
-		<div data-role="content" >
+        <div data-role="page" id="InvoicePreview" data-theme="a">
+            <div data-role="content" >
                 <table width="100%" border="1" cellspacing="0" cellpadding="0">
                   <tbody>
                     <tr>
-                      <td width="22%"><h1>Invoice</h1></td>
-                      <td width="22%">&nbsp;</td>
-                      <td width="32%">&nbsp;</td>
-                      <td width="24%">&nbsp;</td>
+                      <td colspan="2">
+                        <h1 style="height:20px; padding-top:0; margin:0;">Invoice</h1>
+                        <h2><div id="vendor_name" style="padding:0; margin:0; height:15px; "></div></h2>				  
+                        <div id="vendor_addr1" class="TinyFont"></div>
+                        <div id="vendor_addr2" class="TinyFont"></div>
+                        <div id="vendor_addr3" class="TinyFont"></div>
+                        <div id="vendor_city" class="TinyFont"></div>
+                        <div id="vendor_state" class="TinyFont"></div>
+                        <div id="vendor_country" class="TinyFont"></div>              
+                      </td>
+                      <td colspan="3">
+                        <span class="TinyFont" style="alignment-baseline:baseline;">COMPANY NAME</span><br>
+                        <div class="SmallFont" id="customer_companyName"></div>              
+                      </td>
                     </tr>
                     <tr>
-                      <td rowspan="2"><table width="98%" border="0" cellspacing="0" cellpadding="0">
-                        <tbody>
-                          <tr>
-                            <td class="TinyFont">DATE <br>
-                              <input class="SmallFont" type="text" name="Date" id="Date" value=""  /></td>
-                          </tr>
-                          <tr>
-                            <td class="TinyFont">INVOICE # <br>
-                              <input class="SmallFont" type="text" name="refNumber" id="refNumber" value=""  /></td>
-                          </tr>
-                        </tbody>
-                      </table></td>
-                      <td>&nbsp;</td>
-                      <td><span class="TinyFont">
-                        BILL TO<br>
-                        <textarea name="billAddress_addr" class="SmallFont" id="billAddress_addr1"></textarea>
-                      </span></td>
-                      <td><span class="TinyFont">
-                        SHIP TO <br>
-                        <textarea name="shipAddress_addr" class="SmallFont" id="shipAddress_addr2"></textarea>
-                      </span></td>
+                      <td width="21%">
+                        <span class="TinyFont">INVOICE # </span><br>
+                        <div class="SmallFont" id="refNumber"></div>              
+                      </td>
+                      <td width="16%">
+                        <span class="TinyFont">DATE</span><br>
+                        <div class="SmallFont" id="Date"></div>
+                      </td>
+                      <td width="31%" rowspan="2">
+                        <span class="TinyFont">BILLING ADDRESS</span>
+                        <div class="SmallFont" id="billAddress_addr1"></div>
+                        <div class="SmallFont" id="billAddress_addr2"></div>
+                        <div class="SmallFont" id="billAddress_addr3"></div>              
+                      </td>
+                      <td colspan="2" rowspan="2">
+                        <span class="TinyFont">SHIPING ADDRESS</span>
+                        <div class="SmallFont" id="shipAddress_addr1"></div>
+                        <div class="SmallFont" id="shipAddress_addr2"></div>
+                        <div class="SmallFont" id="shipAddress_addr3"></div>              
+                      </td>
                     </tr>
                     <tr>
-                      <td>&nbsp;</td>
-                      <td><span class="TinyFont">
-                        <textarea name="billAddress_addr2" class="SmallFont" id="billAddress_addr2"></textarea>
-                      </span></td>
-                      <td><span class="TinyFont">
-                        <textarea name="shipAddress_addr2" class="SmallFont" id="shipAddress_addr3"></textarea>
-                      </span></td>
-                    </tr>
-                    <tr>
-                      <td>&nbsp;</td>
-                      <td>&nbsp;</td>
-                      <td><span class="TinyFont">
-                        <textarea name="billAddress_addr3" class="SmallFont" id="billAddress_addr3"></textarea>
-                      </span></td>
-                      <td><span class="TinyFont">
-                        <textarea name="shipAddress_addr3" class="SmallFont" id="shipAddress_addr1"></textarea>
-                      </span></td>
-                    </tr>
-                    <tr>
-                      <td><span class="TinyFont">P.O NUMBER<br>
-                        <input class="SmallFont" type="text" name="po_number" id="po_number" value=""  />
-                      </span></td>
-                      <td><span class="TinyFont">TERMS<br>
-                        <input class="SmallFont" type="text" name="term_name" id="term_name" value=""  />
-                      </span></td>
-                      <td><span class="TinyFont">REP<br>
-                        <input class="SmallFont" type="text" name="id_salesrep" id="id_salesrep" value=""  />
-                      </span></td>
-                      <td><span class="TinyFont">SHIP<br>
-                        <input class="SmallFont" type="text" name="shipDate" id="shipDate" value=""  />
-                      </span></td>
+                      <td>
+                        <span class="TinyFont">SHIP DATE</span><br>
+                        <div class="SmallFont" id="shipDate"></div>              
+                      </td>
+                      <td>
+                        <span class="TinyFont">DUE DATE</span><br>
+                        <div class="SmallFont" id="dueDate"></div>             
+                      </td>
                     </tr>
                     <tr>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
-                      <td>&nbsp;</td>
+                      <td colspan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <span class="TinyFont">P.O NUMBER</span><br>
+                        <div class="SmallFont" id="po_number"></div>
+                      </td>
+                      <td>
+                        <span class="TinyFont">TERMS</span><br>
+                        <div class="SmallFont" id="term_name"></div>
+                      </td>
+                      <td>
+                        <span class="TinyFont">SALES REP.</span><br>
+                        <div class="SmallFont" id="salesrep_Name"></div>
+                      </td>
+                      <td width="16%">
+                        <span class="TinyFont">PENDIND</span><br>
+                        <div class="SmallFont" id="isPending"></div>              
+                      </td>
+                      <td width="16%">
+                        <span class="TinyFont">PAID</span><br>
+                        <div class="SmallFont" id="isPaid"></div>              
+                      </td>
                     </tr>
                   </tbody>
                 </table>
-                <div id="identity">
-  <div id="logo">
-  <div id="logohelp">
-          <input id="imageloc" type="text" size="50" value="" /><br />
-                            (max width: 540px, max height: 100px)
-                          </div>
-                          <img id="image" src="images/logo.png" alt="logo" />
-                      </div>
-                  </div>
-                    
-					<div style="clear:both"></div>
-                    <div id="customer">
-                        <textarea id="customer-title">Widget Corp.
-            c/o Steve Widget</textarea>
-                        <table>
-                            <tr>
-                                <td class="meta-head">Amount Due</td>
-                                <td><div class="due">$875.00</div></td>
-                            </tr>
-                        </table>
-                    </div>
+                <br>
 
-                    <table id="items">
-                    
-                      <tr>
-                          <th>Item</th>
-                          <th>Description</th>
-                          <th>Unit Cost</th>
-                          <th>Quantity</th>
-                          <th>Price</th>
-                      </tr>
-                      
-                      <tr class="item-row">
-                          <td class="item-name"><div class="delete-wpr"><textarea>Web Updates</textarea></div></td>
-                          <td class="description"><textarea>Monthly web updates for http://widgetcorp.com (Nov. 1 - Nov. 30, 2009)</textarea></td>
-                          <td><textarea class="cost">$650.00</textarea></td>
-                          <td><textarea class="qty">1</textarea></td>
-                          <td><span class="price">$650.00</span></td>
-                      </tr>
-                      
-                      <tr class="item-row">
-                          <td class="item-name"><div class="delete-wpr"><textarea>SSL Renewals</textarea></div></td>
-            
-                          <td class="description"><textarea>Yearly renewals of SSL certificates on main domain and several subdomains</textarea></td>
-                          <td><textarea class="cost">$75.00</textarea></td>
-                          <td><textarea class="qty">3</textarea></td>
-                          <td><span class="price">$225.00</span></td>
-                      </tr>
-                      
-                      <tr id="hiderow">
-                        <td colspan="5"></td>
-                      </tr>
-                      
+					<div id="tableBodyItems"></div>
+                    <br>
+                    <table width="100%" border="1" cellspacing="0" cellpadding="0">
+                      <tbody>
                       <tr>
                           <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line">Subtotal</td>
-                          <td class="total-value">$<label id="subtotal"></label></td>
+                          <td width="39%"><div id="subtotal" class="SmallFont">$</div></td>
+                      </tr>
+                      <tr>
+                        <td colspan="2" class="blank"></td>
+                        <td colspan="2" class="total-line">Tax Percentage</td>
+                        <td>%<div id="salesTaxPercentage" class="SmallFont"></div></td>
+                      </tr>
+                      <tr>
+                        <td colspan="2" class="blank"></td>
+                        <td colspan="2" class="total-line">Tax Total</td>
+                        <td><div id="salesTaxTotal" class="SmallFont">$</div></td>
                       </tr>
                       <tr>
             
                           <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line">Total</td>
-                          <td class="total-value"><div id="total">$875.00</div></td>
+                          <td><div id="subtotal" class="SmallFont">$</div></td>
                       </tr>
                       <tr>
                           <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line">Payment applied</td>
-            
-                          <td class="total-value"><div id="appliedAmount">$</div></td>
+                          <td><div id="appliedAmount" class="SmallFont">$</div></td>
                       </tr>
                       <tr>
                           <td colspan="2" class="blank"> </td>
-                          <td colspan="2" class="total-line balance"> Due Balance</td>
-                          <td class="total-value balance"><div id="balanceRemaining">$</div></td>
+                          <td colspan="2" class="total-line balance">Due Balance</td>
+                          <td><div id="balanceRemaining" class="SmallFont">$</div></td>
                       </tr>
+                  </tbody>
+                </table>
                     
-                    </table>
-
-                <div id="terms">
-                  <h5>Terms</h5>
-                  <textarea>NET 30 Days. Finance Charge of 1.5% will be made on unpaid balances after 30 days.</textarea>
-                </div>                        		
-	  </div>
+                    <span class="SmallFont">Customer message</span><br>
+					<div id="customer_msg_FullName" class="SmallFont"></div>
+				
+	  		</div>
 		</div>				
 	</body>
 </html>			
