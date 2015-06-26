@@ -93,6 +93,7 @@ function recibeSyncResponse(data, textStatus, jqXHR )
 	}
 }
 
+
 function errSync(jqXHR, textStatus)
 {
 	console.log("en errSync");
