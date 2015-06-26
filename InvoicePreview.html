@@ -24,6 +24,7 @@
 		<script src="js/zoe/inventoryDAO.js"></script>
 		<script src="js/zoe/taxDAO.js"></script>
 		<script src="js/zoe/customerMsgDAO.js"></script>
+        <script type="text/javascript" src="cordova.js"></script>
 
 		<script>
 			$(document).bind("pagebeforecreate", function(event) {
@@ -35,6 +36,26 @@
 				invoiceDAO.getById('7A615-1430865999',true,receiveInvoiceDetails,errReceiveInvoiceDetails);
 			}
 
+		//document.addEventListener('deviceready', onDeviceReady);
+		//document.addEventListener("deviceready", onDeviceReady, false);
+
+		// Cordova Device Ready.
+		function onDeviceReady() {
+				cordova.plugins.printer.isAvailable(
+				//Check whether the printer is available or not.
+				function (isAvailable) {
+					 //Enter the page location.
+					 var page = location.href;
+					 logZoe("page: ===============> "+page);
+					 cordova.plugins.printer.print(page, 'Document.html', function () {
+					 alert('printing finished or canceled')
+						});
+				}
+			);
+		}			
+			
+			
+			
 			// BEGIN Functions on error case
 			function errReceiveInvoiceDetails(err){
 				alert("DB Error Invoice Details: "+JSON.stringify(err));
