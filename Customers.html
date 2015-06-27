@@ -267,10 +267,9 @@
 						if (arrayListInvoicesByCust[i].origin == 'local'){
 							htmlString2 += '<a href="invoice.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-iconpos="notext"  data-ajax="false"></a>';
 						}
-						htmlString2 +='<a href="InvoicePreview.html?id_invoice="' + arrayListInvoicesByCust[i].id_invoice +
+						htmlString2 +='<a href="InvoicePreview.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice +
 						'" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-print" data-ajax="false"></a>' + 
 						'</div></li>';
-						logZoe("htmlString2 =" + JSON.stringify(arrayListInvoicesByCust[i]));
 					}
 					htmlString2 += '</ul>';
 					$('#InvoiceList').html(htmlString2);

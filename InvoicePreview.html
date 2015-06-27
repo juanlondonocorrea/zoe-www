@@ -35,7 +35,8 @@
 				console.log("initThisPage invoice event.currentTarget.URL=" + event.currentTarget.URL);
 				if (event.currentTarget.URL && event.currentTarget.URL.indexOf("?")>-1){
 					var parameters = event.currentTarget.URL.split("?")[1].split("&");
-					console.log("parameters=" + parameters);
+				//	console.log("parameters ==============>>>>>> " + parameters);
+					logZoe("ID_INVOICE - parameters :  ==============>>>>>> " + parameters);
 					for (var i in parameters){
 						var parameterDupla = parameters[i].split("=");
 						if (parameterDupla[0]=="id_invoice"){
