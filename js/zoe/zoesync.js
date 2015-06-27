@@ -2,7 +2,7 @@
 var synchronizing = false;
 var xhrSync;
 var receiveSyncCallback;
-function consumeWS(mensaje, format, receiveFunction, cache, xpathExp){
+function consumeWS(mensaje, format, receiveFunction, acache, axpathExp){
 	receiveSyncCallback = receiveFunction;
 	if (synchronizing==true){
 		alert("Synchronizing in process");
@@ -26,11 +26,11 @@ function consumeWS(mensaje, format, receiveFunction, cache, xpathExp){
 	
 	var dataToSend = "{synch:{uploadOperations:'"+mensaje+"',responseFormat:'"+format+"'"; 
 	
-	if (cache){
-		dataToSend = dataToSend + ",cache:'" + cache + "'";
+	if (acache){
+		dataToSend = dataToSend + ",cache:'" + acache + "'";
 	}
-	if (xpathExp){
-		dataToSend = dataToSend + ",xpathExp:'" + xpathExp + "'";
+	if (axpathExp){
+		dataToSend = dataToSend + ",xpathExp:'" + axpathExp + "'";
 	}
 	
 	dataToSend += "}}";
@@ -41,15 +41,20 @@ function consumeWS(mensaje, format, receiveFunction, cache, xpathExp){
         type: "POST",
         url: webServiceURL,
 		timeout: 120000 ,
-		jsonp: "callback",
         data: dataToSend,
-        dataType: "text",
+        dataType: "json", 
         success: recibeSyncResponse,
+		crossDomain:true,
+		async:true,
         error: errSync,
     });
 
 
 
+}
+
+function receiveJSON(data){
+	console.log("data:" + data);
 }
 
 function recibeSyncResponse(data, textStatus, jqXHR )
@@ -93,11 +98,14 @@ function recibeSyncResponse(data, textStatus, jqXHR )
 	}
 }
 
-function errSync(jqXHR, textStatus)
-{
-	console.log("en errSync");
+function errSync(jqXHR, textStatus){
 	synchronizing = false;
-//	$( "#synchDialog" ).popup( "close" );			
+	if (jqXHR && jqXHR.status == 200 && jqXHR.responseText){
+		recibeSyncResponse(jqXHR.responseText,textStatus,jqXHR);
+		return;
+	}
+		
+	console.log("en errSync");
 	console.log("synchronizing errSync: " + textStatus);              
 	console.log("synchronizing error jqXHR: " + JSON.stringify(jqXHR));              
 	alert("Synch error: empty response");
