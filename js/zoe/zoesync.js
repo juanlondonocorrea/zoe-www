@@ -35,17 +35,19 @@ function consumeWS(mensaje, format, receiveFunction, acache, axpathExp){
 	
 	dataToSend += "}}";
 	
-	log("consumeWS3 data:" + dataToSend); 
+	log("consumeWS3 data USING JSONP:" + dataToSend); 
 	
     xhrSync = $.ajax({
         type: "POST",
         url: webServiceURL,
+		async:false,
+		jsonpCallback: 'jsonCallback',
+		contentType: "application/json",
+        dataType: "jsonp", 
 		timeout: 120000 ,
         data: dataToSend,
-        dataType: "jsonp", 
         success: recibeSyncResponse,
 		crossDomain:true,
-		async:true,
         error: errSync,
     });
 
