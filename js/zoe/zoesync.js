@@ -42,7 +42,7 @@ function consumeWS(mensaje, format, receiveFunction, acache, axpathExp){
         url: webServiceURL,
 		timeout: 120000 ,
         data: dataToSend,
-        dataType: "json", 
+        dataType: "jsonp", 
         success: recibeSyncResponse,
 		crossDomain:true,
 		async:true,
