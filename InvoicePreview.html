@@ -115,8 +115,19 @@
 				$('#shipAddress_state').html(InvoiceVO.shipAddress_state);
 				$('#shipAddress_postalcode').html(InvoiceVO.shipAddress_postalcode);
 				
-				$('#isPending').html(InvoiceVO.isPending);
-				$('#isPaid').html(InvoiceVO.isPaid);
+				if (InvoiceVO.isPending == 1) {
+					$('#isPending').html('Yes');
+				}
+				else if (InvoiceVO.isPending == 0) {
+					$('#isPending').html('No');
+				}
+				
+				if (InvoiceVO.isPaid == 1) {
+					$('#isPaid').html('Yes');
+				}
+				else if (InvoiceVO.isPaid == 0) {
+					$('#isPaid').html('No');
+				}
 
 				$('#salesTaxPercentage').html(InvoiceVO.salesTaxPercentage);
 				$('#salesTaxTotal').html(InvoiceVO.salesTaxTotal);
@@ -141,23 +152,30 @@
 				// Inventory_ListID
 				// SalesTax_ListID
 				$("#tableBodyItems").html("");
-
-				for (var i=0; i < InvoiceVO.items.length; i++) {
-
+				if (InvoiceVO.items){
+					for (var i=0; i < InvoiceVO.items.length; i++) {
+	
+						invoiceItems +=
+						'<tr>'
+						  +'<td><div align="right" class="SmallFont">'+InvoiceVO.items[i].LineID+'</div></td>'
+						  +'<td><div class="SmallFont">'+InvoiceVO.items[i].Desc+'</div></td>'
+						  +'<td><div align="right" class="SmallFont">$ '+InvoiceVO.items[i].Rate+'</div></td>'
+						  +'<td><div align="right" class="SmallFont">'+InvoiceVO.items[i].Quantity+'</div></td>'
+						  +'<td><div align="right" class="SmallFont">$ '+InvoiceVO.items[i].Amount+'</div></td>'
+						  +'<td><div class="SmallFont">'+InvoiceVO.items[i].salesTax_Name+'</div></td>'
+						+'</tr>';
+						logZoe("invoiceItems: ===========> "+invoiceItems);
+						}
+				}
+				else {
 					invoiceItems +=
-					'<tr>'
-					  +'<td><div align="right" class="SmallFont">'+InvoiceVO.items[i].LineID+'</div></td>'
-					  +'<td><div class="SmallFont">'+InvoiceVO.items[i].Desc+'</div></td>'
-					  +'<td><div align="right" class="SmallFont">$ '+InvoiceVO.items[i].Rate+'</div></td>'
-					  +'<td><div align="right" class="SmallFont">'+InvoiceVO.items[i].Quantity+'</div></td>'
-					  +'<td><div align="right" class="SmallFont">$ '+InvoiceVO.items[i].Amount+'</div></td>'
-					  +'<td><div class="SmallFont">'+InvoiceVO.items[i].salesTax_Name+'</div></td>'
-					+'</tr>';
-					logZoe("invoiceItems: ===========> "+invoiceItems);
-					}
-					invoiceItems += '</tbody></table>';
-					logZoe("invoiceItems: ======> "+JSON.stringify(invoiceItems));
-					$("#tableBodyItems").html(invoiceItems); 
+						'<tr>'
+							+'<td colspan="6"><div align="center" class="SmallFont">No items</div></td>'
+						+'</tr>';
+				}
+				invoiceItems += '</tbody></table>';
+				logZoe("invoiceItems: ======> "+JSON.stringify(invoiceItems));
+				$("#tableBodyItems").html(invoiceItems); 
 				}
 			} 
 			
