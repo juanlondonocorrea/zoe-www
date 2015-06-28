@@ -51,10 +51,10 @@
 			}
 
 		//document.addEventListener('deviceready', onDeviceReady);
-		document.addEventListener("deviceready", onDeviceReady, false);
+		//document.addEventListener("deviceready", onDeviceReady, false);
 
 		// Cordova Device Ready.
-		function onDeviceReady() {
+		function print() {
 				cordova.plugins.printer.isAvailable(
 				//Check whether the printer is available or not.
 				function (isAvailable) {
@@ -188,6 +188,7 @@
 				logZoe("invoiceItems: ======> "+JSON.stringify(invoiceItems));
 				$("#tableBodyItems").html(invoiceItems); 
 				}
+				print();
 			} 
 			
 		</script>
