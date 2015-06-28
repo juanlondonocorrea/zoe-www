@@ -24,7 +24,6 @@
   <feature name="http://api.phonegap.com/1.0/file" />
 
   <gap:plugin name="org.apache.cordova.splashscreen"/>
-  <gap:plugin name="at.modalog.cordova.plugin.html2pdf" />
   <gap:plugin name="de.appplant.cordova.plugin.printer" />
 
   <gap:splash src="zoe_full.png"/>

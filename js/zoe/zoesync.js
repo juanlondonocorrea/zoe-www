@@ -41,7 +41,7 @@ $.ajax({
         url: webServiceURL,
         type: "POST",
 		data: dataToSend,
-        contentType: application/json,
+        contentType: "application/json",
         async: true,
         dataType: "json",
         crossDomain: true,
