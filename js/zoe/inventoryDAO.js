@@ -2,6 +2,7 @@
 
 var inventoryDAO = {list:listInventory, 
 				listByCustomer: listInventoryByCustomer,
+				listInventorySite: listInventorySite,
 				getById:getInventoryById, 
 				store:storeInventory,
 				storeItemSites:storeItemSites,
@@ -31,6 +32,14 @@ function listInventory(aReceiveFunction,aErrFunc){
 	inventoryReceiveListFunction = aReceiveFunction;
 	inventoryErrFunc = aErrFunc;
 	db.transaction(doListInventory, inventoryErrFunc);
+}
+
+function listInventorySite(aReceiveFunction,aErrFunc){
+	logZoe("listInventorySite");
+	db = openDatabaseZoe();
+	inventoryReceiveListFunction = aReceiveFunction;
+	inventoryErrFunc = aErrFunc;
+	db.transaction(doListInventorySite, inventoryErrFunc);
 }
 
 function listInventoryByCustomer(aCustomer,aReceiveFunction,aErrFunc){
@@ -85,12 +94,17 @@ function deleteAllPricelevels(aErrFunc,successCB){
 
 function doSelectInventory(tx){
 	logZoe("doSelectInventory filterData=" + filterDataInventory);
-	tx.executeSql("SELECT inventory.ListID, FullName, InventorySite_ListID, QuantityOnHand, salesPrice, salesDesc, salesTax_ListID, salesTax.desc FROM inventory, salesTax Where inventory.ListID = ? AND salesTax_ListID = salesTax.ListID", [filterDataInventory],inventoryLocalReceiveFunction, inventoryErrFunc);
+	tx.executeSql("SELECT inventory.ListID, FullName, InventorySite_ListID, QuantityOnHand, salesPrice, salesDesc, salesTax_ListID, salesTax.desc FROM inventory LEFT JOIN salesTax ON salesTax_ListID = salesTax.ListID WHERE inventory.ListID = ?", [filterDataInventory],inventoryLocalReceiveFunction, inventoryErrFunc);
 }
 
 function doListInventory(tx){
-	logZoe("doSelectSelesrepInventories");
-	tx.executeSql("SELECT inventory.ListID, FullName, InventorySite_ListID, QuantityOnHand, salesPrice, salesTax_ListID, salesTax.desc FROM inventory, salesTax WHERE salesTax_ListID = salesTax.ListID", [],inventoryLocalListReceiveFunction, inventoryErrFunc);
+	logZoe("doListInventory");
+	tx.executeSql("SELECT inventory.ListID, FullName, InventorySite_ListID, QuantityOnHand, salesPrice, salesTax_ListID, salesTax.desc FROM inventory LEFT JOIN salesTax ON salesTax_ListID = salesTax.ListID", [],inventoryLocalListReceiveFunction, inventoryErrFunc);
+}
+
+function doListInventorySite(tx){
+	logZoe("doListInventorySite");
+	tx.executeSql("SELECT inventory.ListID, FullName, InventorySite_ListID, QuantityOnHand, salesPrice, salesTax_ListID, salesTax.desc FROM inventory LEFT JOIN salesTax ON salesTax_ListID = salesTax.ListID WHERE inventorySite_ListID IS NOT NULL", [],inventoryLocalListReceiveFunction, inventoryErrFunc);
 }
 
 function doListInventoryByCustomer(tx){
