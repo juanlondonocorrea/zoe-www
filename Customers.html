@@ -63,8 +63,11 @@
 			// END functions on error case
 			
 			$(document).bind('pagechange', function() {
-				$('.ui-page-active .ui-listview').listview('refresh');
-				$('.ui-page-active :jqmData(role=content)').trigger('create');
+				try{
+					$('.ui-page-active .ui-listview').listview('refresh');
+					$('.ui-page-active :jqmData(role=content)').trigger('create');
+				}catch(exception){
+				}
 			});	
 
 			// Copy bill fileds to ship fields
@@ -210,7 +213,7 @@
 					console.log("li=" + li);					
 					}
 					console.log("========= FIN LISTA =========");
-					$('#custList').html(htmlString1).listview('refresh');
+					try{$('#custList').html(htmlString1).listview('refresh');}catch(e){}
 					$(".linkDetail").click(goDetail); 
 			}
 			
