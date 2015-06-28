@@ -45,8 +45,8 @@ $.ajax({
         async: true,
         dataType: "json",
         crossDomain: true,
-        success: function(resp){console.log(JSON.stringify(resp));},
-        error: function(err) {console.log(JSON.stringify(err));}
+        success: recibeSyncResponse,
+        error: errSync
     });
 	
 	
