@@ -3,7 +3,7 @@
   <description> Application ZOE to PILOCH INC</description>
   <author href="http://phonegap.com" email="support@phonegap.com">Harana</author>
   <content src="index.html"/>
-  <preference name="phonegap-version" value="cli-5.1.1" />
+  <preference name="phonegap-version" value="3.7.0" />
   <preference name="splash-screen-duration" value="5000"/>
   <preference name="permissions" value="none"/>
   <preference name="orientation" value="default"/>

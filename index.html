@@ -18,12 +18,40 @@
 	"salesRepName"));
 			initAnyPage(event.target);
 		});
-		
-document.addEventListener('deviceready', onDeviceReady);
+	
+	
+var theurl = "http://192.168.1.54:54321/SyncService";	
+function callAjaxJSONP(){
+	console.log("llamar con jsonp");
 
-document.addEventListener("deviceready", onDeviceReady, false);
+$.ajax({
+        url: theurl,
+        type: 'GET',
+        contentType: "application/json",
+        async: true,
+        dataType: 'jsonp',
+        crossDomain: true,
+        success: function(resp){console.log(JSON.stringify(resp));},
+        error: function(err) {console.log(JSON.stringify(err));}
+    });
+}
 
+function ejecute(){
+	console.log("llamar con text");
 
+$.ajax({
+        url: theurl,
+        type: $("#type").val(),
+        contentType: $("#contentType").val(),
+        async: $("#async").val()=="true",
+        dataType: $("#dataType").val(),
+        crossDomain: $("#crossDomain").val()=="true",
+        success: function(resp){console.log(JSON.stringify(resp));},
+        error: function(err) {console.log(JSON.stringify(err));}
+    });
+	
+}
+	
 </script>
 </head> 
 <body> 
@@ -33,6 +61,24 @@ document.addEventListener("deviceready", onDeviceReady, false);
     <div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
 	<div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
 	<div data-role="content" id="indexPage">	
+        <form method="post" action="demoform.asp">
+        <label for="contentType">contentType</label>
+        <input type="text" name="contentType" id="contentType">
+
+        <label for="async">async</label>
+        <input type="text" name="async" id="async">
+
+        <label for="dataType">dataType</label>
+        <input type="text" name="dataType" id="dataType">
+
+        <label for="crossDomain">crossDomain</label>
+        <input type="text" name="crossDomain" id="crossDomain">
+
+        <label for="type">type</label>
+        <input type="type" name="type" id="type">
+
+		<input type="button" onClick="ejecute()">
+        </form>
 	</div>
 </div>
 
