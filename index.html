@@ -40,8 +40,9 @@ function ejecute(){
 	console.log("llamar con text");
 
 $.ajax({
-        url: theurl,
+        url: $("#theUrl").val(),
         type: $("#type").val(),
+		data: $("#mensaje").val(),
         contentType: $("#contentType").val(),
         async: $("#async").val()=="true",
         dataType: $("#dataType").val(),
@@ -62,6 +63,16 @@ $.ajax({
 	<div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
 	<div data-role="content" id="indexPage">	
         <form method="post" action="demoform.asp">
+
+        <label for="mensaje">mensaje</label>
+        <input type="text" name="mensaje" id="mansaje" value="{synch:{uploadOperations:'<EmployeeQueryRq requestID=\"c1\"><OwnerID>0</OwnerID></EmployeeQueryRq>',responseFormat:'JSON',cache:'employee',xpathExp:'//EmployeeRet[Name=\"Mark Ochoa\"]'}}">
+
+        <label for="theUrl" class="select">URL</label>
+        <select name="theUrl" id="theUrl">
+          <option value="http://24.234.187.107:54320/SyncService">http://24.234.187.107:54320/SyncService</option>
+          <option value="http://192.168.1.54:54321/SyncService">http://192.168.1.54:54321/SyncService</option>
+        </select>
+
         <label for="contentType">contentType</label>
         <input type="text" name="contentType" id="contentType">
 
@@ -77,7 +88,7 @@ $.ajax({
         <label for="type">type</label>
         <input type="type" name="type" id="type">
 
-		<input type="button" onClick="ejecute()">
+		<input type="button" onClick="ejecute()">Enviar</input>
         </form>
 	</div>
 </div>
