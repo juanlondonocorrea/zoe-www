@@ -31,5 +31,7 @@
   <access origin="*"/>
 
   <icon src="icon_zoe2.png" />
+  
+  <content src="CustomerRoute.html#Customers?type=route" />
 
 </widget>
