@@ -55,6 +55,7 @@
 
 		// Cordova Device Ready.
 		function print() {
+			try{
 				cordova.plugins.printer.isAvailable(
 				//Check whether the printer is available or not.
 				function (isAvailable) {
@@ -66,6 +67,9 @@
 						});
 				}
 			);
+			}catch(e){
+				console.log("could not print:" + e);
+			}
 		}			
 			
 			
@@ -128,8 +132,15 @@
 				else if (InvoiceVO.isPaid == 0) {
 					$('#isPaid').html('No');
 				}
-				var taxTotal = parseFloat("7.25"); // InvoiceVO.salesTaxTotal
-				var subTot = parseFloat(InvoiceVO.subtotal.replace(',','.'));
+				var taxTotal = 0.0;
+				var subTot = 0.0;
+				if (InvoiceVO.salesTaxTotal) {
+					parseFloat(InvoiceVO.salesTaxTotal.replace(',','.'));
+				}
+				
+				if (InvoiceVO.subtotal) {
+					subTot = parseFloat(InvoiceVO.subtotal.replace(',','.'));
+				}
 				var totalInvoice = taxTotal + subTot;
 				
 				logZoe("TaxTotal: ==========> "+taxTotal);
@@ -349,4 +360,4 @@
 	  		</div>
 		</div>				
 	</body>
-</html>			
+</html>
