@@ -128,16 +128,24 @@
 				else if (InvoiceVO.isPaid == 0) {
 					$('#isPaid').html('No');
 				}
-
+				var taxTotal = parseFloat("7.25"); // InvoiceVO.salesTaxTotal
+				var subTot = parseFloat(InvoiceVO.subtotal.replace(',','.'));
+				var totalInvoice = taxTotal + subTot;
+				
+				logZoe("TaxTotal: ==========> "+taxTotal);
+				logZoe("InvoiceVO.subtotal: ==========> "+subTot);
+				logZoe("totalInvoice: ==========> "+totalInvoice);
+				
 				$('#salesTaxPercentage').html(InvoiceVO.salesTaxPercentage);
-				$('#salesTaxTotal').html(InvoiceVO.salesTaxTotal);
-				$('#subtotal').html(InvoiceVO.subtotal);
+				$('#salesTaxTotal').html(taxTotal);
+				$('#subtotal').html(subTot);
+				$('#total').html(totalInvoice);
 				$('#appliedAmount').html(InvoiceVO.appliedAmount);
-				$('#balanceRemaining').html(InvoiceVO.balanceRemaining);				
+				$('#balanceRemaining').html(InvoiceVO.balanceRemaining);
 
 				$('#customer_msg_FullName').html(InvoiceVO.customer_msg_FullName);
 
-				var invoiceItems = '<table class="3table" width="100%" border="1" cellspacing="0" cellpadding="10">'
+				var invoiceItems = '<table class="3table" width="100%" border="1" cellspacing="0" cellpadding="0">'
 				  +'<tbody>'
 					+'<tr>'
 					  +'<td><div class="SmallFont">Code</div></td>'
@@ -162,8 +170,11 @@
 						  +'<td><div align="right" class="SmallFont">$ '+InvoiceVO.items[i].Rate+'</div></td>'
 						  +'<td><div align="right" class="SmallFont">'+InvoiceVO.items[i].Quantity+'</div></td>'
 						  +'<td><div align="right" class="SmallFont">$ '+InvoiceVO.items[i].Amount+'</div></td>'
-						  +'<td><div class="SmallFont">'+InvoiceVO.items[i].salesTax_Name+'</div></td>'
-						+'</tr>';
+						if (InvoiceVO.items[i].salesTax_Name != null)
+						  	invoiceItems += '<td><div class="SmallFont">'+InvoiceVO.items[i].salesTax_Name+'</div></td>';
+						else
+						  invoiceItems += '<td>&nbsp;</td>';
+						invoiceItems +='</tr>';
 						logZoe("invoiceItems: ===========> "+invoiceItems);
 						}
 				}
@@ -189,7 +200,7 @@
 			
 			th, td { padding: 0px; }
 			
-			.3table { border-collapse: separate; 
+			.table { border-collapse: separate; 
 			padding: 5px;
 			}
 			2table { 
@@ -300,38 +311,38 @@
                       <tr>
                           <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line">Subtotal</td>
-                          <td width="39%"><div id="subtotal" class="SmallFont">$</div></td>
+                          <td width="39%"><div id="subtotal" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
                         <td colspan="2" class="blank"></td>
                         <td colspan="2" class="total-line">Tax Percentage</td>
-                        <td>%<div id="salesTaxPercentage" class="SmallFont"></div></td>
+                        <td><div id="salesTaxPercentage" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
                         <td colspan="2" class="blank"></td>
                         <td colspan="2" class="total-line">Tax Total</td>
-                        <td><div id="salesTaxTotal" class="SmallFont">$</div></td>
+                        <td><div id="salesTaxTotal" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
             
                           <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line">Total</td>
-                          <td><div id="subtotal" class="SmallFont">$</div></td>
+                          <td><div id="total" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
                           <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line">Payment applied</td>
-                          <td><div id="appliedAmount" class="SmallFont">$</div></td>
+                          <td><div id="appliedAmount" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
                           <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line balance">Due Balance</td>
-                          <td><div id="balanceRemaining" class="SmallFont">$</div></td>
+                          <td><div id="balanceRemaining" align="right" class="SmallFont"></div></td>
                       </tr>
                   </tbody>
                 </table>
                     
-                    <span class="SmallFont">Customer message</span><br>
+                    <br><span class="SmallFont">Customer message</span><br>
 					<div id="customer_msg_FullName" class="SmallFont"></div>
 				
 	  		</div>
