@@ -31,12 +31,9 @@
 				initThisPage(event);
 			});
 
-			function initThisPage(event){ // 7A600-1430865979	'7A615-1430865999'
-				console.log("initThisPage invoice event.currentTarget.URL=" + event.currentTarget.URL);
+			function initThisPage(event){
 				if (event.currentTarget.URL && event.currentTarget.URL.indexOf("?")>-1){
 					var parameters = event.currentTarget.URL.split("?")[1].split("&");
-				//	console.log("parameters ==============>>>>>> " + parameters);
-					logZoe("ID_INVOICE - parameters :  ==============>>>>>> " + parameters);
 					for (var i in parameters){
 						var parameterDupla = parameters[i].split("=");
 						if (parameterDupla[0]=="id_invoice"){
@@ -60,8 +57,7 @@
 				//Check whether the printer is available or not.
 				function (isAvailable) {
 					 //Enter the page location.
-					 var page = location.href;
-					 logZoe("page: ===============> "+page);
+					 var page = $('#InvoicePreview').html(); //location.href;
 					 cordova.plugins.printer.print(page, 'Document.html', function () {
 					 alert('printing finished or canceled')
 						});
@@ -82,8 +78,6 @@
 
 			function receiveInvoiceDetails(InvoiceVO){
 				if (InvoiceVO) {
-				logZoe("InvoiceVO: ============> "+InvoiceVO);
-
 				$('#refNumber').html(InvoiceVO.refNumber);
 				$('#Date').html(InvoiceVO.txnDate);
 				$('#shipDate').html(InvoiceVO.shipDate);
@@ -142,17 +136,13 @@
 					subTot = parseFloat((''+InvoiceVO.subtotal).replace(',','.'));
 				}
 				var totalInvoice = taxTotal + subTot;
-				
-				logZoe("TaxTotal: ==========> "+taxTotal);
-				logZoe("InvoiceVO.subtotal: ==========> "+subTot);
-				logZoe("totalInvoice: ==========> "+totalInvoice);
-				
-				$('#salesTaxPercentage').html(InvoiceVO.salesTaxPercentage);
-				$('#salesTaxTotal').html(taxTotal);
-				$('#subtotal').html(subTot);
-				$('#total').html(totalInvoice);
-				$('#appliedAmount').html(InvoiceVO.appliedAmount);
-				$('#balanceRemaining').html(InvoiceVO.balanceRemaining);
+
+				$('#salesTaxPercentage').html(InvoiceVO.salesTaxPercentage+' %');
+				$('#salesTaxTotal').html('$ '+taxTotal);
+				$('#subtotal').html('$ '+subTot);
+				$('#total').html('$ '+totalInvoice);
+				$('#appliedAmount').html('$ '+InvoiceVO.appliedAmount);
+				$('#balanceRemaining').html('$ '+InvoiceVO.balanceRemaining);
 
 				$('#customer_msg_FullName').html(InvoiceVO.customer_msg_FullName);
 
@@ -186,7 +176,6 @@
 						else
 						  invoiceItems += '<td>&nbsp;</td>';
 						invoiceItems +='</tr>';
-						logZoe("invoiceItems: ===========> "+invoiceItems);
 						}
 				}
 				else {
@@ -196,7 +185,6 @@
 						+'</tr>';
 				}
 				invoiceItems += '</tbody></table>';
-				logZoe("invoiceItems: ======> "+JSON.stringify(invoiceItems));
 				$("#tableBodyItems").html(invoiceItems); 
 				}
 				print();
@@ -321,35 +309,28 @@
                     <table width="100%" border="1" cellspacing="0" cellpadding="0">
                       <tbody>
                       <tr>
-                          <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line">Subtotal</td>
-                          <td width="39%">$<div id="subtotal" align="right" class="SmallFont"></div></td>
+                          <td width="39%"><div id="subtotal" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
-                        <td colspan="2" class="blank"></td>
                         <td colspan="2" class="total-line">Tax Percentage</td>
-                        <td>%<div id="salesTaxPercentage" align="right" class="SmallFont"></div></td>
+                        <td><div id="salesTaxPercentage" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
-                        <td colspan="2" class="blank"></td>
                         <td colspan="2" class="total-line">Tax Total</td>
-                        <td>$<div id="salesTaxTotal" align="right" class="SmallFont"></div></td>
+                        <td><div id="salesTaxTotal" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
-            
-                          <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line">Total</td>
-                          <td>$<div id="total" align="right" class="SmallFont"></div></td>
+                          <td><div id="total" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
-                          <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line">Payment applied</td>
-                          <td>$<div id="appliedAmount" align="right" class="SmallFont"></div></td>
+                          <td nowrap><div id="appliedAmount" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
-                          <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line balance">Due Balance</td>
-                          <td>$<div id="balanceRemaining" align="right" class="SmallFont"></div></td>
+                          <td nowrap><div id="balanceRemaining" align="right" class="SmallFont"></div></td>
                       </tr>
                   </tbody>
                 </table>
