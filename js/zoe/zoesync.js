@@ -35,9 +35,22 @@ function consumeWS(mensaje, format, receiveFunction, acache, axpathExp){
 	
 	dataToSend += "}}";
 	
-	log("consumeWS3 data USING JSONP:" + dataToSend); 
+	log("consumeWS3 data USING JSON:" + dataToSend); 
 	
-    xhrSync = $.ajax({
+$.ajax({
+        url: webServiceURL,
+        type: "POST",
+		data: dataToSend,
+        contentType: application/json,
+        async: true,
+        dataType: "json",
+        crossDomain: true,
+        success: function(resp){console.log(JSON.stringify(resp));},
+        error: function(err) {console.log(JSON.stringify(err));}
+    });
+	
+	
+/*    xhrSync = $.ajax({
         type: "POST",
         url: webServiceURL,
 		async:false,
@@ -51,7 +64,7 @@ function consumeWS(mensaje, format, receiveFunction, acache, axpathExp){
         error: errSync,
     });
 
-
+*/
 
 }
 
