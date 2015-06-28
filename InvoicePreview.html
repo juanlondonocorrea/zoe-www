@@ -57,7 +57,7 @@
 				//Check whether the printer is available or not.
 				function (isAvailable) {
 					 //Enter the page location.
-					 var page = document.documentElement.innerHTML; // $('#InvoicePreview').html(); //location.href;
+					 var page = $('#InvoicePreview').html(); //location.href;
 					 cordova.plugins.printer.print(page, 'Document.html', function () {
 					 alert('printing finished or canceled')
 						});
@@ -253,13 +253,13 @@
                         <span class="TinyFont">DATE</span><br>
                         <div class="SmallFont" id="Date"></div>
                       </td>
-                      <td width="31%" rowspan="2">
+                      <td width="31%" rowspan="2" style="vertical-align:top">
                         <span class="TinyFont">BILLING ADDRESS</span>
                         <div class="SmallFont" id="billAddress_addr1"></div>
                         <div class="SmallFont" id="billAddress_addr2"></div>
                         <div class="SmallFont" id="billAddress_addr3"></div>              
                       </td>
-                      <td colspan="2" rowspan="2">
+                      <td colspan="2" rowspan="2" style="vertical-align:top">
                         <span class="TinyFont">SHIPING ADDRESS</span>
                         <div class="SmallFont" id="shipAddress_addr1"></div>
                         <div class="SmallFont" id="shipAddress_addr2"></div>
@@ -269,7 +269,7 @@
                     <tr>
                       <td>
                         <span class="TinyFont">SHIP DATE</span><br>
-                        <div class="SmallFont" id="shipDate"></div>              
+                        <div class="SmallFont" id="shipDate"></div>
                       </td>
                       <td>
                         <span class="TinyFont">DUE DATE</span><br>
