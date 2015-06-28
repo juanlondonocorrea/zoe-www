@@ -135,11 +135,11 @@
 				var taxTotal = 0.0;
 				var subTot = 0.0;
 				if (InvoiceVO.salesTaxTotal) {
-					parseFloat(InvoiceVO.salesTaxTotal.replace(',','.'));
+					parseFloat((''+InvoiceVO.salesTaxTotal).replace(',','.'));
 				}
 				
 				if (InvoiceVO.subtotal) {
-					subTot = parseFloat(InvoiceVO.subtotal.replace(',','.'));
+					subTot = parseFloat((''+InvoiceVO.subtotal).replace(',','.'));
 				}
 				var totalInvoice = taxTotal + subTot;
 				
@@ -323,33 +323,33 @@
                       <tr>
                           <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line">Subtotal</td>
-                          <td width="39%"><div id="subtotal" align="right" class="SmallFont"></div></td>
+                          <td width="39%">$<div id="subtotal" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
                         <td colspan="2" class="blank"></td>
                         <td colspan="2" class="total-line">Tax Percentage</td>
-                        <td><div id="salesTaxPercentage" align="right" class="SmallFont"></div></td>
+                        <td>%<div id="salesTaxPercentage" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
                         <td colspan="2" class="blank"></td>
                         <td colspan="2" class="total-line">Tax Total</td>
-                        <td><div id="salesTaxTotal" align="right" class="SmallFont"></div></td>
+                        <td>$<div id="salesTaxTotal" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
             
                           <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line">Total</td>
-                          <td><div id="total" align="right" class="SmallFont"></div></td>
+                          <td>$<div id="total" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
                           <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line">Payment applied</td>
-                          <td><div id="appliedAmount" align="right" class="SmallFont"></div></td>
+                          <td>$<div id="appliedAmount" align="right" class="SmallFont"></div></td>
                       </tr>
                       <tr>
                           <td colspan="2" class="blank"> </td>
                           <td colspan="2" class="total-line balance">Due Balance</td>
-                          <td><div id="balanceRemaining" align="right" class="SmallFont"></div></td>
+                          <td>$<div id="balanceRemaining" align="right" class="SmallFont"></div></td>
                       </tr>
                   </tbody>
                 </table>
