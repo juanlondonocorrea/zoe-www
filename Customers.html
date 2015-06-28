@@ -21,7 +21,7 @@
         <script src="js/zoe/invoiceDAO.js"></script>
 		<script> 
 
-			$(document).bind("pagebeforecreate", function(event) {
+			$(document).bind("pageinit", function(event) {
 				initAnyPage(event.target);
 				initThisPage(event);
 			});
@@ -265,10 +265,10 @@
 						}
 						htmlString2 +='</div></div><div class="ui-block-b" style="width:20%">';
 						if (arrayListInvoicesByCust[i].origin == 'local'){
-							htmlString2 += '<a href="invoice.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-iconpos="notext"  data-ajax="false"></a>';
+							htmlString2 += '<a href="invoice.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
 						}
 						htmlString2 +='<a href="InvoicePreview.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice +
-						'" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-print" data-ajax="false"></a>' + 
+						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false"></a>' + 
 						'</div></li>';
 					}
 					htmlString2 += '</ul>';
