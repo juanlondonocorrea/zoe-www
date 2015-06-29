@@ -36,7 +36,7 @@
 					type = event.currentTarget.URL.split("?type=")[1];
 				}
 
-				if (type=="route"){
+				if (type=="route" || window.localStorage.getItem("current_type") == "route"){
 					customerDAO.listByRouteDay(6, receiveCustomers,errReceiveCustomers);
 				}else{
 					customerDAO.list(receiveCustomers, errReceiveCustomers);
@@ -116,6 +116,12 @@
 				} else {
 					$("#openBalance").css("color", "black");
 				}
+			}
+			
+			function onClickInvoicePreview(id_invoice){
+				window.localStorage.setItem("current_index_customer", selectedIndex);
+				console.log("onClickInvoicePreview current_index_customer=" + window.localStorage.getItem("current_index_customer"));
+				window.localStorage.setItem("current_type", type);
 			}
 
 			// Toggle Switch state (on - off) to enable/disable edit
@@ -215,6 +221,12 @@
 					console.log("========= FIN LISTA =========");
 					try{$('#custList').html(htmlString1).listview('refresh');}catch(e){}
 					$(".linkDetail").click(goDetail); 
+					console.log("current_index_customer="+window.localStorage.getItem("current_index_customer"));
+					if (window.localStorage.getItem("current_index_customer")){
+						selectedIndex = window.localStorage.getItem("current_index_customer");
+						renderDetail(window.localStorage.getItem("current_index_customer"));
+						window.localStorage.removeItem("current_index_customer");
+					}
 			}
 			
 			function receiveTerms(arrayTerms){
@@ -247,6 +259,7 @@
 				$('#priceLevel').trigger("chosen:updated");
 			}
 			
+			
 			// List Invoices by Customer 
 			function receiveInvoices(arrayListInvoicesByCust){
 				// Build customers' invoices by Customer, list with <ul> <li>
@@ -271,7 +284,7 @@
 							htmlString2 += '<a href="invoice.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
 						}
 						htmlString2 +='<a href="InvoicePreview.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice +
-						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false"></a>' + 
+						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>' + 
 						'</div></li>';
 					}
 					htmlString2 += '</ul>';

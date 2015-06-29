@@ -52,7 +52,44 @@
 		logZoe("config localStorage salesRepName=" + window.localStorage.getItem("salesRepName"));
 		return false;
 	}
-
+	
+	var wasSelectedAllSyncDown=false;
+	function onChangeSyncDownSelect(){
+		var	selectedValues = $("#syncDownSelect").val();
+		console.log("onChangeSyncDownSelect values=" + selectedValues);
+		if (selectedValues.indexOf("all")>-1){
+			if (!wasSelectedAllSyncDown){
+				var newSelectedValues=["all"];
+				var i = 1;
+				console.log("onChangeSyncDownSelect recorree=" + selectedValues);
+				$('#syncDownSelect').find("option").each(function(){
+				   if($(this).val()!="all" && $(this).val().indexOf("hoose")==-1){
+						console.log("onChangeSyncDownSelect disabling=" + $(this).val());
+						$(this).attr("disabled","true");
+						$(this).attr("selected","true");
+						newSelectedValues[i++] = $(this).val();
+				   }
+				});
+				wasSelectedAllSyncDown = true;
+//				console.log("newSelectedValues="+newSelectedValues);
+				$("#syncDownSelect").selectmenu("refresh");
+				console.log("syncDownSelect.val="+$("#syncDownSelect").val());
+			}
+		}else{
+			if (wasSelectedAllSyncDown){
+				$('#syncDownSelect').find("option").each(function(){
+				   if($(this).val()!="all" && $(this).val().indexOf("hoose")==-1){
+						console.log("onChangeSyncDownSelect enabling=" + $(this).val());
+						$(this).attr("disabled", "false");
+						$(this).attr("selected","false");
+				   }
+				});
+				wasSelectedAllSyncDown = false;
+				console.log("syncDownSelect.val="+$("#syncDownSelect").val());
+			}
+		}
+	}
+	
 	var whatToUpload = new Array();
 	var currentUp = 0;
 	function syncUp(){
@@ -93,6 +130,7 @@
 		        return;
 		}
 		whatToDownload = $("#syncDownSelect").val();
+		console.log("whatToDownload=" + whatToDownload);
 		currentDown = -1;
 		downNext();
 	}
@@ -102,6 +140,10 @@
 		if (currentDown<whatToDownload.length){
 			if (currentDown == 0){
 				 $("#synchDialog").popup("open"); 
+			}
+			if (whatToDownload[currentDown] == "all" || whatToDownload[currentDown].indexOf("hoose")>-1){
+				downNext();
+				return;
 			}
 			console.log("downloading " +  whatToDownload[currentDown]);
 			$("#currentTask").html(whatToDownload[currentDown] + "...");
@@ -824,8 +866,9 @@
             <label for="syncDownSelect">Download</label>
             <div class="ui-grid-a">
                 <div class="ui-block-a"  style="width:85%">
-                    <select name="syncDownSelect" id="syncDownSelect" multiple="multiple" data-native-menu="false">
-                        <option>Choose what to download </option>
+                    <select name="syncDownSelect" id="syncDownSelect" multiple="multiple" data-native-menu="false" onChange="onChangeSyncDownSelect()">
+                        <option data-placeholder="true">Choose what to download </option>
+                        <option value="all">All</option>
                         <option value="syncDownSalesRep">Sales Rep</option>
                         <option value="syncTaxes">Taxes</option>
                         <option value="syncTerms">Terms</option>
@@ -844,7 +887,7 @@
             <div class="ui-grid-a">
                 <div class="ui-block-a" style="width:85%">
 			    <select name="syncUpSelect" id="syncUpSelect" multiple="multiple" data-native-menu="false">
-			        <option>Choose what to upload</option>
+			        <option  data-placeholder="true">Choose what to upload</option>
 			        <option value="syncUpInvoices">Upload Invoices</option>
 			        <option value="syncUpCustomers">Upload Customers</option>
 			    </select>

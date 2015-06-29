@@ -61,7 +61,7 @@ function listInvoicesByCustomer(customer_ListID, aReceiveFunction,aErrFunc){
 	invoiceReceiveListFunction = aReceiveFunction;
 	invoiceErrFunc = aErrFunc;
 	filterDataInvoice = customer_ListID;
-	db.transaction(doCustomerInvoices, invoiceErrFunc, invoiceLocalListReceiveFunction);
+	db.transaction(doCustomerInvoices, invoiceErrFunc);
 }
 
 function listInvoicesToUpload(aReceiveFunction,aErrFunc){
@@ -194,6 +194,8 @@ function invoiceItemsLocalReceiveFunction(tx,results){
 }
 
 function invoiceLocalListReceiveFunction(tx,results){
+	logZoe("invoiceLocalListReceiveFunction results=" + results);
+	logZoe("invoiceLocalListReceiveFunction results.rows=" + results.rows);
 	logZoe("invoiceLocalListReceiveFunction results.length=" + results.rows.length);
 	var i;
 	arrayInvoices = new Array();
