@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+    <head>
+    <meta charset="utf-8">
+    <title>Inventory</title>
+		<link rel="stylesheet" href="css/themes/zoe.min.css" />
+		<link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+		<link rel="stylesheet" href="js/jquery-mobile/jquery.mobile.structure-1.4.5.min.css" />
+		<link rel="stylesheet" href="js/jqm-inlinetabs/jqm-inlinetabs.min.css" />
+
+		<!--  <link rel="stylesheet" href="js/jquery-mobile/jquery.mobile-1.4.5.min.css" />  -->
+		<script src="js/jquery-mobile/jquery-2.1.4.js"></script>
+		<script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+<!-- 		<script type="text/javascript" src="cordova.js"></script>  -->
+		<script src="js/jqm-inlinetabs/jqm-inlinetabs.min.js"></script>        
+		<script src="js/zoe/zoe.js"></script>
+		<script src="js/zoe/customerDAO.js"></script>
+        <script src="js/zoe/termDAO.js"></script>
+        <script src="js/zoe/pricelevelDAO.js"></script>
+        <script src="js/zoe/invoiceDAO.js"></script>
+		<script src="js/zoe/salesRepDAO.js"></script>
+		<script src="js/zoe/inventoryDAO.js"></script>
+        
+		<script> 
+
+			$(document).bind("pageinit", function(event) {
+				initAnyPage(event.target);
+				initThisPage(event);
+			});
+			
+			function initThisPage(event){ 
+					inventoryDAO.listInventorySite(receiveInventory,errReceiveInventory);
+					// receiveInventory();
+			}
+
+			// BEGIN Functions on error case
+			function errReceiveInventory(err){
+				alert("DB Error inventory: "+JSON.stringify(err));
+			}
+			// END functions on error case
+			
+			$(document).bind('pagechange', function() {
+				try{
+					$('.ui-page-active .ui-listview').listview('refresh');
+					$('.ui-page-active :jqmData(role=content)').trigger('create');
+				}catch(exception){
+				}
+			});	
+		
+
+			var listInventory = new Array();
+			var selectedIndex;			
+			function receiveInventory(arrayInventory){
+				// inventory.ListID, FullName, InventorySite_ListID, QuantityOnHand, salesPrice, salesTax_ListID, salesTax.desc				
+
+/*				var arrayInventory = new Array();
+				arrayInventory[0] = {InventorySite_ListID:'1',FullName:'Juan', QuantityOnHand:'1000.00'};
+				arrayInventory[1] = {InventorySite_ListID:'2',FullName:'Lina', QuantityOnHand:'10000.00'};
+				arrayInventory[2] = {InventorySite_ListID:'3',FullName:'Jose', QuantityOnHand:'100000.00'};
+				arrayInventory[3] = {InventorySite_ListID:'4',FullName:'Lisa', QuantityOnHand:'1000000.00'};
+				arrayInventory[4] = {InventorySite_ListID:'5',FullName:'Cris', QuantityOnHand:'10000000.00'};
+				arrayInventory[5] = {InventorySite_ListID:'6',FullName:'Isa',  QuantityOnHand:'-100000000.00'};
+				arrayInventory[6] = {InventorySite_ListID:'7',FullName:'Ana',  QuantityOnHand:'1000000000.00'};
+				arrayInventory[7] = {InventorySite_ListID:'8',FullName:'Tati', QuantityOnHand:'10000000000.00'};
+				arrayInventory[8] = {InventorySite_ListID:'9',FullName:'Yeny', QuantityOnHand:'100000000000.00'};
+				arrayInventory[9] = {InventorySite_ListID:'10',FullName:'Juli', QuantityOnHand:'1000000000000.00'};
+				arrayInventory[10] = {InventorySite_ListID:'11',FullName:'Xime', QuantityOnHand:'10000000000000.00'};
+*/			
+				console.log("receiveInventory arrayInventory=" + JSON.stringify(arrayInventory));
+				listInventory = arrayInventory; // Copy local array to global array
+				console.log("========= INICIO LISTA =========");
+				// Build Inventory list with <ol> <li>
+				var htmlString1 = "";
+
+				for(var i=0; i< arrayInventory.length; i++) {
+					var li =  '<li data-filtertext="' + arrayInventory[i].FullName + '"><a class="linkDetail" href="InventoryDetails?index=' + i + '" id="link_' + i + '" ><h3>'+arrayInventory[i].FullName+'</h3><p></p><span class="ui-li-count">'+arrayInventory[i].QuantityOnHand+'</span></a><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
+					
+					htmlString1 += li;
+					console.log("li=" + li);					
+					}
+					console.log("========= FIN LISTA =========");
+					try{$('#InvList').html(htmlString1).listview('refresh');}catch(e){}
+					//$(".linkDetail").click(goDetail); 				
+			} 
+		</script>
+
+    </head>
+    <body>
+        <!-- CUSTOMERS LIST (ALPHABETIC BY NAME AND OVERDUE BALANCE IN RED) -->
+        <div data-role="page" id="Inventory" data-theme="a" data-title="Inventory">
+            <div data-role="content" id="InventoryList">
+            <ul id="InvList" data-role="listview" data-filter="true" data-filter-placeholder="Search Inventory..." data-inset="true">
+            
+                </ul>
+            </div>
+            <!-- divs de header, menu y footer-->
+            <div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
+            <div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
+            <div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
+        <!-- fin divs -->
+        </div> 
+    </body>
+</html>
