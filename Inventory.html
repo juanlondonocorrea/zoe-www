@@ -52,20 +52,7 @@
 			var selectedIndex;			
 			function receiveInventory(arrayInventory){
 				// inventory.ListID, FullName, InventorySite_ListID, QuantityOnHand, salesPrice, salesTax_ListID, salesTax.desc				
-
-/*				var arrayInventory = new Array();
-				arrayInventory[0] = {InventorySite_ListID:'1',FullName:'Juan', QuantityOnHand:'1000.00'};
-				arrayInventory[1] = {InventorySite_ListID:'2',FullName:'Lina', QuantityOnHand:'10000.00'};
-				arrayInventory[2] = {InventorySite_ListID:'3',FullName:'Jose', QuantityOnHand:'100000.00'};
-				arrayInventory[3] = {InventorySite_ListID:'4',FullName:'Lisa', QuantityOnHand:'1000000.00'};
-				arrayInventory[4] = {InventorySite_ListID:'5',FullName:'Cris', QuantityOnHand:'10000000.00'};
-				arrayInventory[5] = {InventorySite_ListID:'6',FullName:'Isa',  QuantityOnHand:'-100000000.00'};
-				arrayInventory[6] = {InventorySite_ListID:'7',FullName:'Ana',  QuantityOnHand:'1000000000.00'};
-				arrayInventory[7] = {InventorySite_ListID:'8',FullName:'Tati', QuantityOnHand:'10000000000.00'};
-				arrayInventory[8] = {InventorySite_ListID:'9',FullName:'Yeny', QuantityOnHand:'100000000000.00'};
-				arrayInventory[9] = {InventorySite_ListID:'10',FullName:'Juli', QuantityOnHand:'1000000000000.00'};
-				arrayInventory[10] = {InventorySite_ListID:'11',FullName:'Xime', QuantityOnHand:'10000000000000.00'};
-*/			
+		
 				console.log("receiveInventory arrayInventory=" + JSON.stringify(arrayInventory));
 				listInventory = arrayInventory; // Copy local array to global array
 				console.log("========= INICIO LISTA =========");
@@ -99,5 +86,12 @@
             <div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
         <!-- fin divs -->
         </div> 
+
+		<!-- BEGIN CUSTOMERS DETAILS-->
+		<div data-role="page" id="InventoryDetails"  data-title="Inventory Detail" data-theme="a">
+			<div data-role="content" >
+            </div>
+        </div>
+        
     </body>
 </html>
