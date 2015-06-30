@@ -19,9 +19,10 @@
         <script src="js/zoe/termDAO.js"></script>
         <script src="js/zoe/pricelevelDAO.js"></script>
         <script src="js/zoe/invoiceDAO.js"></script>
+        <script src="js/zoe/salesRepDAO.js"></script>
 		<script> 
 
-			$(document).bind("pagebeforecreate", function(event) {
+			$(document).bind("pageinit", function(event) {
 				initAnyPage(event.target);
 				initThisPage(event);
 			});
@@ -36,12 +37,26 @@
 					type = event.currentTarget.URL.split("?type=")[1];
 				}
 
-				if (type=="route"){
-					customerDAO.listByRouteDay(6, receiveCustomers,errReceiveCustomers);
+				if (type=="route" || window.localStorage.getItem("current_type") == "route"){
+					var routeDay = (new Date()).getDay()+1;
+					console.log("routeDay="+ routeDay);
+					customerDAO.listByRouteDay(routeDay, receiveCustomers,errReceiveCustomers);
+					console.log("zoeTitle="+ $("#zoeTitle"));
+					console.log("zoeTitle.innerHtml="+ $("#zoeTitle").innerHtml);
+					console.log("zoeTitle.html="+ $("#zoeTitle").html());
+					$("#zoeTitle").html($("#zoeTitle").html() + " route day " + routeDay);
+					console.log("zoeTitle="+ $("#zoeTitle").html());
 				}else{
 					customerDAO.list(receiveCustomers, errReceiveCustomers);
 				}
 				
+				salesRepDAO.getByName(window.localStorage.getItem("salesRepName"), receiveSalesRep);
+				
+			}
+			
+			var salesRepVO;
+			function receiveSalesRep(vo){
+				salesRepVO = vo;
 			}
 
 			// BEGIN Functions on error case
@@ -63,8 +78,11 @@
 			// END functions on error case
 			
 			$(document).bind('pagechange', function() {
-				$('.ui-page-active .ui-listview').listview('refresh');
-				$('.ui-page-active :jqmData(role=content)').trigger('create');
+				try{
+					$('.ui-page-active .ui-listview').listview('refresh');
+					$('.ui-page-active :jqmData(role=content)').trigger('create');
+				}catch(exception){
+				}
 			});	
 
 			// Copy bill fileds to ship fields
@@ -114,53 +132,13 @@
 					$("#openBalance").css("color", "black");
 				}
 			}
-
-			// Toggle Switch state (on - off) to enable/disable edit
-			var state;
-			function ChangeEditState()
-			{
-				state = $('#FlipSwithEdit').is(':checked');
-				if (state == true) { // Enable Edit
-						enableEdit()
-					}
-					else if (state == false){ // Disable Edit
-						disableEdit() 
-					}		
-			}
-
-			// Enable fields
-			function enableEdit(){
-				$(".myFormsControl").textinput('enable');
-				$(".myFormsControl").selectmenu('enable').selectmenu( "refresh" );
-				$(".myFormsControl").checkboxradio('enable').checkboxradio( "refresh" );
-				$("#Terms").selectmenu('enable').selectmenu( "refresh" );
-				
-//				$('#SalesRep').textinput('enable');
-				
-				//$('#TabCustomerDetails :input').prop('readonly',false);
-				
-				//$('#TabCustomerDetails :checkbox').prop('readonly',false);
-				//$('#routeDays *').prop('disabled',false);
-				//$('.readonly input:checkbox').click(function(){return false;});
-        		//$('.readonly input:checkbox').keydown(function () { return false; });
-				//:checkbox[readonly=readonly]
-				//'.readonly input:checkbox'
-			}
 			
-			// Disable fields
-			function disableEdit(){
-				$(".myFormsControl").textinput('disable');
-				$(".myFormsControl").selectmenu('disable').selectmenu("refresh");
-				$(".myFormsControl").checkboxradio('disable').checkboxradio( "refresh" );
-
-				//$( "li.item-a" ).closest( "#one", listItemII )
-				//$('#TabCustomerDetails :input').prop('readonly',true);
-				
-				//$('#TabCustomerDetails input:checkbox').prop('checked',true);
-				//$('#routeDays *').prop('disabled',true);
-				//$('.readonly input:checkbox').click(function(){return true;});
-        		//$('.readonly input:checkbox').keydown(function () { return true; });				
+			function onClickInvoicePreview(id_invoice){
+				window.localStorage.setItem("current_index_customer", selectedIndex);
+				console.log("onClickInvoicePreview current_index_customer=" + window.localStorage.getItem("current_index_customer"));
+				window.localStorage.setItem("current_type", type);
 			}
+
 			
 			// Función para calcular los días transcurridos entre dos fechas
 			restaFechas = function(f1,f2)
@@ -210,8 +188,14 @@
 					console.log("li=" + li);					
 					}
 					console.log("========= FIN LISTA =========");
-					$('#custList').html(htmlString1).listview('refresh');
+					try{$('#custList').html(htmlString1).listview('refresh');}catch(e){}
 					$(".linkDetail").click(goDetail); 
+					console.log("current_index_customer="+window.localStorage.getItem("current_index_customer"));
+					if (window.localStorage.getItem("current_index_customer")){
+						selectedIndex = window.localStorage.getItem("current_index_customer");
+						renderDetail(window.localStorage.getItem("current_index_customer"));
+						window.localStorage.removeItem("current_index_customer");
+					}
 			}
 			
 			function receiveTerms(arrayTerms){
@@ -244,6 +228,7 @@
 				$('#priceLevel').trigger("chosen:updated");
 			}
 			
+			
 			// List Invoices by Customer 
 			function receiveInvoices(arrayListInvoicesByCust){
 				// Build customers' invoices by Customer, list with <ul> <li>
@@ -265,12 +250,11 @@
 						}
 						htmlString2 +='</div></div><div class="ui-block-b" style="width:20%">';
 						if (arrayListInvoicesByCust[i].origin == 'local'){
-							htmlString2 += '<a href="invoice.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-iconpos="notext"  data-ajax="false"></a>';
+							htmlString2 += '<a href="invoice.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
 						}
-						htmlString2 +='<a href="InvoicePreview.html?id_invoice="' + arrayListInvoicesByCust[i].id_invoice +
-						'" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-print" data-ajax="false"></a>' + 
+						htmlString2 +='<a href="InvoicePreview.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice +
+						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>' + 
 						'</div></li>';
-						logZoe("htmlString2 =" + JSON.stringify(arrayListInvoicesByCust[i]));
 					}
 					htmlString2 += '</ul>';
 					$('#InvoiceList').html(htmlString2);
@@ -307,6 +291,7 @@
 				$('#lblOverdueBalance1').text(listCustomers[index].overdueBalance);
 				
 				$('#SalesRep').val(listCustomers[index].id_salesrep);
+				$('#SalesRepName').val(window.localStorage.getItem("salesRepName"));
 				$('#ListID').val(listCustomers[index].ListID);
 				$('#IsActive').val(listCustomers[index].IsActive);
 				$('#FullName').val(listCustomers[index].FullName);
@@ -382,7 +367,7 @@
 				var customersVO = [];
 								
 				var customerVO = {
-					id_salesrep:$('#SalesRep').val(),
+					id_salesrep:salesRepVO.id_salesrep,
 
 					ListID:$('#ListID').val(),
 					IsActive:$('#IsActive').val(),
@@ -508,7 +493,7 @@
 		</style> 
 	</head>
 
-	<body onload="disableEdit();">
+	<body>
 
         <!-- CUSTOMERS LIST (ALPHABETIC BY NAME AND OVERDUE BALANCE IN RED) -->
 		<div data-role="page" id="Customers" data-theme="a" data-title="Customers">
@@ -575,13 +560,6 @@
 					</ul>
 					<!-- CUSTOMERS DETAILS CONTENT  - TAB 1 -->
 					<div data-tab="1" id="TabCustomerDetails">
-						<div data-role="fieldcontain">
-							<div>
-								<label for="FlipSwithEdit">Edit enable:</label>
-							</div>
-						<input type="checkbox" data-role="flipswitch" name="flip-checkbox-3" id="FlipSwithEdit" data-on-text="On" data-off-text="Off" data-wrapper-class="custom-size-flipswitch" onChange="ChangeEditState();">
-                        <a href="#" class="ui-shadow ui-btn ui-corner-all ui-btn-inline ui-icon-plus ui-btn-icon-notext ui-btn-b ui-mini">Add Customer</a>
-						</div>
 						<form id="formulario" >
 							<!-- Relational Info --> 
 							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
@@ -590,21 +568,16 @@
 									<div>
 										<label for="ListID">Sales Representant:</label>
 									</div>
-									<input class="myFormsControl" type="text" data-theme="b" name="SalesRep" id="SalesRep" value=""/>
+									<input class="myFormsControl" type="text" data-theme="b" name="SalesRepName" id="SalesRepName" value="" readonly/>
+									<input type="hidden" data-theme="b" name="SalesRep" id="SalesRep" value="" readonly/>
 								</div>
 							</fieldset>    
 							<!-- Identification Info -->
 							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
-								<legend><h4>Identification Info</h4></legend>
 								<div data-role="fieldcontain">
 									<div>
-										<label for="ListID">ListID:</label>
-									</div>
-									<input type="text" data-theme="b" name="ListID" id="ListID" value=""/>
-									<input type="text" data-theme="b" name="IsActive" id="IsActive" value=""/>
-								</div>
-								<div data-role="fieldcontain">
-									<div>
+									<input type="hidden" data-theme="b" name="ListID" id="ListID" value=""/>
+									<input type="hidden" data-theme="b" name="IsActive" id="IsActive" value=""/>
 										<label for="FullName">Full Name:</label>
 									</div>
 									<input  class="myFormsControl" type="text" data-theme="b" name="FullName" id="FullName" value=""/>
@@ -867,7 +840,7 @@
                             <fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px;">
                                 <div class="ui-grid-a" style="height:45px">
                                     <div class="ui-block-a ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="cancel" data-add-back-btn="true" data-theme="b">Cancel</button></div>
-                                    <div class="ui-block-b ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="btnUpdateCustomer"  onClick="UpdateCustomer()";"data-theme="c">Done</button></div>	
+                                    <div class="ui-block-b ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="btnUpdateCustomer"  onClick="UpdateCustomer(); return false;" data-theme="c">Done</button></div>	
                                 </div>
                             </fieldset>
 						</form>		
