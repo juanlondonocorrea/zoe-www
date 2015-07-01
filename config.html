@@ -20,6 +20,7 @@
 <script src="js/zoe/customerDAO.js" type="text/javascript"></script>
 <script src="js/zoe/vendorDAO.js" type="text/javascript"></script>
 <script src="js/zoe/invoiceDAO.js" type="text/javascript"></script>
+<script src="js/zoe/creditMemoDAO.js" type="text/javascript"></script>
 <script src="js/zoe/customerMsgDAO.js" type="text/javascript"></script>
 <script src="js/zoe/termDAO.js" type="text/javascript"></script>
 <script src="js/zoe/taxDAO.js" type="text/javascript"></script>
@@ -140,6 +141,7 @@
 		if (currentDown<whatToDownload.length){
 			if (currentDown == 0){
 				 $("#synchDialog").popup("open"); 
+				 console.log("synchDialog open");
 			}
 			if (whatToDownload[currentDown] == "all" || whatToDownload[currentDown].indexOf("hoose")>-1){
 				downNext();
@@ -159,6 +161,8 @@
 				syncPricelevel();
 			}else if (whatToDownload[currentDown] == "syncDownInvoices" ){
 				syncInvoices();
+			}else if (whatToDownload[currentDown] == "syncDownCreditMemos" ){
+				syncCreditMemos();
 			}else if (whatToDownload[currentDown] == "syncDownCustomers" ){
 				whatToDownload[whatToDownload.length]="syncDownVendors";
 				syncCustomers();
@@ -529,6 +533,178 @@
 		$("#currentTask").html(message);
 	}
 
+//SYNCHRONIZATION CreditMemos	
+	function syncCreditMemos(form){
+		console.log("entre a syncCreditMemos");
+		salesRepDAO.getByName(window.localStorage.getItem("salesRepName"), function(salesrepVO){
+		logZoe("en syncCreditMemos salesrepVO = " + JSON.stringify(salesrepVO));
+		var mensaje = 	
+		'<CreditMemoQueryRq requestID="creditMemo001"></CreditMemoQueryRq>';
+		var cache="creditMemo";
+		var xpathExp = '//CreditMemoRet[SalesRepRef/ListID="'+ salesrepVO.id_salesrep + '"]';
+		
+		consumeWS(mensaje, "JSON", receiveCreditMemosMessage, cache, xpathExp);
+		});
+		return false;
+	}
+
+	function receiveCreditMemosMessage(message){
+		var creditMemos = message.CreditMemoQueryRs.CreditMemoRet;
+		var i;
+		var creditMemosVO = [];
+		for (i=0;i<creditMemos.length;i++){
+			var creditMemo = creditMemos[i];
+			
+			var creditMemoVO = convertCreditMemoFromQB(creditMemo);
+
+			creditMemosVO[i] = creditMemoVO;
+				
+		}
+			
+		creditMemoDAO.deleteAll(errCreditMemoInsert);
+		creditMemoDAO.store(creditMemosVO, errCreditMemoInsert, successCreditMemoInsert,'remote');
+	}
+	
+	function convertCreditMemoFromQB(creditMemo){
+			logZoe("creditMemo=" + JSON.stringify(creditMemo));
+			logZoe("creditMemo.TermsRef=" + JSON.stringify(creditMemo.TermsRef));
+			if (creditMemo.TermsRef)
+				logZoe("creditMemo.TermsRef.ListID=" + JSON.stringify(creditMemo.TermsRef.ListID));
+			
+			var creditMemoVO = {
+				id_creditMemo:creditMemo.TxnID,
+				ListID : creditMemo.CustomerRef.ListID,
+				po_number : creditMemo.PONumber,
+				dueDate : creditMemo.DueDate,
+				appliedAmount : creditMemo.AppliedAmount,
+				txnDate: creditMemo.TxnDate,
+				balanceRemaining : creditMemo.BalanceRemaining,
+				billAddress_addr1 : creditMemo.BillAddress?creditMemo.BillAddress.Addr1:null,
+				billAddress_addr2 :creditMemo.BillAddress?creditMemo.BillAddress.Addr2:null,
+				billAddress_addr3 : creditMemo.BillAddress?creditMemo.BillAddress.Addr3:null,
+				billAddress_city : creditMemo.BillAddress?creditMemo.BillAddress.City:null,
+				billAddress_state : creditMemo.BillAddress?creditMemo.BillAddress.State:null,
+				billAddress_postalcode : creditMemo.BillAddress?creditMemo.BillAddress.PostalCode:null,
+				shipAddress_addr1 : creditMemo.BillAddress?creditMemo.BillAddress.addr1:null,
+				shipAddress_addr2 : creditMemo.BillAddress?creditMemo.BillAddress.addr2:null,
+				shipAddress_addr3 : creditMemo.BillAddress?creditMemo.BillAddress.addr3:null,
+				shipAddress_city : creditMemo.BillAddress?creditMemo.BillAddress.City:null,
+				shipAddress_state : creditMemo.BillAddress?creditMemo.BillAddress.State:null,
+				shipAddress_postalcode : creditMemo.BillAddress?creditMemo.BillAddress.PostalCode:null,
+				isPaid : creditMemo.IsPaid=="true"?1:0,
+				isPending : creditMemo.IsPending=="true"?1:0,
+				refNumber : creditMemo.RefNumber,
+				TaxPercentage : creditMemo.SalesTaxPercentage,
+				salesTaxTotal : creditMemo.SalesTaxTotal,
+				shipDate : creditMemo.ShipDate,
+				subtotal : creditMemo.Subtotal,
+				customerMsg_ListID: creditMemo.CustomerMsgRef?creditMemo.CustomerMsgRef.ListID:null,
+				id_salesrep:creditMemo.SalesRepRef?creditMemo.SalesRepRef.ListID:null,
+				id_term: typeof creditMemo.TermsRef != "undefined"?creditMemo.TermsRef.ListID:null,
+				items: new Array()
+			}
+			
+			if (creditMemo.CreditMemoLineRet){
+				for (j=0;j<creditMemo.CreditMemoLineRet.length;j++){
+					var line = creditMemo.CreditMemoLineRet[j];
+					var itemVO = {
+							LineID:line.TxnLineID,
+							id_creditMemo:creditMemoVO.id_creditMemo,
+							Inventory_ListID:line.ItemRef.ListID,
+							Desc:line.Desc,
+							Quantity:line.Quantity,
+							Rate:line.Rate,
+							Amount:line.Amount,
+							SalesTax_ListID:line.SalesTaxCodeRef.ListID
+					}
+					creditMemoVO.items[j] = itemVO;
+				}
+			}
+			return creditMemoVO;
+	}
+
+
+	function successCreditMemoInsert(){
+		downNext();
+	}
+	
+	function errCreditMemoInsert(err){
+		alert("DB Error synch creditMemos: "+JSON.stringify(err));
+	}
+
+	function syncUpCreditMemos(form){
+		console.log("entre a syncUpCreditMemos");
+		var mensaje = "";
+		creditMemoDAO.listToUpload(function(results){
+			for (var i in results){
+				var rec = results[i];
+				mensaje += '<CreditMemoAddRq requestID="' + rec.refNumber+ '"><CreditMemoAdd>'+
+					'<CustomerRef><ListID>' + rec.ListID + '</ListID></CustomerRef>'+
+					'<TxnDate>'+rec.shipDate+'</TxnDate>'+
+					'<RefNumber>'+rec.refNumber+'</RefNumber>'+
+					'<PONumber>'+rec.po_number+'</PONumber>'+
+					'<TermsRef><ListID>'+rec.id_term+ '</ListID></TermsRef>'+
+					'<DueDate>'+rec.dueDate+'</DueDate>'+
+					'<SalesRepRef><ListID>' +rec.id_salesrep+'</ListID></SalesRepRef>'+
+					'<Memo>' +rec.memo+'</Memo>';
+					if (rec.customerMsg_ListID){
+						mensaje+='<CustomerMsgRef><ListID>' +rec.customerMsg_ListID + '</ListID></CustomerMsgRef>';
+					}
+					if (rec.SalesTax_ListID){
+						mensaje+='<CustomerSalesTaxCodeRef><ListID>' + rec.SalesTax_ListID + '</ListID></CustomerSalesTaxCodeRef>';
+					}
+				for (var j in rec.items){
+					var item=rec.items[j];
+					mensaje += '<CreditMemoLineAdd><ItemRef><ListID>' + item.Inventory_ListID +'</ListID></ItemRef>';
+					mensaje += '<Quantity>' + item.Quantity + '</Quantity>';
+					mensaje += '<Rate>' + item.Rate + '</Rate>';
+					if (item.InventorySite_ListID){
+						mensaje += '<InventorySiteRef><ListID>' + item.InventorySite_ListID+ '</ListID></InventorySiteRef>';
+					}
+					mensaje += '</CreditMemoLineAdd>';
+				}
+				mensaje += '</CreditMemoAdd></CreditMemoAddRq>';
+			}
+						
+			console.log("syncUpCreditMemos mensaje=" +  mensaje)
+			
+			consumeWS(mensaje, "JSON", receiveSyncUpCreditMemosMessage);
+		}, function(err){
+			alert("Fail sync upload CreditMemos " + JSON.stringify(err));
+		});
+		return false;
+	}
+	
+	function receiveSyncUpCreditMemosMessage(message){
+		console.log('receiveSyncUpCreditMemosMessage message=' + message);
+		var ListCreditMemoAddRs = message.CreditMemoAddRs;
+		var message = "";
+		for (var i in ListCreditMemoAddRs){
+			var CreditMemoAddRs;
+			if (ListCreditMemoAddRs.length){
+				CreditMemoAddRs =ListCreditMemoAddRs[i]
+			}else{
+				CreditMemoAddRs = ListCreditMemoAddRs;
+			}
+			var statusMessage =CreditMemoAddRs.statusMessage;
+			if (statusMessage == "Status OK"	){
+				var creditMemo = CreditMemoAddRs.CreditMemoRet;
+				message += "Success upload CreditMemo " + CreditMemoAddRs.requestID + "<br>";
+				creditMemoDAO.delete(CreditMemoAddRs.requestID);
+				var creditMemoVO = convertCreditMemoFromQB(creditMemo);
+				creditMemoDAO.store([creditMemoVO]);
+			}else{
+				message += "Fail to upload creditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
+			}
+			if (!ListCreditMemoAddRs.length){
+				break;
+			}
+		}
+	
+		$("#btnSynchDialog").html("Accept");
+		$("#currentTask").html(message);
+	}
+
 
 //SYNCHRONIZATION inventory
 
@@ -876,6 +1052,7 @@
                         <option value="syncDownInventory">Inventory</option>
                         <option value="syncDownPricelevel">Pricelevel</option>
                         <option value="syncDownInvoices">Invoices</option>
+                        <option value="syncDownCreditMemos">Credit Memos</option>
                         <option value="syncDownCustomers">Customers</option>
                     </select>
                   </div>
@@ -889,6 +1066,7 @@
 			    <select name="syncUpSelect" id="syncUpSelect" multiple="multiple" data-native-menu="false">
 			        <option  data-placeholder="true">Choose what to upload</option>
 			        <option value="syncUpInvoices">Upload Invoices</option>
+			        <option value="syncUpCreditMemos">Upload Credit Memos</option>
 			        <option value="syncUpCustomers">Upload Customers</option>
 			    </select>
                   </div>

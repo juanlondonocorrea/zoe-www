@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 30/06/2015
+Modified: 01/07/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -15,6 +15,7 @@ DROP INDEX IF EXISTS IX_Relationship20;
 DROP INDEX IF EXISTS IX_Relationship22;
 DROP INDEX IF EXISTS IX_Relationship18;
 DROP INDEX IF EXISTS IX_Relationship21;
+DROP INDEX IF EXISTS IX_Relationship23;
 DROP INDEX IF EXISTS IX_Relationship15;
 DROP INDEX IF EXISTS IX_Relationship14;
 DROP INDEX IF EXISTS IX_Relationship16;
@@ -247,9 +248,10 @@ CREATE INDEX IX_Relationship11 ON invoice (customerMsg_ListID);
 CREATE TABLE creditMemo
 (
   id_creditMemo TEXT NOT NULL,
-  customer_ListID TEXT NOT NULL,
+  ListID TEXT NOT NULL,
   po_number TEXT,
   dueDate INTEGER,
+  txnDate INTEGER,
   appliedAmount NUMERIC,
   balanceRemaining NUMERIC,
   billAddress_addr1 TEXT,
@@ -280,13 +282,16 @@ CREATE TABLE creditMemo
   origin TEXT,
   id_salesrep TEXT,
   CONSTRAINT Key4 PRIMARY KEY (id_creditMemo),
-  CONSTRAINT Relationship18 FOREIGN KEY (customer_ListID) REFERENCES customer (ListID),
-  CONSTRAINT Relationship21 FOREIGN KEY (id_term) REFERENCES term (id_term)
+  CONSTRAINT Relationship18 FOREIGN KEY (ListID) REFERENCES customer (ListID),
+  CONSTRAINT Relationship21 FOREIGN KEY (id_term) REFERENCES term (id_term),
+  CONSTRAINT Relationship23 FOREIGN KEY (customerMsg_ListID) REFERENCES customer_msg (ListID)
 );
 
-CREATE INDEX IX_Relationship18 ON creditMemo (customer_ListID);
+CREATE INDEX IX_Relationship18 ON creditMemo (ListID);
 
 CREATE INDEX IX_Relationship21 ON creditMemo (id_term);
+
+CREATE INDEX IX_Relationship23 ON creditMemo (customerMsg_ListID);
 
 -- Table invoice_item
 
