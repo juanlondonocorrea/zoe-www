@@ -11,13 +11,8 @@
 		<!--  <link rel="stylesheet" href="js/jquery-mobile/jquery.mobile-1.4.5.min.css" />  -->
 		<script src="js/jquery-mobile/jquery-2.1.4.js"></script>
 		<script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
-<!-- 		<script type="text/javascript" src="cordova.js"></script>  -->
-		<script src="js/jqm-inlinetabs/jqm-inlinetabs.min.js"></script>        
+ 		<script type="text/javascript" src="cordova.js"></script>
 		<script src="js/zoe/zoe.js"></script>
-		<script src="js/zoe/customerDAO.js"></script>
-        <script src="js/zoe/termDAO.js"></script>
-        <script src="js/zoe/pricelevelDAO.js"></script>
-        <script src="js/zoe/invoiceDAO.js"></script>
 		<script src="js/zoe/salesRepDAO.js"></script>
 		<script src="js/zoe/inventoryDAO.js"></script>
         
@@ -46,11 +41,27 @@
 				}
 			});	
 		
-
+			// Cordova Device Ready.
+			function print() {
+				try{
+					cordova.plugins.printer.isAvailable(
+					//Check whether the printer is available or not.
+					function (isAvailable) {
+						 //Enter the page location.
+						 var page = $('#PrintInventory').html(); //location.href;
+						 cordova.plugins.printer.print(page, 'Document.html', function () {
+						 alert('printing finished or canceled')
+							});
+					}
+				);
+				}catch(e){
+					console.log("could not print:" + e);
+				}
+			}
+		
 			var listInventory = new Array();
 			var selectedIndex;			
 			function receiveInventory(arrayInventory){
-				console.log("receiveInventory arrayInventory=" + JSON.stringify(arrayInventory));
 				listInventory = arrayInventory; // Copy local array to global array
 				// Build Inventory list with <ol> <li>
 				var htmlString1 = "";
@@ -67,7 +78,6 @@
 			
 			function goInventoryDetail(event){
 				var index =  event.currentTarget.id;
-				logZoe("goInventoryDetail index: "+index)
 				index = index.substring(index.indexOf("_")+1);
 				selectedIndex = index;
 				inventoryDetails(index);
@@ -79,7 +89,45 @@
 				$('#salesPrice').val(listInventory[index].salesPrice);
 				$('#salesTax').text(listInventory[index].desc);
 			}
-			
+
+			function inventoryPrint(){
+                var inventoryItems = '<table width="100%" border="1" cellspacing="0" cellpadding="0">'
+                  +'<tbody>'
+                    +'<tr>'
+                      +'<td style="vertical-align:top">Full Name</td>'
+                      +'<td style="vertical-align:top">Quantity On Hand</td>'
+                      +'<td style="vertical-align:top">Sales Price</td>'
+                      +'<td style="vertical-align:top">Sales Tax</td>'
+                    +'</tr>';
+
+				$("#tableInventoryItems").html("");
+				if (listInventory){
+					for (var i=0; i < listInventory.length; i++) {
+						inventoryItems +=
+						'<tr>';
+						inventoryItems +=
+						'<tr>'
+						  +'<td style="vertical-align:top" align="left"><div id="FullNameP" class="TinyFont">'+listInventory[i].FullName+'</div></td>'
+						  +'<td style="vertical-align:top" align="right"><div id="QuantityOnHandP" class="TinyFont">'+listInventory[i].QuantityOnHand+'</div></td>'
+						  +'<td style="vertical-align:top" align="right"><div id="salesPriceP" class="TinyFont">$ '+listInventory[i].salesPrice+'</div></td>';
+							if (listInventory[i].desc != null) {
+								inventoryItems += '<td style="vertical-align:top" align="left"><div id="salesTaxP" class="TinyFont">'+listInventory[i].desc+'</div></td>';
+							}
+							else
+						  		inventoryItems += '<td>&nbsp;</td>';
+						inventoryItems +='</tr>';
+					}						  
+				}
+				else {
+					inventoryItems +=
+						'<tr>'
+							+'<td colspan="6"><div align="center" class="SmallFont">No items</div></td>'
+						+'</tr>';
+				}
+				inventoryItems += '</tbody></table>';
+				$("#tableInventoryItems").html(inventoryItems); 
+				print();
+			} 
 		</script>
 
     </head>
@@ -87,7 +135,8 @@
         <!-- INVENTORY LIST -->
         <div data-role="page" id="Inventory" data-theme="a" data-title="Inventory">
             <div data-role="content" id="InventoryList">
-            <ul id="InvList" data-role="listview" data-filter="true" data-filter-placeholder="Search Inventory..." data-inset="true">
+                <a href="#PrintInventory" data-role="button" data-icon="print" data-iconpos="left" onClick="inventoryPrint();">Print Inventory</a>
+                <ul id="InvList" data-role="listview" data-filter="true" data-filter-placeholder="Search Inventory..." data-inset="true">
             
                 </ul>
             </div>
@@ -95,9 +144,9 @@
             <div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
             <div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
             <div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
-        <!-- fin divs -->
+        	<!-- fin divs -->
         </div> 
-
+		<!-- END INVENTORY LIST -->
 		<!-- BEGIN INVENTORY DETAILS-->
 		<div data-role="page" id="InventoryDetails" data-title="Inventory Detail" data-theme="a">
 			<div data-role="content">
@@ -129,6 +178,26 @@
                     </div>
 				</fieldset>
             </div>
+            <!-- divs de header, menu y footer-->
+            <div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
+            <div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
+            <div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
+        	<!-- fin divs -->            
         </div>
+        <!-- END INVENTORY DETAILS-->
+		<!-- BEGIN PRINT INVENTORY -->
+		<div data-role="page" id="PrintInventory" data-title="Print Inventory" data-theme="a">
+			<div data-role="content">
+				<div id="tableInventoryItems">
+
+            	</div>
+            </div>
+            <!-- divs de header, menu y footer-->
+            <div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
+            <div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
+            <div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
+        	<!-- fin divs -->
+        </div>
+        <!-- END PRINT INVENTORY-->
     </body>
 </html>

@@ -163,14 +163,13 @@
 				$("#tableBodyItems").html("");
 				if (InvoiceVO.items){
 					for (var i=0; i < InvoiceVO.items.length; i++) {
-	
 						invoiceItems +=
 						'<tr>'
 						  +'<td><div align="right" class="SmallFont">'+InvoiceVO.items[i].LineID+'</div></td>'
 						  +'<td><div class="SmallFont">'+InvoiceVO.items[i].Desc+'</div></td>'
 						  +'<td><div align="right" class="SmallFont">$ '+InvoiceVO.items[i].Rate+'</div></td>'
 						  +'<td><div align="right" class="SmallFont">'+InvoiceVO.items[i].Quantity+'</div></td>'
-						  +'<td><div align="right" class="SmallFont">$ '+InvoiceVO.items[i].Amount+'</div></td>'
+						  +'<td><div align="right" class="SmallFont">$ '+InvoiceVO.items[i].Amount+'</div></td>';
 						if (InvoiceVO.items[i].salesTax_Name != null)
 						  	invoiceItems += '<td><div class="SmallFont">'+InvoiceVO.items[i].salesTax_Name+'</div></td>';
 						else
@@ -338,11 +337,14 @@
                       </tr>
                   </tbody>
                 </table>
-                    
-                    <br>
-					<div id="customer_msg_FullName" class="SmallFont"></div>
-				
+                <br>
+                <div id="customer_msg_FullName" class="SmallFont"></div>
 	  		</div>
+            <!-- divs de header, menu y footer-->
+            <div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
+            <div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
+            <div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
+        	<!-- fin divs -->            
 		</div>				
 	</body>
 </html>
