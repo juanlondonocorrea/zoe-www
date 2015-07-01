@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 23/06/2015
+Modified: 30/06/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -10,6 +10,15 @@ Database: SQLite 3.7
 
 -- Drop indexes section -------------------------------------------------
 
+DROP INDEX IF EXISTS IX_Relationship19;
+DROP INDEX IF EXISTS IX_Relationship20;
+DROP INDEX IF EXISTS IX_Relationship22;
+DROP INDEX IF EXISTS IX_Relationship18;
+DROP INDEX IF EXISTS IX_Relationship21;
+DROP INDEX IF EXISTS IX_Relationship15;
+DROP INDEX IF EXISTS IX_Relationship14;
+DROP INDEX IF EXISTS IX_Relationship16;
+DROP INDEX IF EXISTS IX_Relationship17;
 DROP INDEX IF EXISTS IX_VENDOR_NAME;
 DROP INDEX IF EXISTS IX_Inventory_fullName;
 DROP INDEX IF EXISTS IX_Relationship6;
@@ -33,11 +42,16 @@ DROP INDEX IF EXISTS idx_salesrep_1;
 
 -- Drop tables section ---------------------------------------------------
 
+DROP TABLE IF EXISTS InvoiceLinkedTxn;
+DROP TABLE IF EXISTS paymentMethod;
+DROP TABLE IF EXISTS Payments;
 DROP TABLE IF EXISTS Vendor;
 DROP TABLE IF EXISTS customer_msg;
 DROP TABLE IF EXISTS pricelevel_item;
 DROP TABLE IF EXISTS pricelevel;
+DROP TABLE IF EXISTS creditMemo_item;
 DROP TABLE IF EXISTS invoice_item;
+DROP TABLE IF EXISTS creditMemo;
 DROP TABLE IF EXISTS invoice;
 DROP TABLE IF EXISTS customer;
 DROP TABLE IF EXISTS salesrep;
@@ -228,6 +242,52 @@ CREATE INDEX IX_Relationship10 ON invoice (id_salesrep);
 
 CREATE INDEX IX_Relationship11 ON invoice (customerMsg_ListID);
 
+-- Table creditMemo
+
+CREATE TABLE creditMemo
+(
+  id_creditMemo TEXT NOT NULL,
+  customer_ListID TEXT NOT NULL,
+  po_number TEXT,
+  dueDate INTEGER,
+  appliedAmount NUMERIC,
+  balanceRemaining NUMERIC,
+  billAddress_addr1 TEXT,
+  billAddress_addr2 TEXT,
+  billAddress_city TEXT,
+  billAddress_state TEXT,
+  billAddress_postalcode TEXT,
+  shipAddress_addr1 TEXT,
+  shipAddress_addr2 TEXT,
+  shipAddress_city TEXT,
+  shipAddress_state TEXT,
+  shipAddress_postalcode TEXT,
+  isPaid INTEGER,
+  isPending INTEGER,
+  refNumber TEXT,
+  salesTaxPercentage NUMERIC,
+  salesTaxTotal NUMERIC,
+  shipDate INTEGER,
+  subtotal NUMERIC,
+  id_term TEXT,
+  billAddress_addr3 TEXT,
+  customerMsg_ListID TEXT,
+  shipAddress_addr3 TEXT,
+  memo TEXT,
+  zoeUpdateDate INTEGER,
+  zoeSycDate INTEGER,
+  needSync INTEGER,
+  origin TEXT,
+  id_salesrep TEXT,
+  CONSTRAINT Key4 PRIMARY KEY (id_creditMemo),
+  CONSTRAINT Relationship18 FOREIGN KEY (customer_ListID) REFERENCES customer (ListID),
+  CONSTRAINT Relationship21 FOREIGN KEY (id_term) REFERENCES term (id_term)
+);
+
+CREATE INDEX IX_Relationship18 ON creditMemo (customer_ListID);
+
+CREATE INDEX IX_Relationship21 ON creditMemo (id_term);
+
 -- Table invoice_item
 
 CREATE TABLE invoice_item
@@ -251,6 +311,30 @@ CREATE INDEX IX_invoice_lines ON invoice_item (id_invoice);
 CREATE INDEX IX_Relationship1 ON invoice_item (Inventory_ListID);
 
 CREATE INDEX IX_Relationship2 ON invoice_item (SalesTax_ListID);
+
+-- Table creditMemo_item
+
+CREATE TABLE creditMemo_item
+(
+  LineID TEXT NOT NULL,
+  inventory_ListID TEXT,
+  Desc TEXT,
+  Quantity NUMERIC,
+  Rate NUMERIC,
+  Amount NUMERIC,
+  SalesTax_ListID TEXT,
+  id_creditMemo TEXT,
+  CONSTRAINT Key5 PRIMARY KEY (LineID),
+  CONSTRAINT Relationship19 FOREIGN KEY (id_creditMemo) REFERENCES creditMemo (id_creditMemo),
+  CONSTRAINT Relationship20 FOREIGN KEY (inventory_ListID) REFERENCES Inventory (ListID),
+  CONSTRAINT Relationship22 FOREIGN KEY (SalesTax_ListID) REFERENCES salesTax (ListID)
+);
+
+CREATE INDEX IX_Relationship19 ON creditMemo_item (id_creditMemo);
+
+CREATE INDEX IX_Relationship20 ON creditMemo_item (inventory_ListID);
+
+CREATE INDEX IX_Relationship22 ON creditMemo_item (SalesTax_ListID);
 
 -- Table pricelevel
 
@@ -300,5 +384,55 @@ CREATE TABLE Vendor
 );
 
 CREATE INDEX IX_VENDOR_NAME ON Vendor (name);
+
+-- Table Payments
+
+CREATE TABLE Payments
+(
+  TxnID TEXT NOT NULL,
+  TxnDate NUMERIC NOT NULL,
+  ExchangeRate TEXT,
+  RefNumber TEXT,
+  TotalAmount TEXT,
+  memo TEXT,
+  paymentmethod_ListID TEXT,
+  customer_ListID TEXT,
+  CONSTRAINT Key12 PRIMARY KEY (TxnID),
+  CONSTRAINT TxnID UNIQUE (TxnID),
+  CONSTRAINT Relationship14 FOREIGN KEY (paymentmethod_ListID) REFERENCES paymentMethod (ListID),
+  CONSTRAINT Relationship16 FOREIGN KEY (paymentmethod_ListID) REFERENCES customer (ListID),
+  CONSTRAINT Relationship17 FOREIGN KEY (customer_ListID) REFERENCES customer (ListID)
+);
+
+CREATE INDEX IX_Relationship14 ON Payments (paymentmethod_ListID);
+
+CREATE INDEX IX_Relationship16 ON Payments (paymentmethod_ListID);
+
+CREATE INDEX IX_Relationship17 ON Payments (customer_ListID);
+
+-- Table paymentMethod
+
+CREATE TABLE paymentMethod
+(
+  ListID TEXT NOT NULL,
+  FullName TEXT,
+  CONSTRAINT Key11 PRIMARY KEY (ListID)
+);
+
+-- Table InvoiceLinkedTxn
+
+CREATE TABLE InvoiceLinkedTxn
+(
+  TxnID TEXT NOT NULL,
+  TxnType TEXT,
+  TxnDate NUMERIC,
+  RefNumber TEXT,
+  LinkType TEXT DEFAULT AMTTYPE,
+  Amount NUMERIC,
+  id_invoice TEXT,
+  CONSTRAINT Relationship15 FOREIGN KEY (id_invoice) REFERENCES invoice (id_invoice)
+);
+
+CREATE INDEX IX_Relationship15 ON InvoiceLinkedTxn (id_invoice);
 
 

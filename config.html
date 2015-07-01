@@ -56,37 +56,28 @@
 	var wasSelectedAllSyncDown=false;
 	function onChangeSyncDownSelect(){
 		var	selectedValues = $("#syncDownSelect").val();
+		var newValue;
+		var toggle = false;
+		if (selectedValues.indexOf("all")>-1 && !wasSelectedAllSyncDown){
+			newValue = true;
+			toggle = true;
+			wasSelectedAllSyncDown = true;
+		}else if (selectedValues.indexOf("all")==-1 && wasSelectedAllSyncDown){
+			newValue = false;
+			toggle = true;
+			wasSelectedAllSyncDown = false;
+		}
+		console.log("onChangeSyncDownSelect toggle=" + toggle);
 		console.log("onChangeSyncDownSelect values=" + selectedValues);
-		if (selectedValues.indexOf("all")>-1){
-			if (!wasSelectedAllSyncDown){
-				var newSelectedValues=["all"];
-				var i = 1;
-				console.log("onChangeSyncDownSelect recorree=" + selectedValues);
-				$('#syncDownSelect').find("option").each(function(){
-				   if($(this).val()!="all" && $(this).val().indexOf("hoose")==-1){
-						console.log("onChangeSyncDownSelect disabling=" + $(this).val());
-						$(this).attr("disabled","true");
-						$(this).attr("selected","true");
-						newSelectedValues[i++] = $(this).val();
-				   }
-				});
-				wasSelectedAllSyncDown = true;
-//				console.log("newSelectedValues="+newSelectedValues);
-				$("#syncDownSelect").selectmenu("refresh");
-				console.log("syncDownSelect.val="+$("#syncDownSelect").val());
-			}
-		}else{
-			if (wasSelectedAllSyncDown){
-				$('#syncDownSelect').find("option").each(function(){
-				   if($(this).val()!="all" && $(this).val().indexOf("hoose")==-1){
-						console.log("onChangeSyncDownSelect enabling=" + $(this).val());
-						$(this).attr("disabled", "false");
-						$(this).attr("selected","false");
-				   }
-				});
-				wasSelectedAllSyncDown = false;
-				console.log("syncDownSelect.val="+$("#syncDownSelect").val());
-			}
+		if (toggle){
+			$('#syncDownSelect').find("option").each(function(){
+			   if($(this).val()!="all" && $(this).val().indexOf("hoose")==-1){
+				   $("#syncDownSelect option[value='" + $(this).val() + "']").prop("selected",newValue);
+				   $("#syncDownSelect option[value='" + $(this).val() + "']").prop("disabled",newValue);
+			   }
+			});
+			$("#syncDownSelect").selectmenu("refresh");
+			console.log("syncDownSelect.val="+$("#syncDownSelect").val());
 		}
 	}
 	
@@ -129,7 +120,16 @@
 			if (!willcontinue)
 		        return;
 		}
-		whatToDownload = $("#syncDownSelect").val();
+		var i = 0;
+		if ($("#syncDownSelect").val().indexOf("all")>-1){
+			$('#syncDownSelect').find("option").each(function(){
+			   if($(this).val()!="all" && $(this).val().indexOf("hoose")==-1){
+				   whatToDownload[i++] = $(this).val();
+			   }
+			});
+		}else{
+			whatToDownload = $("#syncDownSelect").val();
+		}
 		console.log("whatToDownload=" + whatToDownload);
 		currentDown = -1;
 		downNext();
