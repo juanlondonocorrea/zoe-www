@@ -19,6 +19,22 @@
   <script src="js/zoe/termDAO.js"></script>
   <script src="js/zoe/taxDAO.js"></script>
   <script src="js/zoe/customerMsgDAO.js"></script>
+  
+<script src="js/signature/modernizr.js"></script>
+<script src="js/signature/jSignature.js"></script>
+<script src="js/signature/plugins/jSignature.CompressorBase30.js"></script>
+<script src="js/signature/plugins/jSignature.CompressorSVG.js"></script>
+<script src="js/signatureplugins/jSignature.UndoButton.js"></script> 
+<script src="js/signature/plugins/signhere/jSignature.SignHere.js"></script> 
+<script>
+$(document).ready(function() {
+	// This is the part where jSignature is initialized.
+	var $sigdiv = $("#signature").jSignature({'UndoButton':true, lineWidth: 1, width: "95%", height: "150px"})
+	console.log("on ready");
+})
+
+</script>
+  
   <script>
 			$(document).bind("pagebeforecreate", function(event) {
 				console.log("Cargar Clientes");
@@ -74,8 +90,8 @@
 				$("#Amount").val(currentInvoice.subtotal);
 				$("#memo").val(currentInvoice.memo);
 				$("#selCustomerMsg").val(currentInvoice.customerMsg_ListID).selectmenu('refresh');
-				
-				
+				console.log("currentInvoice.signature=" + currentInvoice.signature);
+				$("#signature").jSignature("setData", currentInvoice.signature);
 				
 				//fill currentItems
 				currentItems = new Array();
@@ -341,6 +357,7 @@
 			
 			function storeInvoice(){
 				console.log("storeInvoice");
+				var datapair = $("#signature").jSignature("getData", "svg");
 				var customer = listCustomers[customerSelectedIndex];
 				var invoiceVO = {
 					id_invoice:$('#refNumber').val(),
@@ -373,6 +390,7 @@
 					id_term:$("#selTerm").val(),
 					memo:$("#memo").val(),
 					customerMsg_ListID:$("#selCustomerMsg").val(),
+					signature:"data:"+ datapair[0] + "," + datapair[1],
 					items: new Array()
 				}
 			
@@ -596,6 +614,11 @@ table, th, td {
 		      <textarea rows="8" name="memo" id="memo"></textarea>
             </div>
             
+
+              <div>
+              <label for="signature">Signature:</label>
+              </div>
+            <div id="signature" style="height:160px; border-top-style: solid;  border-right-style: solid;  border-bottom-style: solid; border-left-style: solid;"></div>
                         
                              
             <fieldset class="ui-grid-a">
@@ -605,7 +628,6 @@ table, th, td {
               
 
       </form>		
-      <button type="button" id="convert" onClick="convertToPDF()">To PDF</button>
 	</div>
 
 			<!-- divs de header, menu y footer-->
