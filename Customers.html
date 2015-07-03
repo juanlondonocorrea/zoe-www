@@ -138,7 +138,18 @@
 				console.log("onClickInvoicePreview current_index_customer=" + window.localStorage.getItem("current_index_customer"));
 				window.localStorage.setItem("current_type", type);
 			}
+			
+			function onClickGetPhoto(id_invoice){
+				navigator.camera.getPicture( photoSucccess, photoError );
+			}
+			
+			function photoSuccess(){
+				alert("success photo");
+			}
 
+			function photoError(){
+				alert("error photo");
+			}
 			
 			// Función para calcular los días transcurridos entre dos fechas
 			restaFechas = function(f1,f2)
@@ -253,8 +264,11 @@
 							htmlString2 += '<a href="invoice.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
 						}
 						htmlString2 +='<a href="InvoicePreview.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice +
-						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>' + 
-						'</div></li>';
+						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>';
+						htmlString2 +='<a href="InvoicePreview.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice +
+						'" class="ui-btn ui-btn-icon-notext ui-icon-camera" data-ajax="false" onClick="onClickGetPhoto(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>';
+						
+						htmlString2 +='</div></li>';
 					}
 					htmlString2 += '</ul>';
 					$('#InvoiceList').html(htmlString2);
