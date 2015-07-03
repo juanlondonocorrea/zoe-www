@@ -129,6 +129,8 @@
 				$('#shipAddress_state').html(InvoiceVO.shipAddress_state);
 				$('#shipAddress_postalcode').html(InvoiceVO.shipAddress_postalcode);
 				$("#signature").jSignature("setData", InvoiceVO.signature);
+				$("#signature").jSignature("disable");
+				
 				
 				if (InvoiceVO.isPending == 1) {
 					$('#isPending').html('Yes');
@@ -360,7 +362,7 @@
               </div>
 
 			<div style="background-color:white;">
-                <div id="signature" style="height:160px; border-top-style: solid;  border-right-style: solid;  border-bottom-style: solid; border-left-style: solid; border-width:thin"></div>
+                <div id="signature" style="height:160px; border-top-style: solid;  border-right-style: solid;  border-bottom-style: solid; border-left-style: solid; border-width:thin;"></div>
             </div>
                 
 	  		</div>
