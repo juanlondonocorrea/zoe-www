@@ -357,7 +357,7 @@ $(document).ready(function() {
 			
 			function storeInvoice(){
 				console.log("storeInvoice");
-				var datapair = $("#signature").jSignature("getData", "svg");
+				var datapair = $("#signature").jSignature("getData","base30");
 				var customer = listCustomers[customerSelectedIndex];
 				var invoiceVO = {
 					id_invoice:$('#refNumber').val(),
@@ -617,13 +617,20 @@ table, th, td {
 
               <div>
               <label for="signature">Signature:</label>
+               <a onClick="$('#signature').jSignature('reset');" data-role="button" data-icon="delete" data-iconpos="notext" class="ui-btn-left">clear</a>
               </div>
-            <div id="signature" style="height:160px; border-top-style: solid;  border-right-style: solid;  border-bottom-style: solid; border-left-style: solid;"></div>
+
+			<div style="background-color:#D3D3D3;">
+                <div id="signature" style="height:160px; border-top-style: solid;  border-right-style: solid;  border-bottom-style: solid; border-left-style: solid;"></div>
+                <button type="button" id="resetsignature" data-rel="back" data-theme="b"  onClick="$('#signature').jSignature('reset');">reset signature</button>
+            </div>
                         
                              
-            <fieldset class="ui-grid-a">
-                <div class="ui-block-a"><button type="button" id="submit" data-theme="c"onClick="storeInvoice(); return false;">Done</button></div>
+            <fieldset class="ui-grid-b">
+                <div class="ui-block-a"><button type="button" id="submit" data-theme="c" onClick="storeInvoice(); return false;">Done</button></div>
                 <div class="ui-block-b"><button type="button" id="cancel" data-rel="back" data-theme="b">Cancel</button></div>	   
+                <div class="ui-block-c"><a onClick="$('#signature').jSignature('reset');" data-role="button" data-icon="delete" data-iconpos="notext" class="ui-btn-left">clear</a></div>
+                 
             </fieldset>              
               
 
