@@ -358,6 +358,7 @@ $(document).ready(function() {
 			function storeInvoice(){
 				console.log("storeInvoice");
 				var datapair = $("#signature").jSignature("getData","base30");
+				var datapairPNG = $("#signature").jSignature("getData","image");
 				var customer = listCustomers[customerSelectedIndex];
 				var invoiceVO = {
 					id_invoice:$('#refNumber').val(),
@@ -391,6 +392,7 @@ $(document).ready(function() {
 					memo:$("#memo").val(),
 					customerMsg_ListID:$("#selCustomerMsg").val(),
 					signature:"data:"+ datapair[0] + "," + datapair[1],
+					signaturePNG:"data:"+ datapairPNG[0] + "," + datapairPNG[1],
 					items: new Array()
 				}
 			

@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 01/07/2015
+Modified: 03/07/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -228,6 +228,7 @@ CREATE TABLE invoice
   id_salesrep TEXT,
   signature TEXT,
   photo TEXT,
+  signaturePNG TEXT,
   CONSTRAINT Key4 PRIMARY KEY (id_invoice),
   CONSTRAINT invoice_custumer FOREIGN KEY (ListID) REFERENCES customer (ListID),
   CONSTRAINT invoice_terms FOREIGN KEY (id_term) REFERENCES term (id_term),
