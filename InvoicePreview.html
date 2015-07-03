@@ -24,6 +24,22 @@
 		<script src="js/zoe/inventoryDAO.js"></script>
 		<script src="js/zoe/taxDAO.js"></script>
 		<script src="js/zoe/customerMsgDAO.js"></script>
+        
+		<script src="js/signature/modernizr.js"></script>
+        <script src="js/signature/jSignature.js"></script>
+        <script src="js/signature/plugins/jSignature.CompressorBase30.js"></script>
+        <script src="js/signature/plugins/jSignature.CompressorSVG.js"></script>
+        <script src="js/signatureplugins/jSignature.UndoButton.js"></script> 
+        <script src="js/signature/plugins/signhere/jSignature.SignHere.js"></script> 
+        <script>
+        $(document).ready(function() {
+            // This is the part where jSignature is initialized.
+            var $sigdiv = $("#signature").jSignature({'UndoButton':true, lineWidth: 1, width: "95%", height: "150px"})
+            console.log("on ready");
+        })
+        
+        </script>
+        
 
 		<script>
 			$(document).bind("pagebeforecreate", function(event) {
@@ -112,6 +128,7 @@
 				$('#shipAddress_city').html(InvoiceVO.shipAddress_city);
 				$('#shipAddress_state').html(InvoiceVO.shipAddress_state);
 				$('#shipAddress_postalcode').html(InvoiceVO.shipAddress_postalcode);
+				$("#signature").jSignature("setData", InvoiceVO.signature);
 				
 				if (InvoiceVO.isPending == 1) {
 					$('#isPending').html('Yes');
@@ -339,12 +356,14 @@
                 </table>
                 <br>
                 <div id="customer_msg_FullName" class="SmallFont"></div>
+              <label for="signature">Signature:</label>
+              </div>
+
+			<div style="background-color:white;">
+                <div id="signature" style="height:160px; border-top-style: solid;  border-right-style: solid;  border-bottom-style: solid; border-left-style: solid; border-width:thin"></div>
+            </div>
+                
 	  		</div>
-            <!-- divs de header, menu y footer-->
-            <div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
-            <div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
-            <div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
-        	<!-- fin divs -->            
 		</div>				
 	</body>
 </html>
