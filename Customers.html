@@ -139,12 +139,26 @@
 				window.localStorage.setItem("current_type", type);
 			}
 			
+			var id_invoicePhoto;
 			function onClickGetPhoto(id_invoice){
-				navigator.camera.getPicture( photoSucccess, photoError );
+				id_invoicePhoto = id_invoice;
+				navigator.camera.getPicture( photoSuccess, photoError, {quality: 20, destinationType: Camera.DestinationType.DATA_URL, encodingType: Camera.EncodingType.JPEG} );
 			}
 			
-			function photoSuccess(){
-				alert("success photo");
+			function photoSuccess(imageData){
+				var invoiceVO = {
+					id_invoice: id_invoicePhoto,
+					photo: imageData
+				}
+				invoiceDAO.storePhoto(invoiceVO, photoStoreFail, photoStoreSuccess);
+			}
+			
+			function photoStoreSuccess(){
+				alert("success: photo stored");
+			}
+			
+			function photoStoreFail(err){
+				alert("fail: the photo was not stored error:" + JSON.stringify(err));
 			}
 
 			function photoError(){
@@ -263,10 +277,11 @@
 						if (arrayListInvoicesByCust[i].origin == 'local'){
 							htmlString2 += '<a href="invoice.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
 						}
+						
 						htmlString2 +='<a href="InvoicePreview.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice +
 						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>';
-						htmlString2 +='<a href="InvoicePreview.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice +
-						'" class="ui-btn ui-btn-icon-notext ui-icon-camera" data-ajax="false" onClick="onClickGetPhoto(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>';
+		
+					    htmlString2 +='<a class="ui-btn ui-btn-icon-notext ui-icon-camera" data-ajax="false" onClick="onClickGetPhoto(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>';
 						
 						htmlString2 +='</div></li>';
 					}

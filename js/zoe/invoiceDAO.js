@@ -5,6 +5,7 @@ var invoiceDAO = {listBySalesrep:listInvoicesBySalesrep,
 				listToUpload:listInvoicesToUpload,
 				getById:getInvoiceById, 
 				store:storeInvoice, 
+				storePhoto:storeInvoicePhoto, 
 				deleteAll:deleteAllInvoices, 
 				delete:deleteInvoice, 
 				markToSync:markToSyncInvoice, 
@@ -29,8 +30,8 @@ function doGenerateRefNum(prefix){
 	var toReturn = prefix + (date.getFullYear()+"").substring(2) + "" + (date.getMonth()+1) + "" + date.getDate();
 	var plantilla = 'xxxxxxxxxxx'.substring(toReturn.length);
 	toReturn += plantilla.replace(/[xy]/g, function(c) {
-        var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
-        return v.toString(16);
+        var r = Math.random()*10|0, v = c === 'x' ? r : (r&0x3|0x8);
+        return v.toString(10);
     });
     toReturn = toReturn.toUpperCase();
 	return toReturn;
@@ -79,6 +80,14 @@ function storeInvoice(records,aErrFunc,successCB, origin){
 	invoiceErrFunc = aErrFunc;
 	invoiceOrigin = origin;
 	db.transaction(doStoreInvoice, errorCB, successCB);
+}
+
+function storeInvoicePhoto(record,aErrFunc,successCB){
+	db = openDatabaseZoe();
+	logZoe("storeInvoice db=" + db);
+	recordInvoice = record;
+	invoiceErrFunc = aErrFunc;
+	db.transaction(doStoreInvoicePhoto, errorCB, successCB);
 }
 
 function deleteAllInvoices(aErrFunc,successCB){
@@ -347,3 +356,7 @@ function doMarkSynchorinizedInvoice(tx){
 	tx.executeSql("UPDATE invoice SET needSync=0, zoeSyncDate=datetime('now', 'localtime') where id_invoice = ?",[filterDataInvoice]);
 }
 
+function doStoreInvoicePhoto(tx){
+	logZoe ("doStoreInvoicePhoto record=" + JSON.stringify(recordInvoice));
+	tx.executeSql("UPDATE invoice SET photo=? where id_invoice = ?",[recordInvoice.photo, recordInvoice.id_invoice]);
+}
