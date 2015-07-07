@@ -57,7 +57,9 @@ $(document).ready(function() {
 							id_invoice = parameterDupla[1];
 						}
 					}
-					
+				}else if (window.localStorage.getItem("id_invoice")){
+					id_invoice = window.localStorage.getItem("id_invoice");
+					window.localStorage.removeItem("id_invoice");
 				}
 				customerDAO.list(receiveCustomers,errReceive);
 				termDAO.list(receiveTerms,errReceive);
@@ -71,6 +73,8 @@ $(document).ready(function() {
 			
 			var currentInvoice;
 			function receiveInvoice(invoice){
+				$("#isPersisted").val("true");
+				isPersistedChange();
 				currentInvoice = invoice;
 				console.log("invoice.html receiveInvoice=" + JSON.stringify(invoice));
 				setTimeout(waitAllLoad, 300);
@@ -354,7 +358,7 @@ $(document).ready(function() {
 				taxSelectedIndex = $("#selTax")[0].selectedIndex-1;
 				calcInvoice();
 			}
-			
+
 			function storeInvoice(){
 				console.log("storeInvoice");
 				var datapair = $("#signature").jSignature("getData","base30");
@@ -390,7 +394,7 @@ $(document).ready(function() {
 					subtotal:totalAmount,
 					id_term:$("#selTerm").val(),
 					memo:$("#memo").val(),
-					customerMsg_ListID:$("#selCustomerMsg").val(),
+					customerMsg_ListID:($("#selCustomerMsg").val()=="choose-one")?null:$("#selCustomerMsg").val(),
 					signature:"data:"+ datapair[0] + "," + datapair[1],
 					signaturePNG:"data:"+ datapairPNG[0] + "," + datapairPNG[1],
 					items: new Array()
@@ -404,7 +408,9 @@ $(document).ready(function() {
 		}
 		
 		function successInvoiceInsert(){
+			$("#isPersisted").val("true");
 			invoiceDAO.markToSync($('#refNumber').val(), errInvoiceInsert, successInvoiceInsertMark);
+			isPersistedChange();
 		}
 		
 		function successInvoiceInsertMark(){
@@ -414,6 +420,56 @@ $(document).ready(function() {
 		function errInvoiceInsert(err){
 			alert("Fail to update invoice:" + JSON.stringify(err));
 		}
+		
+		function isPersistedChange(){
+			if ($("#isPersisted").val() == "true"){
+				$("#signature").jSignature("disable");
+				$('#cameraButton').closest('.ui-btn').show();
+			}
+		}
+		
+		var id_invoicePhoto;
+		function onClickPrint(){
+				if ($("#isPersisted").val() == "false"){
+					alert("Please, save invoice first!");
+					return false;
+				}
+				window.localStorage.setItem("id_invoice", $("#refNumber").val());
+				console.log("onClickInvoicePreview id_invoice=" + window.localStorage.getItem("id_invoice"));
+				window.location = "InvoicePreview.html?id_invoice=" + $("#refNumber").val();
+			}
+
+		
+			var id_invoicePhoto;
+			function onClickGetPhoto(){
+				if ($("#isPersisted").val() == "false"){
+					alert("Please, save invoice first!");
+					return false;
+				}
+				id_invoicePhoto = $('#refNumber').val();
+				navigator.camera.getPicture( photoSuccess, photoError, {quality: 20, destinationType: Camera.DestinationType.DATA_URL, encodingType: Camera.EncodingType.JPEG} );
+			}
+			
+			function photoSuccess(imageData){
+				var invoiceVO = {
+					id_invoice: id_invoicePhoto,
+					photo: imageData
+				}
+				invoiceDAO.storePhoto(invoiceVO, photoStoreFail, photoStoreSuccess);
+			}
+			
+			function photoStoreSuccess(){
+				alert("success: photo stored");
+			}
+			
+			function photoStoreFail(err){
+				alert("fail: the photo was not stored error:" + JSON.stringify(err));
+			}
+
+			function photoError(){
+				alert("error photo");
+			}
+		
 		
 
   </script>
@@ -619,19 +675,33 @@ table, th, td {
 
               <div>
               <label for="signature">Signature:</label>
-               <a onClick="$('#signature').jSignature('reset');" data-role="button" data-icon="delete" data-iconpos="notext" class="ui-btn-left">clear</a>
               </div>
 
 			<div style="background-color:#D3D3D3;">
                 <div id="signature" style="height:160px; border-top-style: solid;  border-right-style: solid;  border-bottom-style: solid; border-left-style: solid;"></div>
-                <button type="button" id="resetsignature" data-rel="back" data-theme="b"  onClick="$('#signature').jSignature('reset');">reset signature</button>
             </div>
+          
                         
-                             
             <fieldset class="ui-grid-b">
-                <div class="ui-block-a"><button type="button" id="submit" data-theme="c" onClick="storeInvoice(); return false;">Done</button></div>
+                <div class="ui-block-a">
+                	<a data-role="button" data-icon="delete" data-iconpos="left"  id="resetsignature" data-rel="back" onClick="$('#signature').jSignature('reset'); $('#signature').jSignature('enable'); return false;">reset signature</a>
+                 </div>
+                <div class="ui-block-b">
+                	<a id="cameraButton" data-role="button" data-icon="camera" data-iconpos="left" data-ajax="false" onClick="onClickGetPhoto(); return false;">Photo</a>
+                </div>
+                <div class="ui-block-c">
+                	<a id="printButton" data-role="button" data-icon="print" data-iconpos="left" data-ajax="false" onClick="onClickPrint(); return false;">Print</a>
+                </div>
+
+            </fieldset>
+                             
+            <fieldset class="ui-grid-a">
+                <div class="ui-block-a"><button type="button" id="submit" data-theme="b" onClick="storeInvoice(); return false;">Done</button></div>
                 <div class="ui-block-b"><button type="button" id="cancel" data-rel="back" data-theme="b">Cancel</button></div>	   
-            </fieldset>              
+            </fieldset>    
+            
+            
+            <input type="hidden" id="isPersisted" name="isPersisted" value="false" onChange="isPersistedChange()">          
               
 
       </form>		

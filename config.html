@@ -463,6 +463,7 @@
 	function syncUpInvoices(form){
 		console.log("entre a syncUpInvoices");
 		var mensaje = "";
+		var extraData = "[";
 		invoiceDAO.listToUpload(function(results){
 			for (var i in results){
 				var rec = results[i];
@@ -492,13 +493,29 @@
 					mensaje += '</InvoiceLineAdd>';
 				}
 				mensaje += '</InvoiceAdd></InvoiceAddRq>';
+				if (rec.photo!=null && rec.photo!=''){
+					extraData += "{\"type\":\"invoicePhoto\",\"refNumber\":\"" + rec.refNumber + "\"" +
+					",\"companyName\":\"" + rec.companyName +  "\"" +
+					",\"date\":\"" + rec.txnDate + "\"" +
+					",\"data\":\"" +rec.photo + "\"},";
+				}
+				if (rec.signaturePNG!=null && rec.signaturePNG!=''){
+					extraData += "{\"type\":\"invoiceSignature\",\"refNumber\":\"" + rec.refNumber + "\"" +
+					",\"companyName\":\"" + rec.companyName +  "\"" +
+					",\"date\":\"" + rec.txnDate + "\"" +
+					",\"data\":\"" +rec.signaturePNG + "\"},";
+				}
 			}
+			
+			if (extraData.lastIndexOf(",") == extraData.length){
+				extraData = extraData.substring(0,extraData.length-1);
+			}
+			extraData += "]";
 						
 			console.log("syncUpInvoices mensaje=" +  mensaje)
+			console.log("syncUpInvoices extraData=" +  extraData)
 			
-			consumeWS(mensaje, "JSON", receiveSyncUpInvoicesMessage);
-		}, function(err){
-			alert("Fail sync upload Invoices " + JSON.stringify(err));
+			consumeWS(mensaje, "JSON", receiveSyncUpInvoicesMessage, null, null, extraData);
 		});
 		return false;
 	}

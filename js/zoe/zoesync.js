@@ -2,7 +2,7 @@
 var synchronizing = false;
 var xhrSync;
 var receiveSyncCallback;
-function consumeWS(mensaje, format, receiveFunction, acache, axpathExp){
+function consumeWS(mensaje, format, receiveFunction, acache, axpathExp, aExtraData){
 	receiveSyncCallback = receiveFunction;
 	if (synchronizing==true){
 		alert("Synchronizing in process");
@@ -31,6 +31,10 @@ function consumeWS(mensaje, format, receiveFunction, acache, axpathExp){
 	}
 	if (axpathExp){
 		dataToSend = dataToSend + ",xpathExp:'" + axpathExp + "'";
+	}
+
+	if (aExtraData){
+		dataToSend = dataToSend + ",extraData:'" + aExtraData + "'";
 	}
 	
 	dataToSend += "}}";
