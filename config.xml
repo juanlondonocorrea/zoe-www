@@ -29,6 +29,8 @@
 
   <gap:plugin name="org.apache.cordova.splashscreen"/>
   <gap:plugin name="de.appplant.cordova.plugin.printer" />
+  <gap:plugin name="org.apache.cordova.camera" />
+  
   
   <gap:splash src="zoe_full.png"/>
 
