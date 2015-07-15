@@ -19,7 +19,6 @@ var invoiceErrFunc;
 var invoiceVO;
 var recordInvoice;
 var includeInvoiceDetails;
-var invoiceOrigin;
 
 //----------------------
 //metodos hacia afuera
@@ -27,7 +26,7 @@ var invoiceOrigin;
 
 function doGenerateRefNum(prefix){
 	var date = new Date();
-	var toReturn = prefix + (date.getFullYear()+"").substring(2) + "" + (date.getMonth()+1) + "" + date.getDate()+""+date.getHours() + "" + date.getMinutes();
+	var toReturn = prefix + (date.getFullYear()+"").substring(3) + "" + (date.getMonth()+1) + "" + date.getDate()+""+date.getHours() + "" + date.getMinutes();
 	var plantilla = 'xxxxxxxxxxx'.substring(toReturn.length);
 	toReturn += plantilla.replace(/[xy]/g, function(c) {
         var r = Math.random()*10|0, v = c === 'x' ? r : (r&0x3|0x8);
@@ -73,12 +72,11 @@ function listInvoicesToUpload(aReceiveFunction,aErrFunc){
 	db.transaction(doListInvoicesToUpload, invoiceErrFunc);
 }
 
-function storeInvoice(records,aErrFunc,successCB, origin){
+function storeInvoice(records,aErrFunc,successCB){
 	db = openDatabaseZoe();
 	logZoe("storeInvoice db=" + db);
 	recordInvoice = records;
 	invoiceErrFunc = aErrFunc;
-	invoiceOrigin = origin;
 	db.transaction(doStoreInvoice, errorCB, successCB);
 }
 
@@ -326,8 +324,8 @@ function doStoreInvoice(tx){
 }
 
 function doStoreOneInvoice(tx, rec){
-		tx.executeSql('INSERT OR REPLACE INTO invoice(id_invoice, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, signature,signaturePNG,  photo) ' +
-		' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?,?,?, ?)',
+		tx.executeSql('INSERT OR REPLACE INTO invoice(id_invoice, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, signature,signaturePNG,  photo, origin) ' +
+		' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?,?,?, ?, ?)',
 		[rec.id_invoice, rec.ListID, ifUndefNull(rec.po_number), ifUndefNull(rec.txnDate), 
 		ifUndefNull(rec.dueDate), ifUndefNull(rec.appliedAmount), ifUndefNull(rec.balanceRemaining), 
 		ifUndefNull(rec.billAddress_addr1), ifUndefNull(rec.billAddress_addr2), 
@@ -340,13 +338,8 @@ function doStoreOneInvoice(tx, rec){
 		ifUndefNull(rec.TaxPercentage), ifUndefNull(rec.salesTaxTotal), ifUndefNull(rec.shipDate), 
 		ifUndefNull(rec.subtotal), ifUndefNull(rec.id_term), ifUndefNull(rec.id_salesrep), 
 		ifUndefNull(rec.customerMsg_ListID), ifUndefNull(rec.memo), ifUndefNull(rec.signature), 
-		ifUndefNull(rec.signaturePNG), ifUndefNull(rec.photo)] );
+		ifUndefNull(rec.signaturePNG), ifUndefNull(rec.photo), ifUndefNull(rec.origin)] );
 		
-	if (invoiceOrigin){
-		tx.executeSql('UPDATE invoice set origin = ? WHERE id_invoice = ?',[invoiceOrigin,rec.id_invoice]);
-	}
-
-	
 	 if (rec.items){
 	 	console.log("storing invoice items")
 		 for (var i=0;i<rec.items.length;i++){
@@ -357,12 +350,6 @@ function doStoreOneInvoice(tx, rec){
 			 ' VALUES(?,?,?,?,?,?,?,?)',
 			 [item.LineID,rec.id_invoice,ifUndefNull(item.Inventory_ListID),ifUndefNull(item.Desc),ifUndefNull(item.Quantity),
 			 ifUndefNull(item.Rate),ifUndefNull(item.Amount),ifUndefNull(item.salesTax_ListID)]);
-/*			 //update inventory if the invoice is created localy
-			 if (invoiceOrigen=='local'){
-				 tx.executeSql("UPDATE Inventory SET quantityOnHand = quantityOnHand - ? WHERE ListID = ? ",
-				 [item.Quantity,ifUndefNull(item.inventory_ListID)]);
-			 }
-			 */
 		 }
 	 }
 }

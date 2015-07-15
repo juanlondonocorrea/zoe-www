@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 14/07/2015
+Modified: 15/07/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -334,7 +334,7 @@ CREATE TRIGGER IF NOT EXISTS insert_invoice_item AFTER INSERT
  FOR EACH ROW
 BEGIN
 UPDATE Inventory SET quantityOnHand = quantityOnHand - NEW.quantity WHERE ListID = NEW.Inventory_ListID
-AND EXISTS (SELECT origin FROM Invoice WHERE id_invoice=NEW.id_invoice  AND origin= "local");
+AND EXISTS (SELECT origin FROM Invoice WHERE id_invoice=NEW.id_invoice  AND (origin= "local" OR origin="synch"));
 END
 @
 

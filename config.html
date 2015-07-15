@@ -91,15 +91,13 @@
 		}
 		whatToUpload = $("#syncUpSelect").val();
 		currentUp = -1;
+		$("#synchDialog").popup("open"); 
 		upNext();
 	}
 
 	function upNext(){
 		currentUp += 1;
 		if (currentUp<whatToUpload.length){
-			if (currentUp == 0){
-				 $("#synchDialog").popup("open"); 
-			}
 			console.log("uploading " +  whatToUpload[currentUp]);
 			$("#currentTask").html(whatToUpload[currentUp] + "...");
 			if (whatToUpload[currentUp] == "syncUpInvoices" ){
@@ -133,16 +131,14 @@
 		}
 		console.log("whatToDownload=" + whatToDownload);
 		currentDown = -1;
+		 $("#synchDialog").popup("open"); 
+		 console.log("synchDialog open");
 		downNext();
 	}
 
 	function downNext(){
 		currentDown += 1;
 		if (currentDown<whatToDownload.length){
-			if (currentDown == 0){
-				 $("#synchDialog").popup("open"); 
-				 console.log("synchDialog open");
-			}
 			if (whatToDownload[currentDown] == "all" || whatToDownload[currentDown].indexOf("hoose")>-1){
 				downNext();
 				return;
@@ -384,13 +380,14 @@
 			var invoice = invoices[i];
 			
 			var invoiceVO = convertInvoiceFromQB(invoice);
-
+			invoiceVO.origin = "remote";
 			invoicesVO[i] = invoiceVO;
+			
 				
 		}
 			
 		invoiceDAO.deleteAll(errCustomerInsert);
-		invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert,'remote');
+		invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert);
 	}
 	
 	function convertInvoiceFromQB(invoice){
@@ -537,6 +534,7 @@
 				message += "Success upload Invoice " + InvoiceAddRs.requestID + "<br>";
 				invoiceDAO.delete(InvoiceAddRs.requestID);
 				var invoiceVO = convertInvoiceFromQB(invoice);
+				invoiceVO.origin = "synch";
 				invoiceDAO.store([invoiceVO]);
 			}else{
 				message += "Fail to upload invoice " + InvoiceAddRs.requestID + ":" + statusMessage + "<br>";
