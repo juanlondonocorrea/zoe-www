@@ -430,22 +430,35 @@
 			}
 			
 			if (invoice.InvoiceLineRet){
-				for (j=0;j<invoice.InvoiceLineRet.length;j++){
-					var line = invoice.InvoiceLineRet[j];
-					var itemVO = {
-							LineID:line.TxnLineID,
-							id_invoice:invoiceVO.id_invoice,
-							Inventory_ListID:line.ItemRef.ListID,
-							Desc:line.Desc,
-							Quantity:line.Quantity,
-							Rate:line.Rate,
-							Amount:line.Amount,
-							SalesTax_ListID:line.SalesTaxCodeRef.ListID
+				if (invoice.InvoiceLineRet.length){
+					for (j=0;j<invoice.InvoiceLineRet.length;j++){
+						var line = invoice.InvoiceLineRet[j];
+						var itemVO = convertInvoiceLineToItem(invoiceVO,line);
+						invoiceVO.items[j] = itemVO;
 					}
-					invoiceVO.items[j] = itemVO;
+				}else{
+					var line = invoice.InvoiceLineRet;
+					var itemVO = convertInvoiceLineToItem(invoiceVO,line);
+					invoiceVO.items[0] = itemVO;
 				}
+					
 			}
 			return invoiceVO;
+	}
+	
+	function convertInvoiceLineToItem(invoiceVO,line){
+		var itemVO = {
+		LineID:line.TxnLineID,
+		id_invoice:invoiceVO.id_invoice,
+		Inventory_ListID:line.ItemRef.ListID,
+		Desc:line.Desc,
+		Quantity:line.Quantity,
+		Rate:line.Rate,
+		Amount:line.Amount,
+		SalesTax_ListID:line.SalesTaxCodeRef.ListID
+		}
+		return itemVO;
+
 	}
 
 
@@ -517,6 +530,7 @@
 		return false;
 	}
 	
+	var currentInvoice;
 	function receiveSyncUpInvoicesMessage(message){
 		console.log('receiveSyncUpInvoicesMessage message=' + message);
 		var ListInvoiceAddRs = message.InvoiceAddRs;
@@ -532,10 +546,13 @@
 			if (statusMessage == "Status OK"	){
 				var invoice = InvoiceAddRs.InvoiceRet;
 				message += "Success upload Invoice " + InvoiceAddRs.requestID + "<br>";
-				invoiceDAO.delete(InvoiceAddRs.requestID);
-				var invoiceVO = convertInvoiceFromQB(invoice);
-				invoiceVO.origin = "synch";
-				invoiceDAO.store([invoiceVO]);
+				currentInvoice = invoice;
+				
+				invoiceDAO.delete(InvoiceAddRs.requestID,null,function() {
+					var invoiceVO = convertInvoiceFromQB(currentInvoice);
+					invoiceVO.origin = "synch";
+					invoiceDAO.store([invoiceVO]);
+				});
 			}else{
 				message += "Fail to upload invoice " + InvoiceAddRs.requestID + ":" + statusMessage + "<br>";
 			}
@@ -620,8 +637,14 @@
 			}
 			
 			if (creditMemo.CreditMemoLineRet){
-				for (j=0;j<creditMemo.CreditMemoLineRet.length;j++){
-					var line = creditMemo.CreditMemoLineRet[j];
+				var lines = new Array();
+				if (creditMemo.CreditMemoLineRet.length){
+					lines =  creditMemo.CreditMemoLineRet;
+				}else{
+					lines = [creditMemo.CreditMemoLineRet];
+				}
+				for (j=0;j<lines.length;j++){
+					var line = lines[j];
 					var itemVO = {
 							LineID:line.TxnLineID,
 							id_creditMemo:creditMemoVO.id_creditMemo,

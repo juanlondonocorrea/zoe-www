@@ -8,6 +8,8 @@ Database: SQLite 3.7
 
 -- Drop triggers for tables section -------------------------------------------------
 
+DROP TRIGGER IF EXISTS insert_creditMemo_item@
+DROP TRIGGER IF EXISTS delete_creditmemo_item@
 DROP TRIGGER IF EXISTS insert_invoice_item@
 DROP TRIGGER IF EXISTS delete_invoice_item@
 
@@ -369,6 +371,24 @@ CREATE INDEX IX_Relationship19 ON creditMemo_item (id_creditMemo)@
 CREATE INDEX IX_Relationship20 ON creditMemo_item (inventory_ListID)@
 
 CREATE INDEX IX_Relationship22 ON creditMemo_item (SalesTax_ListID)@
+
+-- Create triggers for table creditMemo_item
+
+CREATE TRIGGER insert_creditMemo_item AFTER INSERT
+ ON creditMemo_item
+ FOR EACH ROW
+BEGIN
+UPDATE Inventory SET quantityOnHand = quantityOnHand + NEW.quantity WHERE ListID = NEW.Inventory_ListID
+AND EXISTS (SELECT origin FROM creditMemo WHERE id_creditMemo=NEW.id_creditMemo  AND (origin= "local" OR origin="synch"));
+END@
+
+CREATE TRIGGER delete_creditmemo_item AFTER DELETE
+ ON creditMemo_item
+ FOR EACH ROW
+BEGIN
+       UPDATE Inventory SET quantityOnHand = quantityOnHand - OLD.quantity WHERE ListID = OLD.Inventory_ListID
+AND EXISTS (SELECT origin FROM creditMemo WHERE id_creditMemo=OLD.id_creditMemo  AND origin= "local");
+END@
 
 -- Table pricelevel
 

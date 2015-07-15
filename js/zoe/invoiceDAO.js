@@ -300,7 +300,7 @@ function doGetInvoiceItems(tx){
 	currentI += 1;
 	if (currentI<arrayInvoices.length){
 		var currentInvoice = arrayInvoices[i];
-		tx.executeSql("SELECT LineID, id_invoice, Inventory_ListID, Desc, Quantity, Rate, Amount, SalesTax_ListID FROM invoice_item Where id_invoice = ?", [currentInvoice.id_invoice],invoiceItemLocalReceiveFunction, invoiceErrFunc);
+		tx.executeSql("SELECT LineID, id_invoice, Inventory_ListID, Desc, Quantity, Rate, Amount, SalesTax_ListID FROM invoice_item Where id_invoice = ?", [currentInvoice.id_invoice+""],invoiceItemLocalReceiveFunction, invoiceErrFunc);
 	}
 }
 
@@ -326,7 +326,7 @@ function doStoreInvoice(tx){
 function doStoreOneInvoice(tx, rec){
 		tx.executeSql('INSERT OR REPLACE INTO invoice(id_invoice, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, signature,signaturePNG,  photo, origin) ' +
 		' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?,?,?, ?, ?)',
-		[rec.id_invoice, rec.ListID, ifUndefNull(rec.po_number), ifUndefNull(rec.txnDate), 
+		[rec.id_invoice, rec.ListID, ifUndefNull(rec.po_number)+"", ifUndefNull(rec.txnDate), 
 		ifUndefNull(rec.dueDate), ifUndefNull(rec.appliedAmount), ifUndefNull(rec.balanceRemaining), 
 		ifUndefNull(rec.billAddress_addr1), ifUndefNull(rec.billAddress_addr2), 
 		ifUndefNull(rec.billAddress_addr3), ifUndefNull(rec.billAddress_city), 
@@ -334,7 +334,7 @@ function doStoreOneInvoice(tx, rec){
 		ifUndefNull(rec.shipAddress_addr1), ifUndefNull(rec.shipAddress_addr2), 
 		ifUndefNull(rec.shipAddress_addr3), ifUndefNull(rec.shipAddress_city), 
 		ifUndefNull(rec.shipAddress_state), ifUndefNull(rec.shipAddress_postalcode), 
-		ifUndefNull(rec.isPaid), ifUndefNull(rec.isPending), ifUndefNull(rec.refNumber), 
+		ifUndefNull(rec.isPaid), ifUndefNull(rec.isPending), ifUndefNull(rec.refNumber)+"", 
 		ifUndefNull(rec.TaxPercentage), ifUndefNull(rec.salesTaxTotal), ifUndefNull(rec.shipDate), 
 		ifUndefNull(rec.subtotal), ifUndefNull(rec.id_term), ifUndefNull(rec.id_salesrep), 
 		ifUndefNull(rec.customerMsg_ListID), ifUndefNull(rec.memo), ifUndefNull(rec.signature), 
@@ -360,20 +360,21 @@ function doDeleteAllInvoices(tx){
 }
 
 function doDeleteInvoice(tx){
-	tx.executeSql('DELETE FROM invoice_item where id_invoice=?',[filterDataInvoice]);
-	tx.executeSql('DELETE FROM invoice where id_invoice = ?',[filterDataInvoice]);
+	console.log("doDeleteInvoice filterDataInvoice=" + filterDataInvoice);
+	tx.executeSql('DELETE FROM invoice_item where id_invoice=?',[filterDataInvoice+""]);
+	tx.executeSql('DELETE FROM invoice where id_invoice = ?',[filterDataInvoice+""]);
 }
 
 function doMarkToSyncInvoice(tx){
 	logZoe ("doMarkToSyncInvoice datafiler=" + filterDataInvoice);
-	tx.executeSql("UPDATE invoice SET needSync=1, zoeUpdateDate=datetime('now', 'localtime') where id_invoice = ?",[filterDataInvoice]);
+	tx.executeSql("UPDATE invoice SET needSync=1, zoeUpdateDate=datetime('now', 'localtime') where id_invoice = ?",[filterDataInvoice+""]);
 }
 
 function doMarkSynchorinizedInvoice(tx){
-	tx.executeSql("UPDATE invoice SET needSync=0, zoeSyncDate=datetime('now', 'localtime') where id_invoice = ?",[filterDataInvoice]);
+	tx.executeSql("UPDATE invoice SET needSync=0, zoeSyncDate=datetime('now', 'localtime') where id_invoice = ?",[filterDataInvoice+""]);
 }
 
 function doStoreInvoicePhoto(tx){
 	logZoe ("doStoreInvoicePhoto record=" + JSON.stringify(recordInvoice));
-	tx.executeSql("UPDATE invoice SET photo=? where id_invoice = ?",[recordInvoice.photo, recordInvoice.id_invoice]);
+	tx.executeSql("UPDATE invoice SET photo=? where id_invoice = ?",[recordInvoice.photo, recordInvoice.id_invoice+""]);
 }
