@@ -588,6 +588,7 @@
 			var creditMemo = creditMemos[i];
 			
 			var creditMemoVO = convertCreditMemoFromQB(creditMemo);
+			creditMemoVO.origin = "remote";
 
 			creditMemosVO[i] = creditMemoVO;
 				
@@ -713,6 +714,7 @@
 		return false;
 	}
 	
+	var currentCreditMemo;
 	function receiveSyncUpCreditMemosMessage(message){
 		console.log('receiveSyncUpCreditMemosMessage message=' + message);
 		var ListCreditMemoAddRs = message.CreditMemoAddRs;
@@ -727,10 +729,13 @@
 			var statusMessage =CreditMemoAddRs.statusMessage;
 			if (statusMessage == "Status OK"	){
 				var creditMemo = CreditMemoAddRs.CreditMemoRet;
+				currentCreditMemo =creditMemo;
 				message += "Success upload CreditMemo " + CreditMemoAddRs.requestID + "<br>";
-				creditMemoDAO.delete(CreditMemoAddRs.requestID);
-				var creditMemoVO = convertCreditMemoFromQB(creditMemo);
+				creditMemoDAO.delete(CreditMemoAddRs.requestID,null,function() {
+				var creditMemoVO = convertCreditMemoFromQB(currentCreditMemo);
+				creditMemoVO.origin="synch";
 				creditMemoDAO.store([creditMemoVO]);
+				});
 			}else{
 				message += "Fail to upload creditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
 			}
