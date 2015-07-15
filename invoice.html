@@ -253,7 +253,7 @@ $(document).ready(function() {
 				console.log("addItem listItems[productSelectedIndex]=" + JSON.stringify(listItems[productSelectedIndex]));
 				var aItem = {"LineID":generateKey(), 
 					"id_invoice": listCustomers[customerSelectedIndex].id_invoice,
-					"inventory_ListID": listItems[productSelectedIndex].ListID,
+					"Inventory_ListID": listItems[productSelectedIndex].ListID,
 					"Desc": listItems[productSelectedIndex].salesDesc,
 					"Quantity": $("#Quantity").val(),
 					"Rate": parseFloat($("#RatePrice").val()).toFixed(2),
@@ -361,6 +361,10 @@ $(document).ready(function() {
 
 			function storeInvoice(){
 				console.log("storeInvoice");
+				//first remove all invoice if exist
+				invoiceDAO.delete($('#refNumber').val(),errInvoiceInsert, storeInvoiceCallback);
+			}
+			function storeInvoiceCallback(){
 				var datapair = $("#signature").jSignature("getData","base30");
 				var datapairPNG = $("#signature").jSignature("getData","image");
 				var customer = listCustomers[customerSelectedIndex];
@@ -399,13 +403,13 @@ $(document).ready(function() {
 					signaturePNG:"data:"+ datapairPNG[0] + "," + datapairPNG[1],
 					items: new Array()
 				}
-			
-			invoiceVO.items = currentItems;
-			console.log("storeInvoice invoiceVO=" + JSON.stringify(invoiceVO));
-			var invoicesVO = [invoiceVO];
-			invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert,'local');
-			return false;
-		}
+				
+				invoiceVO.items = currentItems;
+				console.log("storeInvoice invoiceVO=" + JSON.stringify(invoiceVO));
+				var invoicesVO = [invoiceVO];
+				invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert,'local');
+				return false;
+			}
 		
 		function successInvoiceInsert(){
 			$("#isPersisted").val("true");

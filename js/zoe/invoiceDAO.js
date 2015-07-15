@@ -352,11 +352,17 @@ function doStoreOneInvoice(tx, rec){
 		 for (var i=0;i<rec.items.length;i++){
 			 var item = rec.items[i];
 			 console.log("item=" + JSON.stringify(item));
-			 console.log("elementos=" + JSON.stringify([item.LineID,item.id_invoice,item.inventory_ListID,item.Desc,item.Quantity,item.Rate,item.Amount,item.salesTax_ListID]));
-			 tx.executeSql('INSERT OR REPLACE INTO invoice_item(LineID,id_invoice,Inventory_ListID,Desc,Quantity,Rate,Amount,SalesTax_ListID) '+
+			 console.log("elementos=" + JSON.stringify([item.LineID,rec.id_invoice,item.Inventory_ListID,item.Desc,item.Quantity,item.Rate,item.Amount,item.salesTax_ListID]));
+			 tx.executeSql('INSERT INTO invoice_item(LineID,id_invoice,Inventory_ListID,Desc,Quantity,Rate,Amount,SalesTax_ListID) '+
 			 ' VALUES(?,?,?,?,?,?,?,?)',
-			 [item.LineID,rec.id_invoice,ifUndefNull(item.inventory_ListID),ifUndefNull(item.Desc),ifUndefNull(item.Quantity),
+			 [item.LineID,rec.id_invoice,ifUndefNull(item.Inventory_ListID),ifUndefNull(item.Desc),ifUndefNull(item.Quantity),
 			 ifUndefNull(item.Rate),ifUndefNull(item.Amount),ifUndefNull(item.salesTax_ListID)]);
+/*			 //update inventory if the invoice is created localy
+			 if (invoiceOrigen=='local'){
+				 tx.executeSql("UPDATE Inventory SET quantityOnHand = quantityOnHand - ? WHERE ListID = ? ",
+				 [item.Quantity,ifUndefNull(item.inventory_ListID)]);
+			 }
+			 */
 		 }
 	 }
 }

@@ -75,7 +75,7 @@ function openDatabaseZoe(){
             url : "dbcreate.sql",
             dataType: "text",
             success : function (data) {
-				sqls = data.split(";");
+				sqls = data.split("@");
 				db = openDatabaseZoe();
 				db.transaction(createDB,errorCB, successCreateDB);
             },

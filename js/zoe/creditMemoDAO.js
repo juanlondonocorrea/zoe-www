@@ -322,8 +322,8 @@ function doStoreOneCreditMemo(tx, rec){
 		 for (var i=0;i<rec.items.length;i++){
 			 var item = rec.items[i];
 			 console.log("item=" + JSON.stringify(item));
-			 console.log("elementos=" + JSON.stringify([item.LineID,item.id_creditMemo,item.inventory_ListID,item.Desc,item.Quantity,item.Rate,item.Amount,item.salesTax_ListID]));
-			 tx.executeSql('INSERT OR REPLACE INTO creditMemo_item(LineID,id_creditMemo,Inventory_ListID,Desc,Quantity,Rate,Amount,SalesTax_ListID) VALUES(?,?,?,?,?,?,?,?)',[item.LineID,rec.id_creditMemo,item.inventory_ListID,item.Desc,item.Quantity,item.Rate,item.Amount,item.salesTax_ListID]);
+			 console.log("elementos=" + JSON.stringify([item.LineID,rec.id_creditMemo,item.Inventory_ListID,item.Desc,item.Quantity,item.Rate,item.Amount,item.salesTax_ListID]));
+			 tx.executeSql('INSERT OR REPLACE INTO creditMemo_item(LineID,id_creditMemo,Inventory_ListID,Desc,Quantity,Rate,Amount,SalesTax_ListID) VALUES(?,?,?,?,?,?,?,?)',[item.LineID,rec.id_creditMemo,ifUndefNull(item.Inventory_ListID),item.Desc,item.Quantity,item.Rate,item.Amount,ifUndefNull(item.salesTax_ListID)]);
 		 }
 	 }
 }
