@@ -16,7 +16,7 @@
 
 		  var toPage = target.id;
 		  if(!toPage || toPage.indexOf("Login") < 0  && toPage.indexOf("config")<0) {
-			//checkSession();
+			checkSession();
 		  }
 
 		  checkNeedToSync();
@@ -215,7 +215,13 @@ function createPopup(title, content, withOk, withCancel){
 	html+='</div>';
     html += '</div>';
     return html;
-}	
+}
+
+function logout(){
+		window.localStorage.setItem("currentUser",null);
+		window.localStorage.setItem("lastAccess",null);
+		window.location="Login.html";
+}
 
 function ifUndefNull(variable){
 	if (typeof variable == 'undefined'){

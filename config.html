@@ -26,6 +26,7 @@
 <script src="js/zoe/taxDAO.js" type="text/javascript"></script>
 <script src="js/zoe/inventoryDAO.js" type="text/javascript"></script>
 <script src="js/zoe/pricelevelDAO.js" type="text/javascript"></script>
+<script src="js/sha256.js" type="text/javascript"></script>
 <!-- fin librerias -->
 
 <script>
@@ -201,22 +202,32 @@
 
 	var salesRepVO;
 	function receiveMessageEmployee(message){
-		var employee = message.EmployeeQueryRs;
+		var employee = message.EmployeeQueryRs.EmployeeRet;
 		var password = "";
+		var roles = "user";
+		console.log("receiveMessageEmployee employee.DataExtRet=" + employee.DataExtRet);
+		console.log("receiveMessageEmployee employee.DataExtRet.length=" + employee.DataExtRet);
 		if (employee.DataExtRet && employee.DataExtRet.length>0){
 			for (var j = 0; j< employee.DataExtRet.length; j++){
-				logZoe("employee.DataExtRet[j].DataExtName=" + employee.DataExtRet[j].DataExtName);
-				if ("password" == employee.DataExtRet[j].DataExtName){
+				console.log("employee.DataExtRet[j].DataExtName=" + employee.DataExtRet[j].DataExtName);
+				if ("PASSWORD" == employee.DataExtRet[j].DataExtName.toUpperCase()){
 					password = employee.DataExtRet[j].DataExtValue;
+				}else if ("ZOEROLE" == employee.DataExtRet[j].DataExtName.toUpperCase()){
+					roles = employee.DataExtRet[j].DataExtValue;
 				}
 			}
-		}else if (employee.DataExtRet && employee.DataExtRet.DataExtName=="password"){
-					passwrod = employee.DataExtRet.DataExtValue;
+		}else if (employee.DataExtRet && employee.DataExtRet.DataExtName.toUpperCase()=="PASSWORD"){
+			password = employee.DataExtRet.DataExtValue;
+		}else if (employee.DataExtRet && "ZOEROLE" == employee.DataExtRet.DataExtName.toUpperCase()){
+			roles = employee.DataExtRet[j].DataExtValue;
 		}
-		salesRepVO = {id_employee:employee.EmployeeRet.ListID,
-			name:employee.EmployeeRet.Name, 
-			password:password, 
-			isActive:employee.EmployeeRet.IsActive, 
+		password = password+"";
+		console.log("password=" + password);
+		salesRepVO = {id_employee:employee.ListID,
+			name:employee.Name, 
+			password:CryptoJS.SHA256(password), 
+			roles: roles,
+			isActive:employee.IsActive, 
 			syncTime:Date.now(), Initial:""};
 			
 		var mensajeSalesRep = '<SalesRepQueryRq requestID="c1"></SalesRepQueryRq>';

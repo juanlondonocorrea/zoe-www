@@ -6,12 +6,8 @@ Database: SQLite 3.7
 */
 
 
--- Drop triggers for tables section -------------------------------------------------
 
-DROP TRIGGER IF EXISTS insert_creditMemo_item@
-DROP TRIGGER IF EXISTS delete_creditmemo_item@
-DROP TRIGGER IF EXISTS insert_invoice_item@
-DROP TRIGGER IF EXISTS delete_invoice_item@
+
 
 
 -- Drop indexes section -------------------------------------------------
@@ -123,6 +119,7 @@ CREATE TABLE salesrep
   SyncTime NUMERIC NOT NULL,
   initial TEXT,
   id_employee TEXT,
+  roles TEXT,
   CONSTRAINT Key2 PRIMARY KEY (id_salesrep),
   CONSTRAINT id_salesrep UNIQUE (id_salesrep)
 )@
@@ -323,13 +320,10 @@ CREATE TABLE invoice_item
   CONSTRAINT Relationship2 FOREIGN KEY (SalesTax_ListID) REFERENCES salesTax (ListID)
 )@
 
-CREATE INDEX IX_invoice_lines ON invoice_item (id_invoice)@
-
-CREATE INDEX IX_Relationship1 ON invoice_item (Inventory_ListID)@
-
-CREATE INDEX IX_Relationship2 ON invoice_item (SalesTax_ListID)@
-
 -- Create triggers for table invoice_item
+
+DROP TRIGGER IF EXISTS insert_invoice_item@
+DROP TRIGGER IF EXISTS delete_invoice_item@
 
 CREATE TRIGGER IF NOT EXISTS insert_invoice_item AFTER INSERT
  ON invoice_item
@@ -347,6 +341,13 @@ BEGIN
     UPDATE Inventory SET quantityOnHand = quantityOnHand + OLD.quantity WHERE ListID = OLD.Inventory_ListID
 AND EXISTS (SELECT origin FROM Invoice WHERE id_invoice=OLD.id_invoice  AND origin= "local");
 END@
+
+
+CREATE INDEX IX_invoice_lines ON invoice_item (id_invoice)@
+
+CREATE INDEX IX_Relationship1 ON invoice_item (Inventory_ListID)@
+
+CREATE INDEX IX_Relationship2 ON invoice_item (SalesTax_ListID)@
 
 -- Table creditMemo_item
 
@@ -366,13 +367,10 @@ CREATE TABLE creditMemo_item
   CONSTRAINT Relationship22 FOREIGN KEY (SalesTax_ListID) REFERENCES salesTax (ListID)
 )@
 
-CREATE INDEX IX_Relationship19 ON creditMemo_item (id_creditMemo)@
-
-CREATE INDEX IX_Relationship20 ON creditMemo_item (inventory_ListID)@
-
-CREATE INDEX IX_Relationship22 ON creditMemo_item (SalesTax_ListID)@
-
 -- Create triggers for table creditMemo_item
+
+DROP TRIGGER IF EXISTS insert_creditMemo_item@
+DROP TRIGGER IF EXISTS delete_creditmemo_item@
 
 CREATE TRIGGER insert_creditMemo_item AFTER INSERT
  ON creditMemo_item
@@ -389,6 +387,13 @@ BEGIN
        UPDATE Inventory SET quantityOnHand = quantityOnHand - OLD.quantity WHERE ListID = OLD.Inventory_ListID
 AND EXISTS (SELECT origin FROM creditMemo WHERE id_creditMemo=OLD.id_creditMemo  AND origin= "local");
 END@
+
+
+CREATE INDEX IX_Relationship19 ON creditMemo_item (id_creditMemo)@
+
+CREATE INDEX IX_Relationship20 ON creditMemo_item (inventory_ListID)@
+
+CREATE INDEX IX_Relationship22 ON creditMemo_item (SalesTax_ListID)@
 
 -- Table pricelevel
 
@@ -500,5 +505,7 @@ CREATE TABLE log
   log TEXT,
   CONSTRAINT id UNIQUE (id)
 )@
+
+
 
 
