@@ -16,7 +16,7 @@
 
 		  var toPage = target.id;
 		  if(!toPage || toPage.indexOf("Login") < 0  && toPage.indexOf("config")<0) {
-			checkSession();
+			// checkSession();
 		  }
 
 		  checkNeedToSync();
@@ -237,10 +237,37 @@ function ifNull(variable, defaultValue){
 	return variable;
 }
 
-function NumberCast(variable) {
+function isNumeric( obj ) {
+    return !jQuery.isArray( obj ) && (obj - parseFloat( obj ) + 1) >= 0;
+}
+
+function isInt(n){
+        return Number(n)===n && n%1===0;
+}
+
+function isFloat(n){
+        return   n===Number(n)  && n%1!==0;
+}
+
+function NumberCast(variable,decimales, defaultValue) {
 	var Num = 0;
 	variable = parseFloat((''+variable).replace(',','.'));
-
+	if (isNumeric(variable))
+	{
+		if (isInt(variable)) 
+		{
+			Num = variable;
+		}
+		else if (isFloat(variable)) 
+		{
+			Num = variable.toFixed(decimales);
+		}
+		return Num;
+	}
+	else if (isNaN(variable) || (variable == null)) 
+	{
+		return defaultValue;
+	}
 }
 
 function generateKey(){
