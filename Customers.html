@@ -20,6 +20,7 @@
         <script src="js/zoe/pricelevelDAO.js"></script>
         <script src="js/zoe/invoiceDAO.js"></script>
         <script src="js/zoe/salesRepDAO.js"></script>
+        <script src="js/zoe/creditMemoDAO.js"></script>
 		<script> 
 
 			$(document).bind("pageinit", function(event) {
@@ -49,9 +50,7 @@
 				}else{
 					customerDAO.list(receiveCustomers, errReceiveCustomers);
 				}
-				
 				salesRepDAO.getByName(window.localStorage.getItem("salesRepName"), receiveSalesRep);
-				
 			}
 			
 			var salesRepVO;
@@ -75,6 +74,9 @@
 			function errListInvoicesByCustomer(err){
 				alert("DB Error ListInvoicesByCustomer: "+JSON.stringify(err));
 			}
+			function errListCreditMemosByCustomer(err){
+				alert("DB Error ListCreditMemosByCustomer: "+JSON.stringify(err));
+			}			
 			// END functions on error case
 			
 			$(document).bind('pagechange', function() {
@@ -181,19 +183,6 @@
 			var listCustomers = new Array();
 			var selectedIndex;
 			function receiveCustomers(arrayCustomers){
-/*				var arrayCustomers = new Array();
-				arrayCustomers[0] = {ListId:'1',FullName:'Juan', openBalance:'1000.00'};
-				arrayCustomers[1] = {ListId:'2',FullName:'Lina', openBalance:'10000.00'};
-				arrayCustomers[2] = {ListId:'3',FullName:'Jose', openBalance:'100000.00'};
-				arrayCustomers[3] = {ListId:'4',FullName:'Lisa', openBalance:'1000000.00'};
-				arrayCustomers[4] = {ListId:'5',FullName:'Cris', openBalance:'10000000.00'};
-				arrayCustomers[5] = {ListId:'6',FullName:'Isa',  openBalance:'-100000000.00'};
-				arrayCustomers[6] = {ListId:'7',FullName:'Ana',  openBalance:'1000000000.00'};
-				arrayCustomers[7] = {ListId:'8',FullName:'Tati', openBalance:'10000000000.00'};
-				arrayCustomers[8] = {ListId:'9',FullName:'Yeny', openBalance:'100000000000.00'};
-				arrayCustomers[9] = {ListId:'10',FullName:'Juli', openBalance:'1000000000000.00'};
-				arrayCustomers[10] = {ListId:'11',FullName:'Xime', openBalance:'10000000000000.00'};
-*/			
 				console.log("receiveCustomers arrayCustomers=" + JSON.stringify(arrayCustomers));
 				listCustomers = arrayCustomers; // Copy local array to global array
 				console.log("========= INICIO LISTA =========");
@@ -255,10 +244,15 @@
 			
 			
 			// List Invoices by Customer 
+			var listInvoices = new Array();
+			var selectedIndex2;
 			function receiveInvoices(arrayListInvoicesByCust){
+				listInvoices = arrayListInvoicesByCust; // Copy local array to global array
 				// Build customers' invoices by Customer, list with <ul> <li>
 				var htmlString2 = '<ul id="listInvoiceByCust" data-role="listview" data-filter="true" data-filter-placeholder="Search invoice..." data-inset="true">';
 				var hoy=Date.now(); // Current date in milliseconds
+				var TotBalanceRem = 0.00;
+				var TotAmount = 0.00;
 				
 				for(var i=0; i< arrayListInvoicesByCust.length; i++) {
 						var dueDays = restaFechas(arrayListInvoicesByCust[i].dueDate,hoy); // Date in format yyyy-mm-dd
@@ -277,15 +271,15 @@
 						if (arrayListInvoicesByCust[i].origin == 'local'){
 							htmlString2 += '<a href="invoice.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
 						}
-						
 						htmlString2 +='<a href="InvoicePreview.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice +
 						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>';
-		
 					    htmlString2 +='<a class="ui-btn ui-btn-icon-notext ui-icon-camera" data-ajax="false" onClick="onClickGetPhoto(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>';
-						
 						htmlString2 +='</div></li>';
+						TotBalanceRem += parseFloat(arrayListInvoicesByCust[i].balanceRemaining);
+						TotAmount += parseFloat(arrayListInvoicesByCust[i].appliedAmount);
 					}
 					htmlString2 += '</ul>';
+					htmlString2 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Applied Amount</td><td>Total Balance Remaining</td></tr><tr><td>'+TotBalanceRem+'</td><td>'+TotAmount+'</td></tr></table>';
 					$('#InvoiceList').html(htmlString2);
 					$(".linkDetail").click(goDetailInvoice);
 			}
@@ -300,16 +294,24 @@
 			
 			function goDetailInvoice(event){
 				var index =  event.currentTarget.id;
-				logZoe("goDetail2 index: "+index)
+				logZoe("goDetail Invoice index: "+index)
 				index = index.substring(index.indexOf("_")+1);
-				selectedIndex = index;
+				selectedIndex2 = index;
 				//renderDetail(index);
 			}			
+			
+			function goDetailCreditMemo(event){
+				var index =  event.currentTarget.id;
+				logZoe("goDetail Credit Memo index: "+index)
+				index = index.substring(index.indexOf("_")+1);
+				selectedIndex3 = index;
+				//renderDetail(index);
+			}	
 			
 			var CustomerAddress='';
 			var CustomerEmail='';
 			var CustomerPhone='';
-			
+
 			function renderDetail(index){
 				logZoe("renderDetail index=" + index);
 				logZoe("renderDetail =" + JSON.stringify(listCustomers[index]));
@@ -371,7 +373,8 @@
 				
 				termDAO.list(receiveTerms,errReceiveTerms);
 				pricelevelDAO.list(receivePriceLevel,errPriceLevel);
-				invoiceDAO.listByCustomer(listCustomers[index].ListID,receiveInvoices, errListInvoicesByCustomer);
+				invoiceDAO.listByCustomer(listCustomers[index].ListID, receiveInvoices, errListInvoicesByCustomer);
+				creditMemoDAO.listByCustomer(listCustomers[index].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
 			}
 			
 			function LocateAddress(){
@@ -461,6 +464,72 @@
 			function errCustomermarkToSync(err){
 				alert("DB Error on mark to Sync update customers: "+JSON.stringify(err));
 			}
+			
+			// List Credit Memos by Customers
+			var listCreditMemos = new Array();
+			var selectedIndex3;			
+			function receiveCreditMemos(arrayListCreditMemosByCust){
+				listCreditMemos = arrayListCreditMemosByCust; // Copy local array to global array
+				logZoe("Receive ====== CreditMemos");
+			/*	id_creditMemo, ListID, po_number, 
+				txnDate, shipDate, dueDate, 
+
+				id_term,
+				id_salesrep,
+				
+				billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, 
+				shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, 
+
+				isPaid, isPending, 
+				refNumber, 
+				appliedAmount, balanceRemaining,				
+				salesTaxPercentage, salesTaxTotal, 
+				subtotal, 
+ 
+				customerMsg_ListID,
+				 memo, 
+				 origin  */
+				
+				// Build customers' Credit memos by Customer, list with <ul> <li>
+				var TotBalanceRemCM = 0.00;
+				var TotAmountCM = 0.00;				
+				var htmlString3 = '<ul id="ListCreditMemosByCust" data-role="listview" data-filter="true" data-filter-placeholder="Search Credit Memo..." data-inset="true">';
+				for(var i=0; i< arrayListCreditMemosByCust.length; i++) {
+						htmlString3 += '<li data-filtertext="' + arrayListCreditMemosByCust[i].refNumber + '">'+
+						'<div class="ui-grid-b"><div class="ui-block-a" style="width:80%">Credit Memo #' + arrayListCreditMemosByCust[i].refNumber +
+						'<div>Amount: <span id="overdueBal">'+ifNull(arrayListCreditMemosByCust[i].appliedAmount,'')+'</span><br/>Balance Remaining:<span> '+ifNull(arrayListCreditMemosByCust[i].balanceRemaining,'')+'</span><br/>';
+						htmlString3 +='</div></div><div class="ui-block-b" style="width:20%">';
+						if (arrayListCreditMemosByCust[i].origin == 'local'){
+							htmlString3 += '<a href="CreditMemoPreview.html?id_creditMemo=' + arrayListCreditMemosByCust[i].id_creditMemo + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
+						}
+						htmlString3 +='<a href="CreditMemoPreview.html?id_creditMemo=' + arrayListCreditMemosByCust[i].id_creditMemo +
+						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListCreditMemosByCust[i].id_creditMemo + '\'); return true;"></a>' + 
+						'</div></li>';
+						TotBalanceRemCM += parseFloat(arrayListCreditMemosByCust[i].balanceRemaining);
+						TotAmountCM += parseFloat(arrayListCreditMemosByCust[i].appliedAmount);
+					}
+					htmlString3 += '</ul>';
+					htmlString3 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Applied Amount</td><td>Total Balance Remaining</td></tr><tr><td>'+ifNull(TotBalanceRemCM,'')+'</td><td>'+ifNull(TotAmountCM,'')+'</td></tr></table>';
+					try{$('#CreditMemoList').html(htmlString3).listview('refresh');}catch(e){}
+					$(".linkDetail").click(goDetailCreditMemo);
+			}
+						
+			// Makes sure the code contained doesn't run until all the DOM elements have loaded
+			function changeActivityList() {
+				 $('.ActivitiesLists').hide();
+					$('#' +$('#selActivities').val()).show();
+					switch($('#selActivities').val()){
+						case 'InvoiceCreditMemoList': // invoiceDAO.listByCustomer(listCustomers[index].ListID, receiveInvoices, errListInvoicesByCustomer);
+													  // creditMemoDAO.listByCustomer(listCustomers[index].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
+													  break;
+						case 'InvoiceList'			: invoiceDAO.listByCustomer(listCustomers[selectedIndex].ListID, receiveInvoices, errListInvoicesByCustomer);
+
+													  break;
+						case 'CreditMemoList'		: creditMemoDAO.listByCustomer(listCustomers[selectedIndex].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
+													  break;
+					
+					}
+			}			
 	
 		</script>
 		<style type="text/css">
@@ -882,10 +951,11 @@
 							  <div>
 								<label for="selActivities" class="select">Select Activities:</label>
 							  </div>
-							  <select name="selActivities" id="selActivities" data-theme="a">
-								<option value="option1">All Activities</option>
-								<option value="option2">Invoices last month</option>
-								<option value="option3">Credit memos last month</option>
+							  <select name="selActivities" id="selActivities" data-theme="a" onChange="changeActivityList()">
+                              	<option value="" selected="selected">--- Select an option ---</option>
+								<option value="InvoiceCreditMemoList">All Activities</option>
+								<option value="InvoiceList">Invoices last month</option>
+								<option value="CreditMemoList">Credit memos last month</option>
 							  </select>
 							</div>
 							<div data-role="collapsible">
@@ -899,11 +969,25 @@
 								</div>
 							</div>
 							<br/><hr>
-                            <!-- BEGIN Invoices List and overdue -->
-                            <div data-role="content" id="InvoiceList">
+                            <!-- BEGIN Invoices & Credit Memo List -->
+                            <div data-role="content" id="InvoiceCreditMemoList" class="ActivitiesLists" style="display:none">
                                 <!-- Injection-->
+                                <span>InvoiceCreditMemoList</span>
                             </div>
-                            <!-- END Invoices List and overdue -->							
+                            <!-- END Invoices & Credit Memo List -
+                            <!-- BEGIN Invoices List and overdue -->
+                            <div data-role="content" id="InvoiceList" class="ActivitiesLists" style="display:none">
+                                <!-- Injection-->
+                                <span>InvoiceList</span>
+                            </div>
+                            <!-- END Invoices List and overdue -->	
+                            <!-- BEGIN Credit Memo List -->
+                            <div data-role="content" id="CreditMemoList" class="ActivitiesLists" style="display:none">
+                                <!-- Injection-->
+                                <span>CreditMemoList</span>
+                                
+                            </div>
+                            <!-- END Credit Memo List --> 						
 					</fieldset> 
 					</div>
 				</div>				

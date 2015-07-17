@@ -224,6 +224,18 @@ function ifUndefNull(variable){
 	return variable;
 }
 
+function ifNull(variable, defaultValue){
+	if  (isNaN(variable) || (variable == null)) {
+		return defaultValue;
+	}
+	return variable;
+}
+
+function NumberCast(variable) {
+	var Num = 0;
+	variable = parseFloat((''+variable).replace(',','.'));
+
+}
 
 function generateKey(){
 	var date = new Date();

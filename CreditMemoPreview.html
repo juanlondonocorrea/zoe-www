@@ -18,7 +18,7 @@
 		<script src="js/zoe/customerDAO.js"></script>
         <script src="js/zoe/termDAO.js"></script>
         <script src="js/zoe/pricelevelDAO.js"></script>
-        <script src="js/zoe/invoiceDAO.js"></script>
+        <script src="js/zoe/creditMemoDAO.js"></script>
 		<script src="js/zoe/salesRepDAO.js"></script>
 		<script src="js/zoe/inventoryDAO.js"></script>
 		<script src="js/zoe/taxDAO.js"></script>
@@ -35,14 +35,14 @@
 					var parameters = event.currentTarget.URL.split("?")[1].split("&");
 					for (var i in parameters){
 						var parameterDupla = parameters[i].split("=");
-						if (parameterDupla[0]=="id_invoice"){
-							id_invoice = parameterDupla[1];
+						if (parameterDupla[0]=="id_creditMemo"){
+							id_creditMemo = parameterDupla[1];
 						}
 					}
 					
 				}				
-				if (id_invoice){
-					invoiceDAO.getById(id_invoice,true,receiveInvoiceDetails,errReceiveInvoiceDetails);
+				if (id_creditMemo){
+					creditMemoDAO.getById(id_creditMemo,true,receiveCreditMemoDetails,errReceiveCreditMemoDetails);
 				}
 			}
 
@@ -56,7 +56,7 @@
 				//Check whether the printer is available or not.
 				function (isAvailable) {
 					 //Enter the page location.
-					 var page = $('#InvoicePreview').html(); //location.href;
+					 var page = $('#CreditMemoPreview').html(); //location.href;
 					 cordova.plugins.printer.print(page, 'Document.html', function () {
 					 alert('printing finished or canceled')
 						});
@@ -68,82 +68,82 @@
 		}			
 
 			// BEGIN Functions on error case
-			function errReceiveInvoiceDetails(err){
-				alert("DB Error Invoice Details: "+JSON.stringify(err));
+			function errReceiveCreditMemoDetails(err){
+				alert("DB Error Credit Memo Details: "+JSON.stringify(err));
 			}
 			// END functions on error case
 
-			function receiveInvoiceDetails(InvoiceVO){
-				if (InvoiceVO) {
-				$('#refNumber').html(InvoiceVO.refNumber);
-				$('#Date').html(InvoiceVO.txnDate);
-				$('#shipDate').html(InvoiceVO.shipDate);
-				$('#dueDate').html(InvoiceVO.dueDate);				
-			//	$('#ListID').html(InvoiceVO.ListID);
+			function receiveCreditMemoDetails(CreditMemoVO){
+				if (CreditMemoVO) {
+				$('#refNumber').html(CreditMemoVO.refNumber);
+				$('#Date').html(CreditMemoVO.txnDate);
+				$('#shipDate').html(CreditMemoVO.shipDate);
+				$('#dueDate').html(CreditMemoVO.dueDate);				
+			//	$('#ListID').html(CreditMemoVO.ListID);
 			
-				$('#vendor_name').html(InvoiceVO.vendor_name);
-				$('#vendor_addr1').html(InvoiceVO.vendor_addr1);
-				$('#vendor_addr2').html(InvoiceVO.vendor_addr2);
-				$('#vendor_addr3').html(InvoiceVO.vendor_addr3);
-				$('#vendor_city').html(InvoiceVO.vendor_city);
-				$('#vendor_state').html(InvoiceVO.vendor_state);
-				$('#vendor_country').html(InvoiceVO.vendor_country);
+				$('#vendor_name').html(CreditMemoVO.vendor_name);
+				$('#vendor_addr1').html(CreditMemoVO.vendor_addr1);
+				$('#vendor_addr2').html(CreditMemoVO.vendor_addr2);
+				$('#vendor_addr3').html(CreditMemoVO.vendor_addr3);
+				$('#vendor_city').html(CreditMemoVO.vendor_city);
+				$('#vendor_state').html(CreditMemoVO.vendor_state);
+				$('#vendor_country').html(CreditMemoVO.vendor_country);
 			
-				$('#po_number').html(InvoiceVO.po_number);
-				$('#term_name').html(InvoiceVO.term_name);
-				$('#salesrep_Name').html(InvoiceVO.salesrep_Name);
+				$('#po_number').html(CreditMemoVO.po_number);
+				$('#term_name').html(CreditMemoVO.term_name);
+				$('#salesrep_Name').html(CreditMemoVO.salesrep_Name);
 
-				$('#customer_companyName').html(InvoiceVO.billAddress_addr1); // InvoiceVO.customer_companyName
+				$('#customer_companyName').html(CreditMemoVO.billAddress_addr1); // CreditMemoVO.customer_companyName
 				
-				$('#billAddress_addr1').html(InvoiceVO.billAddress_addr1);
-				$('#billAddress_addr2').html(InvoiceVO.billAddress_addr2);
-				$('#billAddress_addr3').html(InvoiceVO.billAddress_addr3);
-				$('#billAddress_city').html(InvoiceVO.billAddress_city);
-				$('#billAddress_state').html(InvoiceVO.billAddress_state);
-				$('#billAddress_postalcode').html(InvoiceVO.billAddress_postalcode);
+				$('#billAddress_addr1').html(CreditMemoVO.billAddress_addr1);
+				$('#billAddress_addr2').html(CreditMemoVO.billAddress_addr2);
+				$('#billAddress_addr3').html(CreditMemoVO.billAddress_addr3);
+				$('#billAddress_city').html(CreditMemoVO.billAddress_city);
+				$('#billAddress_state').html(CreditMemoVO.billAddress_state);
+				$('#billAddress_postalcode').html(CreditMemoVO.billAddress_postalcode);
 				
-				$('#shipAddress_addr1').html(InvoiceVO.shipAddress_addr1);
-				$('#shipAddress_addr2').html(InvoiceVO.shipAddress_addr2);
-				$('#shipAddress_addr3').html(InvoiceVO.shipAddress_addr3);
-				$('#shipAddress_city').html(InvoiceVO.shipAddress_city);
-				$('#shipAddress_state').html(InvoiceVO.shipAddress_state);
-				$('#shipAddress_postalcode').html(InvoiceVO.shipAddress_postalcode);
-				$("#signature").attr("src",InvoiceVO.signaturePNG);
+				$('#shipAddress_addr1').html(CreditMemoVO.shipAddress_addr1);
+				$('#shipAddress_addr2').html(CreditMemoVO.shipAddress_addr2);
+				$('#shipAddress_addr3').html(CreditMemoVO.shipAddress_addr3);
+				$('#shipAddress_city').html(CreditMemoVO.shipAddress_city);
+				$('#shipAddress_state').html(CreditMemoVO.shipAddress_state);
+				$('#shipAddress_postalcode').html(CreditMemoVO.shipAddress_postalcode);
+				$("#signature").attr("src",CreditMemoVO.signaturePNG);
 				
-				if (InvoiceVO.isPending == 1) {
+				if (CreditMemoVO.isPending == 1) {
 					$('#isPending').html('Yes');
 				}
-				else if (InvoiceVO.isPending == 0) {
+				else if (CreditMemoVO.isPending == 0) {
 					$('#isPending').html('No');
 				}
 				
-				if (InvoiceVO.isPaid == 1) {
+				if (CreditMemoVO.isPaid == 1) {
 					$('#isPaid').html('Yes');
 				}
-				else if (InvoiceVO.isPaid == 0) {
+				else if (CreditMemoVO.isPaid == 0) {
 					$('#isPaid').html('No');
 				}
 				var taxTotal = 0.00;
 				var subTot = 0.00;
-				if (InvoiceVO.salesTaxTotal) {
-					parseFloat((''+InvoiceVO.salesTaxTotal).replace(',','.'));
+				if (CreditMemoVO.salesTaxTotal) {
+					parseFloat((''+CreditMemoVO.salesTaxTotal).replace(',','.'));
 				}
 				
-				if (InvoiceVO.subtotal) {
-					subTot = parseFloat((''+InvoiceVO.subtotal).replace(',','.'));
+				if (CreditMemoVO.subtotal) {
+					subTot = parseFloat((''+CreditMemoVO.subtotal).replace(',','.'));
 				}
-				var totalInvoice = taxTotal + subTot;
+				var totalCreditMemo = taxTotal + subTot;
 
-				$('#salesTaxPercentage').html(InvoiceVO.salesTaxPercentage+' %');
+				$('#salesTaxPercentage').html(CreditMemoVO.salesTaxPercentage+' %');
 				$('#salesTaxTotal').html('$ '+taxTotal);
 				$('#subtotal').html('$ '+subTot);
-				$('#total').html('$ '+totalInvoice);
-				$('#appliedAmount').html('$ '+ifNull(InvoiceVO.appliedAmount,0.00));
-				$('#balanceRemaining').html('$ '+ifNull(InvoiceVO.balanceRemaining,0.00));
+				$('#total').html('$ '+totalCreditMemo);
+				$('#appliedAmount').html('$ '+ifNull(CreditMemoVO.appliedAmount,0.00));
+				$('#balanceRemaining').html('$ '+ifNull(CreditMemoVO.balanceRemaining,0.00));
 
-				$('#customer_msg_FullName').html(InvoiceVO.customer_msg_FullName);
+				$('#customer_msg_FullName').html(CreditMemoVO.customer_msg_FullName);
 
-				var invoiceItems = '<table class="tblItems">'
+				var creditMemoItems = '<table  class="tblItems">'
 				  +'<tbody>'
 					+'<tr>'
 					  +'<td><div class="TinyFont">Description</div></td>'
@@ -154,35 +154,35 @@
 					+'</tr>';
 				var TotItems = 0;
 				$("#tableBodyItems").html("");
-				if (InvoiceVO.items){
-					for (var i=0; i < InvoiceVO.items.length; i++) {
-						invoiceItems +=
+				if (CreditMemoVO.items){
+					for (var i=0; i < CreditMemoVO.items.length; i++) {
+						creditMemoItems +=
 						'<tr>'
-						  +'<td><div class="TinyFont">'+InvoiceVO.items[i].Desc+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">$ '+InvoiceVO.items[i].Rate+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">'+InvoiceVO.items[i].Quantity+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">$ '+ifNull(parseFloat((''+InvoiceVO.items[i].Amount).replace(',','.')), 0.00)+'</div></td>';
-						invoiceItems += '<td><div class="TinyFont">'+ifNull(InvoiceVO.items[i].salesTax_Name, '')+'</div></td>';
-						invoiceItems +='</tr>';
-						TotItems += InvoiceVO.items[i].Quantity;
+						  +'<td><div class="TinyFont">'+CreditMemoVO.items[i].Desc+'</div></td>'
+						  +'<td><div align="right" class="TinyFont">$ '+CreditMemoVO.items[i].Rate+'</div></td>'
+						  +'<td><div align="right" class="TinyFont">'+CreditMemoVO.items[i].Quantity+'</div></td>'
+						  +'<td><div align="right" class="TinyFont">$ '+ifNull(CreditMemoVO.items[i].Amount, 0.00)+'</div></td>';
+					  	creditMemoItems += '<td><div class="TinyFont">'+ifNull(CreditMemoVO.items[i].salesTax_Name, '')+'</div></td>';
+						creditMemoItems +='</tr>';
+						TotItems += CreditMemoVO.items[i].Quantity;
 						}
 				}
 				else {
-					invoiceItems +=
-						'<tr>'
-							+'<td colspan="6"><div align="center" class="TinyFont">No items</div></td>'
-						+'</tr>';
+					creditMemoItems += 
+							'<tr>'
+								+'<td colspan="6"><div align="center" class="TinyFont">No items</div></td>'
+							+'</tr>';
 				}
-				invoiceItems +=
+				creditMemoItems +=
 					'<tr>'
 						+'<td colspan="3"><div align="right" class="TinyFont">Total Items</div></td>'
 						+'<td><div align="right" class="TinyFont">'+TotItems+'</div></td>'
 						+'<td colspan="2"></td>'
-					+'</tr>';				
-				invoiceItems += '</tbody></table>';
-				$("#tableBodyItems").html(invoiceItems); 
+					+'</tr>';
+				creditMemoItems += '</tbody></table>';
+				$("#tableBodyItems").html(creditMemoItems); 
 				}
-				//print();
+				print();
 			} 
 		</script>
 		<style type="text/css">
@@ -223,14 +223,14 @@
 	</head> 
 
 	<body>
-        <div data-role="page" id="InvoicePreview" data-title="Print Invoice" data-theme="a">
+        <div data-role="page" id="CreditMemoPreview" data-title="Print Credit Memo" data-theme="a">
             <div data-role="content">
                 <table class="tblHeader">
                   <tbody>
                     <tr>
                       <td colspan="2">
-                        <div id="InvoiceTitle" class="BigFont">Invoice</div>
-                        <div id="vendor_name" class="MediumFont"></div>
+                        <div id="CreditMemoTitle" class="BigFont">Credit Memo</div>
+                        <div id="vendor_name" class="MediumFont"></div>				  
                         <div id="vendor_addr1" class="TinyFont"></div>
                         <div id="vendor_addr2" class="TinyFont"></div>
                         <div id="vendor_addr3" class="TinyFont"></div>
@@ -245,7 +245,7 @@
                     </tr>
                     <tr>
                       <td width="21%">
-                        <span class="TinyFont">INVOICE # </span><br>
+                        <span class="TinyFont">Credit Memo # </span><br>
                         <div class="SmallFont" id="refNumber"></div>              
                       </td>
                       <td width="16%">
@@ -309,42 +309,42 @@
 
                 <div id="tableBodyItems"></div>
                 <br>
-				<div id="Footer">
-                   <table class="tblFooter">
-                        <tbody>
-                          <tr>
-                              <td colspan="2" class="SmallFontN">Subtotal</td>
-                              <td width="39%"><div id="subtotal" align="right" class="SmallFont"></div></td>
-                          </tr>
-                          <tr>
-                            <td colspan="2" class="SmallFontN">Tax Percentage</td>
-                            <td><div id="salesTaxPercentage" align="right" class="SmallFont"></div></td>
-                          </tr>
-                          <tr>
-                            <td colspan="2" class="SmallFontN">Tax Total</td>
-                            <td><div id="salesTaxTotal" align="right" class="SmallFont"></div></td>
-                          </tr>
-                          <tr>
-                              <td colspan="2" class="SmallFontN">Total</td>
-                              <td><div id="total" align="right" class="SmallFont"></div></td>
-                          </tr>
-                          <tr>
-                              <td colspan="2" class="SmallFontN">Payment applied</td>
-                              <td nowrap><div id="appliedAmount" align="right" class="SmallFont"></div></td>
-                          </tr>
-                          <tr>
-                              <td colspan="2" class="SmallFontN">Due Balance</td>
-                              <td nowrap><div id="balanceRemaining" align="right" class="SmallFont"></div></td>
-                          </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <br>
-                <div id="customer_msg_FullName" class="SmallFont"></div>
-                <div id="SignatureT" class="SmallFont">Signature:</div>
-              </div>
+                <div id="Footer">
+                    <table class="tblFooter">
+                      <tbody>
+                      <tr>
+                          <td colspan="2" class="SmallFontN">Subtotal</td>
+                          <td width="39%"><div id="subtotal" align="right" class="SmallFont"></div></td>
+                      </tr>
+                      <tr>
+                        <td colspan="2" class="SmallFontN">Tax Percentage</td>
+                        <td><div id="salesTaxPercentage" align="right" class="SmallFont"></div></td>
+                      </tr>
+                      <tr>
+                        <td colspan="2" class="SmallFontN">Tax Total</td>
+                        <td><div id="salesTaxTotal" align="right" class="SmallFont"></div></td>
+                      </tr>
+                      <tr>
+                          <td colspan="2" class="SmallFontN">Total</td>
+                          <td><div id="total" align="right" class="SmallFont"></div></td>
+                      </tr>
+                      <tr>
+                          <td colspan="2" class="SmallFontN">Payment applied</td>
+                          <td nowrap><div id="appliedAmount" align="right" class="SmallFont"></div></td>
+                      </tr>
+                      <tr>
+                          <td colspan="2" class="SmallFontN">Due Balance</td>
+                          <td nowrap><div id="balanceRemaining" align="right" class="SmallFont"></div></td>
+                      </tr>
+                  </tbody>
+                </table>
+            </div>
+            <br>
+            <div id="customer_msg_FullName" class="SmallFont"></div>
+            <div id="SignatureT" class="SmallFont">Signature:</div>
+           </div>
 
-			<div style="background-color:white;">
+            <div style="background-color:white;">
                 <image id="signature">
             </div>
                 
