@@ -18,7 +18,7 @@ var creditMemoErrFunc;
 var creditMemoVO;
 var recordCreditMemo;
 var includeCreditMemoDetails;
-var creditMemoOrigin;
+
 
 //----------------------
 //metodos hacia afuera
@@ -72,12 +72,11 @@ function listCreditMemosToUpload(aReceiveFunction,aErrFunc){
 	db.transaction(doListCreditMemosToUpload, creditMemoErrFunc);
 }
 
-function storeCreditMemo(records,aErrFunc,successCB, origin){
+function storeCreditMemo(records,aErrFunc,successCB){
 	db = openDatabaseZoe();
 	logZoe("storeCreditMemo db=" + db);
 	recordCreditMemo = records;
 	creditMemoErrFunc = aErrFunc;
-	creditMemoOrigin = origin;
 	db.transaction(doStoreCreditMemo, errorCB, successCB);
 }
 
@@ -310,20 +309,16 @@ function doStoreCreditMemo(tx){
 }
 
 function doStoreOneCreditMemo(tx, rec){
-		tx.executeSql('INSERT OR REPLACE INTO creditMemo(id_creditMemo, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?)',[rec.id_creditMemo, rec.ListID, ifUndefNull(rec.po_number), ifUndefNull(rec.txnDate), ifUndefNull(rec.dueDate), ifUndefNull(rec.appliedAmount), ifUndefNull(rec.balanceRemaining), ifUndefNull(rec.billAddress_addr1), ifUndefNull(rec.billAddress_addr2), ifUndefNull(rec.billAddress_addr3), ifUndefNull(rec.billAddress_city), ifUndefNull(rec.billAddress_state), ifUndefNull(rec.billAddress_postalcode), ifUndefNull(rec.shipAddress_addr1), ifUndefNull(rec.shipAddress_addr2), ifUndefNull(rec.shipAddress_addr3), ifUndefNull(rec.shipAddress_city), ifUndefNull(rec.shipAddress_state), ifUndefNull(rec.shipAddress_postalcode), ifUndefNull(rec.isPaid), ifUndefNull(rec.isPending), ifUndefNull(rec.refNumber), ifUndefNull(rec.TaxPercentage), ifUndefNull(rec.salesTaxTotal), ifUndefNull(rec.shipDate), ifUndefNull(rec.subtotal), ifUndefNull(rec.id_term), ifUndefNull(rec.id_salesrep), ifUndefNull(rec.customerMsg_ListID), ifUndefNull(rec.memo)] );
+		tx.executeSql('INSERT OR REPLACE INTO creditMemo(id_creditMemo, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, origin) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?, ?)',[rec.id_creditMemo, rec.ListID, ifUndefNull(rec.po_number), ifUndefNull(rec.txnDate), ifUndefNull(rec.dueDate), ifUndefNull(rec.appliedAmount), ifUndefNull(rec.balanceRemaining), ifUndefNull(rec.billAddress_addr1), ifUndefNull(rec.billAddress_addr2), ifUndefNull(rec.billAddress_addr3), ifUndefNull(rec.billAddress_city), ifUndefNull(rec.billAddress_state), ifUndefNull(rec.billAddress_postalcode), ifUndefNull(rec.shipAddress_addr1), ifUndefNull(rec.shipAddress_addr2), ifUndefNull(rec.shipAddress_addr3), ifUndefNull(rec.shipAddress_city), ifUndefNull(rec.shipAddress_state), ifUndefNull(rec.shipAddress_postalcode), ifUndefNull(rec.isPaid), ifUndefNull(rec.isPending), ifUndefNull(rec.refNumber), ifUndefNull(rec.TaxPercentage), ifUndefNull(rec.salesTaxTotal), ifUndefNull(rec.shipDate), ifUndefNull(rec.subtotal), ifUndefNull(rec.id_term), ifUndefNull(rec.id_salesrep), ifUndefNull(rec.customerMsg_ListID), ifUndefNull(rec.memo), ifUndefNull(rec.origin)] );
 		
-	if (creditMemoOrigin){
-		tx.executeSql('UPDATE creditMemo set origin = ? WHERE id_creditMemo = ?',[creditMemoOrigin,rec.id_creditMemo]);
-	}
-
 	
 	 if (rec.items){
 	 	console.log("storing creditMemo items")
 		 for (var i=0;i<rec.items.length;i++){
 			 var item = rec.items[i];
 			 console.log("item=" + JSON.stringify(item));
-			 console.log("elementos=" + JSON.stringify([item.LineID,item.id_creditMemo,item.inventory_ListID,item.Desc,item.Quantity,item.Rate,item.Amount,item.salesTax_ListID]));
-			 tx.executeSql('INSERT OR REPLACE INTO creditMemo_item(LineID,id_creditMemo,Inventory_ListID,Desc,Quantity,Rate,Amount,SalesTax_ListID) VALUES(?,?,?,?,?,?,?,?)',[item.LineID,rec.id_creditMemo,item.inventory_ListID,item.Desc,item.Quantity,item.Rate,item.Amount,item.salesTax_ListID]);
+			 console.log("elementos=" + JSON.stringify([item.LineID,rec.id_creditMemo,item.Inventory_ListID,item.Desc,item.Quantity,item.Rate,item.Amount,item.salesTax_ListID]));
+			 tx.executeSql('INSERT OR REPLACE INTO creditMemo_item(LineID,id_creditMemo,Inventory_ListID,Desc,Quantity,Rate,Amount,SalesTax_ListID) VALUES(?,?,?,?,?,?,?,?)',[item.LineID,rec.id_creditMemo,ifUndefNull(item.Inventory_ListID),item.Desc,item.Quantity,item.Rate,item.Amount,ifUndefNull(item.salesTax_ListID)]);
 		 }
 	 }
 }
@@ -334,8 +329,8 @@ function doDeleteAllCreditMemos(tx){
 }
 
 function doDeleteCreditMemo(tx){
-	tx.executeSql('DELETE FROM creditMemo_item where id_creditMemo=?',[filterDataCreditMemo]);
-	tx.executeSql('DELETE FROM creditMemo where id_creditMemo = ?',[filterDataCreditMemo]);
+	tx.executeSql('DELETE FROM creditMemo_item where id_creditMemo=?',[filterDataCreditMemo+""]);
+	tx.executeSql('DELETE FROM creditMemo where id_creditMemo = ?',[filterDataCreditMemo+""]);
 }
 
 function doMarkToSyncCreditMemo(tx){

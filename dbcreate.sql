@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 03/07/2015
+Modified: 15/07/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -8,57 +8,60 @@ Database: SQLite 3.7
 
 
 
+
+
 -- Drop indexes section -------------------------------------------------
 
-DROP INDEX IF EXISTS IX_Relationship19;
-DROP INDEX IF EXISTS IX_Relationship20;
-DROP INDEX IF EXISTS IX_Relationship22;
-DROP INDEX IF EXISTS IX_Relationship18;
-DROP INDEX IF EXISTS IX_Relationship21;
-DROP INDEX IF EXISTS IX_Relationship23;
-DROP INDEX IF EXISTS IX_Relationship15;
-DROP INDEX IF EXISTS IX_Relationship14;
-DROP INDEX IF EXISTS IX_Relationship16;
-DROP INDEX IF EXISTS IX_Relationship17;
-DROP INDEX IF EXISTS IX_VENDOR_NAME;
-DROP INDEX IF EXISTS IX_Inventory_fullName;
-DROP INDEX IF EXISTS IX_Relationship6;
-DROP INDEX IF EXISTS IX_Inventory_salesDesc;
-DROP INDEX IF EXISTS IX_invoice_lines;
-DROP INDEX IF EXISTS IX_Relationship1;
-DROP INDEX IF EXISTS IX_Relationship2;
-DROP INDEX IF EXISTS IX_invoice_custumer;
-DROP INDEX IF EXISTS IX_invoice_terms;
-DROP INDEX IF EXISTS IX_INVOICE_SYNC;
-DROP INDEX IF EXISTS IX_Relationship10;
-DROP INDEX IF EXISTS IX_Relationship11;
-DROP INDEX IF EXISTS customer_idx1;
-DROP INDEX IF EXISTS IX_sales_rep_customer;
-DROP INDEX IF EXISTS IX_Relationship3;
-DROP INDEX IF EXISTS IX_Customer_Name;
-DROP INDEX IF EXISTS IX_Relationship7;
-DROP INDEX IF EXISTS IX_CUSTOMER_SYNC;
-DROP INDEX IF EXISTS IX_Relationship12;
-DROP INDEX IF EXISTS idx_salesrep_1;
+DROP INDEX IF EXISTS IX_Relationship19@
+DROP INDEX IF EXISTS IX_Relationship20@
+DROP INDEX IF EXISTS IX_Relationship22@
+DROP INDEX IF EXISTS IX_Relationship18@
+DROP INDEX IF EXISTS IX_Relationship21@
+DROP INDEX IF EXISTS IX_Relationship23@
+DROP INDEX IF EXISTS IX_Relationship15@
+DROP INDEX IF EXISTS IX_Relationship14@
+DROP INDEX IF EXISTS IX_Relationship16@
+DROP INDEX IF EXISTS IX_Relationship17@
+DROP INDEX IF EXISTS IX_VENDOR_NAME@
+DROP INDEX IF EXISTS IX_Inventory_fullName@
+DROP INDEX IF EXISTS IX_Relationship6@
+DROP INDEX IF EXISTS IX_Inventory_salesDesc@
+DROP INDEX IF EXISTS IX_invoice_lines@
+DROP INDEX IF EXISTS IX_Relationship1@
+DROP INDEX IF EXISTS IX_Relationship2@
+DROP INDEX IF EXISTS IX_invoice_custumer@
+DROP INDEX IF EXISTS IX_invoice_terms@
+DROP INDEX IF EXISTS IX_INVOICE_SYNC@
+DROP INDEX IF EXISTS IX_Relationship10@
+DROP INDEX IF EXISTS IX_Relationship11@
+DROP INDEX IF EXISTS customer_idx1@
+DROP INDEX IF EXISTS IX_sales_rep_customer@
+DROP INDEX IF EXISTS IX_Relationship3@
+DROP INDEX IF EXISTS IX_Customer_Name@
+DROP INDEX IF EXISTS IX_Relationship7@
+DROP INDEX IF EXISTS IX_CUSTOMER_SYNC@
+DROP INDEX IF EXISTS IX_Relationship12@
+DROP INDEX IF EXISTS idx_salesrep_1@
 
 -- Drop tables section ---------------------------------------------------
 
-DROP TABLE IF EXISTS InvoiceLinkedTxn;
-DROP TABLE IF EXISTS paymentMethod;
-DROP TABLE IF EXISTS Payments;
-DROP TABLE IF EXISTS Vendor;
-DROP TABLE IF EXISTS customer_msg;
-DROP TABLE IF EXISTS pricelevel_item;
-DROP TABLE IF EXISTS pricelevel;
-DROP TABLE IF EXISTS creditMemo_item;
-DROP TABLE IF EXISTS invoice_item;
-DROP TABLE IF EXISTS creditMemo;
-DROP TABLE IF EXISTS invoice;
-DROP TABLE IF EXISTS customer;
-DROP TABLE IF EXISTS salesrep;
-DROP TABLE IF EXISTS Inventory;
-DROP TABLE IF EXISTS term;
-DROP TABLE IF EXISTS salesTax;
+DROP TABLE IF EXISTS log@
+DROP TABLE IF EXISTS InvoiceLinkedTxn@
+DROP TABLE IF EXISTS paymentMethod@
+DROP TABLE IF EXISTS Payments@
+DROP TABLE IF EXISTS Vendor@
+DROP TABLE IF EXISTS customer_msg@
+DROP TABLE IF EXISTS pricelevel_item@
+DROP TABLE IF EXISTS pricelevel@
+DROP TABLE IF EXISTS creditMemo_item@
+DROP TABLE IF EXISTS invoice_item@
+DROP TABLE IF EXISTS creditMemo@
+DROP TABLE IF EXISTS invoice@
+DROP TABLE IF EXISTS customer@
+DROP TABLE IF EXISTS salesrep@
+DROP TABLE IF EXISTS Inventory@
+DROP TABLE IF EXISTS term@
+DROP TABLE IF EXISTS salesTax@
 
 -- Create tables section -------------------------------------------------
 
@@ -70,7 +73,7 @@ CREATE TABLE salesTax
   Name TEXT,
   desc TEXT,
   CONSTRAINT Key8 PRIMARY KEY (ListID)
-);
+)@
 
 -- Table term
 
@@ -82,7 +85,7 @@ CREATE TABLE term
   stdDiscountDays NUMERIC,
   discountPct NUMERIC,
   CONSTRAINT Key6 PRIMARY KEY (id_term)
-);
+)@
 
 -- Table Inventory
 
@@ -97,13 +100,13 @@ CREATE TABLE Inventory
   salesDesc TEXT,
   CONSTRAINT Key7 PRIMARY KEY (ListID),
   CONSTRAINT Relationship6 FOREIGN KEY (salesTax_ListID) REFERENCES salesTax (ListID)
-);
+)@
 
-CREATE INDEX IX_Inventory_fullName ON Inventory (FullName);
+CREATE INDEX IX_Inventory_fullName ON Inventory (FullName)@
 
-CREATE INDEX IX_Relationship6 ON Inventory (salesTax_ListID);
+CREATE INDEX IX_Relationship6 ON Inventory (salesTax_ListID)@
 
-CREATE INDEX IX_Inventory_salesDesc ON Inventory (salesDesc);
+CREATE INDEX IX_Inventory_salesDesc ON Inventory (salesDesc)@
 
 -- Table salesrep
 
@@ -116,11 +119,12 @@ CREATE TABLE salesrep
   SyncTime NUMERIC NOT NULL,
   initial TEXT,
   id_employee TEXT,
+  roles TEXT,
   CONSTRAINT Key2 PRIMARY KEY (id_salesrep),
   CONSTRAINT id_salesrep UNIQUE (id_salesrep)
-);
+)@
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_salesrep_1 ON salesrep (Name,isActive);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_salesrep_1 ON salesrep (Name,isActive)@
 
 -- Table customer
 
@@ -172,21 +176,21 @@ CREATE TABLE customer
   CONSTRAINT Relationship3 FOREIGN KEY (id_term) REFERENCES term (id_term),
   CONSTRAINT Relationship7 FOREIGN KEY (pricelevel_ListID) REFERENCES pricelevel (ListID),
   CONSTRAINT Relationship12 FOREIGN KEY (vendor_ListID) REFERENCES Vendor (ListID)
-);
+)@
 
-CREATE INDEX customer_idx1 ON customer (FullName);
+CREATE INDEX customer_idx1 ON customer (FullName)@
 
-CREATE INDEX IX_sales_rep_customer ON customer (id_salesrep);
+CREATE INDEX IX_sales_rep_customer ON customer (id_salesrep)@
 
-CREATE INDEX IX_Relationship3 ON customer (id_term);
+CREATE INDEX IX_Relationship3 ON customer (id_term)@
 
-CREATE INDEX IX_Customer_Name ON customer (FullName);
+CREATE INDEX IX_Customer_Name ON customer (FullName)@
 
-CREATE INDEX IX_Relationship7 ON customer (pricelevel_ListID);
+CREATE INDEX IX_Relationship7 ON customer (pricelevel_ListID)@
 
-CREATE INDEX IX_CUSTOMER_SYNC ON customer (needSync);
+CREATE INDEX IX_CUSTOMER_SYNC ON customer (needSync)@
 
-CREATE INDEX IX_Relationship12 ON customer (vendor_ListID);
+CREATE INDEX IX_Relationship12 ON customer (vendor_ListID)@
 
 -- Table invoice
 
@@ -234,17 +238,17 @@ CREATE TABLE invoice
   CONSTRAINT invoice_terms FOREIGN KEY (id_term) REFERENCES term (id_term),
   CONSTRAINT Relationship10 FOREIGN KEY (id_salesrep) REFERENCES salesrep (id_salesrep),
   CONSTRAINT Relationship11 FOREIGN KEY (customerMsg_ListID) REFERENCES customer_msg (ListID)
-);
+)@
 
-CREATE INDEX IX_invoice_custumer ON invoice (ListID);
+CREATE INDEX IX_invoice_custumer ON invoice (ListID)@
 
-CREATE INDEX IX_invoice_terms ON invoice (id_term);
+CREATE INDEX IX_invoice_terms ON invoice (id_term)@
 
-CREATE INDEX IX_INVOICE_SYNC ON invoice (needSync);
+CREATE INDEX IX_INVOICE_SYNC ON invoice (needSync)@
 
-CREATE INDEX IX_Relationship10 ON invoice (id_salesrep);
+CREATE INDEX IX_Relationship10 ON invoice (id_salesrep)@
 
-CREATE INDEX IX_Relationship11 ON invoice (customerMsg_ListID);
+CREATE INDEX IX_Relationship11 ON invoice (customerMsg_ListID)@
 
 -- Table creditMemo
 
@@ -290,13 +294,13 @@ CREATE TABLE creditMemo
   CONSTRAINT Relationship18 FOREIGN KEY (ListID) REFERENCES customer (ListID),
   CONSTRAINT Relationship21 FOREIGN KEY (id_term) REFERENCES term (id_term),
   CONSTRAINT Relationship23 FOREIGN KEY (customerMsg_ListID) REFERENCES customer_msg (ListID)
-);
+)@
 
-CREATE INDEX IX_Relationship18 ON creditMemo (ListID);
+CREATE INDEX IX_Relationship18 ON creditMemo (ListID)@
 
-CREATE INDEX IX_Relationship21 ON creditMemo (id_term);
+CREATE INDEX IX_Relationship21 ON creditMemo (id_term)@
 
-CREATE INDEX IX_Relationship23 ON creditMemo (customerMsg_ListID);
+CREATE INDEX IX_Relationship23 ON creditMemo (customerMsg_ListID)@
 
 -- Table invoice_item
 
@@ -314,13 +318,36 @@ CREATE TABLE invoice_item
   CONSTRAINT invoice_lines FOREIGN KEY (id_invoice) REFERENCES invoice (id_invoice),
   CONSTRAINT Relationship1 FOREIGN KEY (Inventory_ListID) REFERENCES Inventory (ListID),
   CONSTRAINT Relationship2 FOREIGN KEY (SalesTax_ListID) REFERENCES salesTax (ListID)
-);
+)@
 
-CREATE INDEX IX_invoice_lines ON invoice_item (id_invoice);
+-- Create triggers for table invoice_item
 
-CREATE INDEX IX_Relationship1 ON invoice_item (Inventory_ListID);
+DROP TRIGGER IF EXISTS insert_invoice_item@
+DROP TRIGGER IF EXISTS delete_invoice_item@
 
-CREATE INDEX IX_Relationship2 ON invoice_item (SalesTax_ListID);
+CREATE TRIGGER IF NOT EXISTS insert_invoice_item AFTER INSERT
+ ON invoice_item
+ FOR EACH ROW
+BEGIN
+UPDATE Inventory SET quantityOnHand = quantityOnHand - NEW.quantity WHERE ListID = NEW.Inventory_ListID
+AND EXISTS (SELECT origin FROM Invoice WHERE id_invoice=NEW.id_invoice  AND (origin= "local" OR origin="synch"));
+END
+@
+
+CREATE TRIGGER delete_invoice_item AFTER DELETE
+ ON invoice_item
+ FOR EACH ROW
+BEGIN
+    UPDATE Inventory SET quantityOnHand = quantityOnHand + OLD.quantity WHERE ListID = OLD.Inventory_ListID
+AND EXISTS (SELECT origin FROM Invoice WHERE id_invoice=OLD.id_invoice  AND origin= "local");
+END@
+
+
+CREATE INDEX IX_invoice_lines ON invoice_item (id_invoice)@
+
+CREATE INDEX IX_Relationship1 ON invoice_item (Inventory_ListID)@
+
+CREATE INDEX IX_Relationship2 ON invoice_item (SalesTax_ListID)@
 
 -- Table creditMemo_item
 
@@ -338,13 +365,35 @@ CREATE TABLE creditMemo_item
   CONSTRAINT Relationship19 FOREIGN KEY (id_creditMemo) REFERENCES creditMemo (id_creditMemo),
   CONSTRAINT Relationship20 FOREIGN KEY (inventory_ListID) REFERENCES Inventory (ListID),
   CONSTRAINT Relationship22 FOREIGN KEY (SalesTax_ListID) REFERENCES salesTax (ListID)
-);
+)@
 
-CREATE INDEX IX_Relationship19 ON creditMemo_item (id_creditMemo);
+-- Create triggers for table creditMemo_item
 
-CREATE INDEX IX_Relationship20 ON creditMemo_item (inventory_ListID);
+DROP TRIGGER IF EXISTS insert_creditMemo_item@
+DROP TRIGGER IF EXISTS delete_creditmemo_item@
 
-CREATE INDEX IX_Relationship22 ON creditMemo_item (SalesTax_ListID);
+CREATE TRIGGER insert_creditMemo_item AFTER INSERT
+ ON creditMemo_item
+ FOR EACH ROW
+BEGIN
+UPDATE Inventory SET quantityOnHand = quantityOnHand + NEW.quantity WHERE ListID = NEW.Inventory_ListID
+AND EXISTS (SELECT origin FROM creditMemo WHERE id_creditMemo=NEW.id_creditMemo  AND (origin= "local" OR origin="synch"));
+END@
+
+CREATE TRIGGER delete_creditmemo_item AFTER DELETE
+ ON creditMemo_item
+ FOR EACH ROW
+BEGIN
+       UPDATE Inventory SET quantityOnHand = quantityOnHand - OLD.quantity WHERE ListID = OLD.Inventory_ListID
+AND EXISTS (SELECT origin FROM creditMemo WHERE id_creditMemo=OLD.id_creditMemo  AND origin= "local");
+END@
+
+
+CREATE INDEX IX_Relationship19 ON creditMemo_item (id_creditMemo)@
+
+CREATE INDEX IX_Relationship20 ON creditMemo_item (inventory_ListID)@
+
+CREATE INDEX IX_Relationship22 ON creditMemo_item (SalesTax_ListID)@
 
 -- Table pricelevel
 
@@ -355,7 +404,7 @@ CREATE TABLE pricelevel
   type TEXT,
   fixedPercentage TEXT,
   CONSTRAINT Key9 PRIMARY KEY (ListID)
-);
+)@
 
 -- Table pricelevel_item
 
@@ -367,7 +416,7 @@ CREATE TABLE pricelevel_item
   CONSTRAINT Key10 PRIMARY KEY (pricelevel_ListID,inventory_ListID),
   CONSTRAINT Relationship8 FOREIGN KEY (pricelevel_ListID) REFERENCES pricelevel (ListID),
   CONSTRAINT Relationship9 FOREIGN KEY (inventory_ListID) REFERENCES Inventory (ListID)
-);
+)@
 
 -- Table customer_msg
 
@@ -376,7 +425,7 @@ CREATE TABLE customer_msg
   ListID TEXT NOT NULL,
   FullName TEXT,
   CONSTRAINT Key11 PRIMARY KEY (ListID)
-);
+)@
 
 -- Table Vendor
 
@@ -391,9 +440,9 @@ CREATE TABLE Vendor
   state TEXT,
   country TEXT,
   CONSTRAINT Key12 PRIMARY KEY (ListID)
-);
+)@
 
-CREATE INDEX IX_VENDOR_NAME ON Vendor (name);
+CREATE INDEX IX_VENDOR_NAME ON Vendor (name)@
 
 -- Table Payments
 
@@ -412,13 +461,13 @@ CREATE TABLE Payments
   CONSTRAINT Relationship14 FOREIGN KEY (paymentmethod_ListID) REFERENCES paymentMethod (ListID),
   CONSTRAINT Relationship16 FOREIGN KEY (paymentmethod_ListID) REFERENCES customer (ListID),
   CONSTRAINT Relationship17 FOREIGN KEY (customer_ListID) REFERENCES customer (ListID)
-);
+)@
 
-CREATE INDEX IX_Relationship14 ON Payments (paymentmethod_ListID);
+CREATE INDEX IX_Relationship14 ON Payments (paymentmethod_ListID)@
 
-CREATE INDEX IX_Relationship16 ON Payments (paymentmethod_ListID);
+CREATE INDEX IX_Relationship16 ON Payments (paymentmethod_ListID)@
 
-CREATE INDEX IX_Relationship17 ON Payments (customer_ListID);
+CREATE INDEX IX_Relationship17 ON Payments (customer_ListID)@
 
 -- Table paymentMethod
 
@@ -427,7 +476,7 @@ CREATE TABLE paymentMethod
   ListID TEXT NOT NULL,
   FullName TEXT,
   CONSTRAINT Key11 PRIMARY KEY (ListID)
-);
+)@
 
 -- Table InvoiceLinkedTxn
 
@@ -440,9 +489,23 @@ CREATE TABLE InvoiceLinkedTxn
   LinkType TEXT DEFAULT AMTTYPE,
   Amount NUMERIC,
   id_invoice TEXT,
+  CONSTRAINT key1222 PRIMARY KEY (TxnID),
   CONSTRAINT Relationship15 FOREIGN KEY (id_invoice) REFERENCES invoice (id_invoice)
-);
+)@
 
-CREATE INDEX IX_Relationship15 ON InvoiceLinkedTxn (id_invoice);
+CREATE INDEX IX_Relationship15 ON InvoiceLinkedTxn (id_invoice)@
+
+-- Table log
+
+CREATE TABLE log
+(
+  id INTEGER NOT NULL
+        CONSTRAINT Key13 PRIMARY KEY AUTOINCREMENT,
+  curtime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  log TEXT,
+  CONSTRAINT id UNIQUE (id)
+)@
+
+
 
 

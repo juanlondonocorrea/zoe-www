@@ -127,7 +127,7 @@ $(document).ready(function() {
 				salesrepVO = obj;
 				console.log("salesRep=" + JSON.stringify(salesrepVO));
 				
-				$('#refNumber').val( invoiceDAO.generateRefNum(salesrepVO.initial+ "-") );
+				$('#refNumber').val( invoiceDAO.generateRefNum(salesrepVO.initial+ "") );
 				$('#PONumber').val($('#refNumber').val());
 				$("#SalesRep").val(window.localStorage.getItem("salesRepName"));
 
@@ -217,7 +217,7 @@ $(document).ready(function() {
 				$('#selProduct').empty();
 				$('#selProduct').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');				
 				for (var i in list) {
-					$('#selProduct').append('<option value="' + list[i].ListID +'">'+list[i].salesDesc+'</option>');
+					$('#selProduct').append('<option value="' + list[i].ListID +'">('+ list[i].QuantityOnHand + ') ' + list[i].salesDesc+ '</option>');
 				}
 				$('#selProduct').trigger("chosen:updated");
 			}
@@ -251,9 +251,13 @@ $(document).ready(function() {
 			function addItem(){
 				console.log("addItem listCustomers[customerSelectedIndex]=" + JSON.stringify(listCustomers[customerSelectedIndex]));
 				console.log("addItem listItems[productSelectedIndex]=" + JSON.stringify(listItems[productSelectedIndex]));
+				if (listItems[productSelectedIndex].QuantityOnHand *1< $("#Quantity").val()*1){
+					alert("Cannot set quantity " + $("#Quantity").val() + " over inventory available " + listItems[productSelectedIndex].QuantityOnHand);
+					return false;
+				}
 				var aItem = {"LineID":generateKey(), 
 					"id_invoice": listCustomers[customerSelectedIndex].id_invoice,
-					"inventory_ListID": listItems[productSelectedIndex].ListID,
+					"Inventory_ListID": listItems[productSelectedIndex].ListID,
 					"Desc": listItems[productSelectedIndex].salesDesc,
 					"Quantity": $("#Quantity").val(),
 					"Rate": parseFloat($("#RatePrice").val()).toFixed(2),
@@ -361,6 +365,10 @@ $(document).ready(function() {
 
 			function storeInvoice(){
 				console.log("storeInvoice");
+				//first remove all invoice if exist
+				invoiceDAO.delete($('#refNumber').val(),errInvoiceInsert, storeInvoiceCallback);
+			}
+			function storeInvoiceCallback(){
 				var datapair = $("#signature").jSignature("getData","base30");
 				var datapairPNG = $("#signature").jSignature("getData","image");
 				var customer = listCustomers[customerSelectedIndex];
@@ -399,13 +407,14 @@ $(document).ready(function() {
 					signaturePNG:"data:"+ datapairPNG[0] + "," + datapairPNG[1],
 					items: new Array()
 				}
-			
-			invoiceVO.items = currentItems;
-			console.log("storeInvoice invoiceVO=" + JSON.stringify(invoiceVO));
-			var invoicesVO = [invoiceVO];
-			invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert,'local');
-			return false;
-		}
+				
+				invoiceVO.items = currentItems;
+				invoiceVO.origin = "local";
+				console.log("storeInvoice invoiceVO=" + JSON.stringify(invoiceVO));
+				var invoicesVO = [invoiceVO];
+				invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert);
+				return false;
+			}
 		
 		function successInvoiceInsert(){
 			$("#isPersisted").val("true");
@@ -567,7 +576,7 @@ table, th, td {
 				</div>
 
                 <div class="ui-grid-a" style="height:45px">
-                  <div class="ui-block-a" style="height:100%">
+                  <div class="ui-block-a" style="height:95%">
                     <div class="ui-field-contain">
                       <label for="Quantity">Quantity:</label>
                     </div>
@@ -578,18 +587,18 @@ table, th, td {
                 </div>
                 
                 <div class="ui-grid-a" style="height:45px">
-                  <div class="ui-block-a" style="height:100%">
+                  <div class="ui-block-a" style="height:95%">
                     <div class="ui-field-contain" >
                       <label for="RatePrice">Rate/Price Each:</label>
                     </div>
                   </div>
                   <div class="ui-block-b" style="height:100%">
-                    <input type="number" step="0.01" name="RatePrice" id="RatePrice" align="right" readonly>
+                    <input type="number" step="0.01" name="RatePrice" id="RatePrice" align="right">
                   </div>
                 </div>
                 
                 <div class="ui-grid-a" style="height:45px">
-                  <div class="ui-block-a" style="height:100%">
+                  <div class="ui-block-a" style="height:95%">
                     <div class="ui-field-contain">
                       <label for="Amount">Amount:</label>
                     </div>
@@ -599,10 +608,11 @@ table, th, td {
                   </div>
                 </div>
     
-                <fieldset class="ui-grid-a">
-                    <div class="ui-block-a"><button type="button" id="cancel" data-theme="c" onClick="clearItem()">Cancel</button></div>
-                    <div class="ui-block-b"><button type="button" id="add" data-theme="b" onClick="addItem()">Add</button></div>	   
-                </fieldset> 
+                <div class="ui-grid-b" style="width:100%">
+                    <div class="ui-block-a" style="width:49%"><button type="button" id="add" data-theme="b" onClick="addItem()">Add</button></div>	   
+                    <div class="ui-block-b" style="width:2%"></div>	   
+                    <div class="ui-block-c" style="width:49%"><button type="button" id="cancel" data-theme="c" onClick="clearItem()">Cancel</button></div>
+                </div> 
             </div>
 <!-- END   ADD ITEM -->
 

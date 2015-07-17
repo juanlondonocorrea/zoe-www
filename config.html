@@ -26,6 +26,7 @@
 <script src="js/zoe/taxDAO.js" type="text/javascript"></script>
 <script src="js/zoe/inventoryDAO.js" type="text/javascript"></script>
 <script src="js/zoe/pricelevelDAO.js" type="text/javascript"></script>
+<script src="js/sha256.js" type="text/javascript"></script>
 <!-- fin librerias -->
 
 <script>
@@ -91,15 +92,13 @@
 		}
 		whatToUpload = $("#syncUpSelect").val();
 		currentUp = -1;
+		$("#synchDialog").popup("open"); 
 		upNext();
 	}
 
 	function upNext(){
 		currentUp += 1;
 		if (currentUp<whatToUpload.length){
-			if (currentUp == 0){
-				 $("#synchDialog").popup("open"); 
-			}
 			console.log("uploading " +  whatToUpload[currentUp]);
 			$("#currentTask").html(whatToUpload[currentUp] + "...");
 			if (whatToUpload[currentUp] == "syncUpInvoices" ){
@@ -133,16 +132,14 @@
 		}
 		console.log("whatToDownload=" + whatToDownload);
 		currentDown = -1;
+		 $("#synchDialog").popup("open"); 
+		 console.log("synchDialog open");
 		downNext();
 	}
 
 	function downNext(){
 		currentDown += 1;
 		if (currentDown<whatToDownload.length){
-			if (currentDown == 0){
-				 $("#synchDialog").popup("open"); 
-				 console.log("synchDialog open");
-			}
 			if (whatToDownload[currentDown] == "all" || whatToDownload[currentDown].indexOf("hoose")>-1){
 				downNext();
 				return;
@@ -205,22 +202,32 @@
 
 	var salesRepVO;
 	function receiveMessageEmployee(message){
-		var employee = message.EmployeeQueryRs;
+		var employee = message.EmployeeQueryRs.EmployeeRet;
 		var password = "";
+		var roles = "user";
+		console.log("receiveMessageEmployee employee.DataExtRet=" + employee.DataExtRet);
+		console.log("receiveMessageEmployee employee.DataExtRet.length=" + employee.DataExtRet);
 		if (employee.DataExtRet && employee.DataExtRet.length>0){
 			for (var j = 0; j< employee.DataExtRet.length; j++){
-				logZoe("employee.DataExtRet[j].DataExtName=" + employee.DataExtRet[j].DataExtName);
-				if ("password" == employee.DataExtRet[j].DataExtName){
+				console.log("employee.DataExtRet[j].DataExtName=" + employee.DataExtRet[j].DataExtName);
+				if ("PASSWORD" == employee.DataExtRet[j].DataExtName.toUpperCase()){
 					password = employee.DataExtRet[j].DataExtValue;
+				}else if ("ZOEROLE" == employee.DataExtRet[j].DataExtName.toUpperCase()){
+					roles = employee.DataExtRet[j].DataExtValue;
 				}
 			}
-		}else if (employee.DataExtRet && employee.DataExtRet.DataExtName=="password"){
-					passwrod = employee.DataExtRet.DataExtValue;
+		}else if (employee.DataExtRet && employee.DataExtRet.DataExtName.toUpperCase()=="PASSWORD"){
+			password = employee.DataExtRet.DataExtValue;
+		}else if (employee.DataExtRet && "ZOEROLE" == employee.DataExtRet.DataExtName.toUpperCase()){
+			roles = employee.DataExtRet[j].DataExtValue;
 		}
-		salesRepVO = {id_employee:employee.EmployeeRet.ListID,
-			name:employee.EmployeeRet.Name, 
-			password:password, 
-			isActive:employee.EmployeeRet.IsActive, 
+		password = password+"";
+		console.log("password=" + password);
+		salesRepVO = {id_employee:employee.ListID,
+			name:employee.Name, 
+			password:CryptoJS.SHA256(password), 
+			roles: roles,
+			isActive:employee.IsActive, 
 			syncTime:Date.now(), Initial:""};
 			
 		var mensajeSalesRep = '<SalesRepQueryRq requestID="c1"></SalesRepQueryRq>';
@@ -384,13 +391,14 @@
 			var invoice = invoices[i];
 			
 			var invoiceVO = convertInvoiceFromQB(invoice);
-
+			invoiceVO.origin = "remote";
 			invoicesVO[i] = invoiceVO;
+			
 				
 		}
 			
 		invoiceDAO.deleteAll(errCustomerInsert);
-		invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert,'remote');
+		invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert);
 	}
 	
 	function convertInvoiceFromQB(invoice){
@@ -433,22 +441,35 @@
 			}
 			
 			if (invoice.InvoiceLineRet){
-				for (j=0;j<invoice.InvoiceLineRet.length;j++){
-					var line = invoice.InvoiceLineRet[j];
-					var itemVO = {
-							LineID:line.TxnLineID,
-							id_invoice:invoiceVO.id_invoice,
-							Inventory_ListID:line.ItemRef.ListID,
-							Desc:line.Desc,
-							Quantity:line.Quantity,
-							Rate:line.Rate,
-							Amount:line.Amount,
-							SalesTax_ListID:line.SalesTaxCodeRef.ListID
+				if (invoice.InvoiceLineRet.length){
+					for (j=0;j<invoice.InvoiceLineRet.length;j++){
+						var line = invoice.InvoiceLineRet[j];
+						var itemVO = convertInvoiceLineToItem(invoiceVO,line);
+						invoiceVO.items[j] = itemVO;
 					}
-					invoiceVO.items[j] = itemVO;
+				}else{
+					var line = invoice.InvoiceLineRet;
+					var itemVO = convertInvoiceLineToItem(invoiceVO,line);
+					invoiceVO.items[0] = itemVO;
 				}
+					
 			}
 			return invoiceVO;
+	}
+	
+	function convertInvoiceLineToItem(invoiceVO,line){
+		var itemVO = {
+		LineID:line.TxnLineID,
+		id_invoice:invoiceVO.id_invoice,
+		Inventory_ListID:line.ItemRef.ListID,
+		Desc:line.Desc,
+		Quantity:line.Quantity,
+		Rate:line.Rate,
+		Amount:line.Amount,
+		SalesTax_ListID:line.SalesTaxCodeRef.ListID
+		}
+		return itemVO;
+
 	}
 
 
@@ -520,6 +541,7 @@
 		return false;
 	}
 	
+	var currentInvoice;
 	function receiveSyncUpInvoicesMessage(message){
 		console.log('receiveSyncUpInvoicesMessage message=' + message);
 		var ListInvoiceAddRs = message.InvoiceAddRs;
@@ -535,9 +557,13 @@
 			if (statusMessage == "Status OK"	){
 				var invoice = InvoiceAddRs.InvoiceRet;
 				message += "Success upload Invoice " + InvoiceAddRs.requestID + "<br>";
-				invoiceDAO.delete(InvoiceAddRs.requestID);
-				var invoiceVO = convertInvoiceFromQB(invoice);
-				invoiceDAO.store([invoiceVO]);
+				currentInvoice = invoice;
+				
+				invoiceDAO.delete(InvoiceAddRs.requestID,null,function() {
+					var invoiceVO = convertInvoiceFromQB(currentInvoice);
+					invoiceVO.origin = "synch";
+					invoiceDAO.store([invoiceVO]);
+				});
 			}else{
 				message += "Fail to upload invoice " + InvoiceAddRs.requestID + ":" + statusMessage + "<br>";
 			}
@@ -573,6 +599,7 @@
 			var creditMemo = creditMemos[i];
 			
 			var creditMemoVO = convertCreditMemoFromQB(creditMemo);
+			creditMemoVO.origin = "remote";
 
 			creditMemosVO[i] = creditMemoVO;
 				
@@ -622,8 +649,14 @@
 			}
 			
 			if (creditMemo.CreditMemoLineRet){
-				for (j=0;j<creditMemo.CreditMemoLineRet.length;j++){
-					var line = creditMemo.CreditMemoLineRet[j];
+				var lines = new Array();
+				if (creditMemo.CreditMemoLineRet.length){
+					lines =  creditMemo.CreditMemoLineRet;
+				}else{
+					lines = [creditMemo.CreditMemoLineRet];
+				}
+				for (j=0;j<lines.length;j++){
+					var line = lines[j];
 					var itemVO = {
 							LineID:line.TxnLineID,
 							id_creditMemo:creditMemoVO.id_creditMemo,
@@ -692,6 +725,7 @@
 		return false;
 	}
 	
+	var currentCreditMemo;
 	function receiveSyncUpCreditMemosMessage(message){
 		console.log('receiveSyncUpCreditMemosMessage message=' + message);
 		var ListCreditMemoAddRs = message.CreditMemoAddRs;
@@ -706,10 +740,13 @@
 			var statusMessage =CreditMemoAddRs.statusMessage;
 			if (statusMessage == "Status OK"	){
 				var creditMemo = CreditMemoAddRs.CreditMemoRet;
+				currentCreditMemo =creditMemo;
 				message += "Success upload CreditMemo " + CreditMemoAddRs.requestID + "<br>";
-				creditMemoDAO.delete(CreditMemoAddRs.requestID);
-				var creditMemoVO = convertCreditMemoFromQB(creditMemo);
+				creditMemoDAO.delete(CreditMemoAddRs.requestID,null,function() {
+				var creditMemoVO = convertCreditMemoFromQB(currentCreditMemo);
+				creditMemoVO.origin="synch";
 				creditMemoDAO.store([creditMemoVO]);
+				});
 			}else{
 				message += "Fail to upload creditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
 			}
