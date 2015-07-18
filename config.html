@@ -541,8 +541,6 @@
 		return false;
 	}
 	
-	var finishProcessInvoice = false;
-	var errorStateDB = true;
 	var InvoiceAddRs;
 	var ListInvoiceAddRs;
 	var currentInvoiceIndex;
@@ -579,8 +577,8 @@
 			currentInvoice = convertInvoiceFromQB(InvoiceAddRs.InvoiceRet);
 			currentInvoice.origin = "synch";
 			
-			invoiceDAO.store([currentInvoice],errorStateDB,function(){
-				invoiceDAO.delete(currentInvoice.refNumber,errorStateDB, processedInvoice);
+			invoiceDAO.store([currentInvoice],errorInvoiceDB,function(){
+				invoiceDAO.delete(currentInvoice.refNumber,errorInvoiceDB, processedInvoice);
 			});
 		}else{
 			message += "Fail to upload invoice " + InvoiceAddRs.requestID + ":" + statusMessage + "<br>";
@@ -594,7 +592,7 @@
 	}
 	
 
-	function	errorStateDB(err) {
+	function	errorInvoiceDB(err) {
 		message += "Fail to store invoice " + InvoiceAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
 		currentInvoiceIndex++;
 		processNextInvoiceResponse();
@@ -610,27 +608,67 @@
 		var cache="creditMemo";
 		var xpathExp = '//CreditMemoRet[SalesRepRef/ListID="'+ salesrepVO.id_salesrep + '"]';
 		
-		consumeWS(mensaje, "JSON", receiveCreditMemosMessage, cache, xpathExp);
+		consumeWS(mensaje, "JSON", receiveSyncUpCreditMemosMessage, cache, xpathExp);
 		});
 		return false;
 	}
 
-	function receiveCreditMemosMessage(message){
-		var creditMemos = message.CreditMemoQueryRs.CreditMemoRet;
-		var i;
-		var creditMemosVO = [];
-		for (i=0;i<creditMemos.length;i++){
-			var creditMemo = creditMemos[i];
-			
-			var creditMemoVO = convertCreditMemoFromQB(creditMemo);
-			creditMemoVO.origin = "remote";
 
-			creditMemosVO[i] = creditMemoVO;
-				
+	var CreditMemoAddRs;
+	var ListCreditMemoAddRs;
+	var currentCreditMemoIndex;
+	var currentCreditMemo;
+	function receiveSyncUpCreditMemosMessage(message){
+		console.log('receiveSyncUpCreditMemosMessage message=' + message);
+		ListCreditMemoAddRs = message.CreditMemoAddRs;
+		console.log("ListCreditMemoAddRs=" + ListCreditMemoAddRs);
+		currentCreditMemoIndex = 0;
+		message = "";
+		processNextCreditMemoResponse();
+	}
+	
+	function processNextCreditMemoResponse(){
+		console.log("currentCreditMemoIndex=" +currentCreditMemoIndex);
+		if (message!=null&& message!=""){
+			$("#currentTask").html(message);
 		}
+			if (!ListCreditMemoAddRs.length && currentCreditMemoIndex==1){
+				$("#btnSynchDialog").html("Accept");
+				return;
+			}else if (currentCreditMemoIndex == ListCreditMemoAddRs.length){
+				$("#btnSynchDialog").html("Accept");
+				return;
+			}
+		if (ListCreditMemoAddRs.length){
+			CreditMemoAddRs =ListCreditMemoAddRs[currentCreditMemoIndex]
+		}else{
+			CreditMemoAddRs = ListCreditMemoAddRs;
+		}
+		console.log("CreditMemoAddRs=" +CreditMemoAddRs);
+		var statusMessage =CreditMemoAddRs.statusMessage;
+		if (statusMessage == "Status OK"	){
+			currentCreditMemo = convertCreditMemoFromQB(CreditMemoAddRs.CreditMemoRet);
+			currentCreditMemo.origin = "synch";
 			
-		creditMemoDAO.deleteAll(errCreditMemoInsert);
-		creditMemoDAO.store(creditMemosVO, errCreditMemoInsert, successCreditMemoInsert,'remote');
+			creditMemoDAO.store([currentCreditMemo],errorCreditMemoDB,function(){
+				creditMemoDAO.delete(currentCreditMemo.refNumber,errorCreditMemoDB, processedCreditMemo);
+			});
+		}else{
+			message += "Fail to upload creditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
+		}
+	}
+	
+	function processedCreditMemo(){
+		currentCreditMemoIndex++;
+		message += "Success upload CreditMemo " + CreditMemoAddRs.requestID + "<br>";
+		processNextCreditMemoResponse();
+	}
+	
+
+	function	errorCreditMemoDB(err) {
+		message += "Fail to store creditMemo " + CreditMemoAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
+		currentCreditMemoIndex++;
+		processNextCreditMemoResponse();
 	}
 	
 	function convertCreditMemoFromQB(creditMemo){
