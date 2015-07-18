@@ -298,7 +298,6 @@
 				logZoe("goDetail Invoice index: "+index)
 				index = index.substring(index.indexOf("_")+1);
 				selectedIndex2 = index;
-				//renderDetail(index);
 			}			
 			
 			function goDetailCreditMemo(event){
@@ -306,7 +305,6 @@
 				logZoe("goDetail Credit Memo index: "+index)
 				index = index.substring(index.indexOf("_")+1);
 				selectedIndex3 = index;
-				//renderDetail(index);
 			}	
 			
 			var CustomerAddress='';
@@ -491,7 +489,7 @@
 						TotAmountCM += parseFloat(arrayListCreditMemosByCust[i].appliedAmount);
 					}
 					htmlString3 += '</ul>';
-					htmlString3 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Balance RemainingTotal Applied Amount</td><td>Total Applied Amount</td></tr><tr><td>'+NumberCast(TotBalanceRemCM,2, 0.00)+'</td><td>'+NumberCast(TotAmountCM,2, 0.00)+'</td></tr></table>';
+					htmlString3 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Balance Remaining</td><td>Total Applied Amount</td></tr><tr><td>'+NumberCast(TotBalanceRemCM,2, 0.00)+'</td><td>'+NumberCast(TotAmountCM,2, 0.00)+'</td></tr></table>';
 					try{$('#CreditMemoList').html(htmlString3).listview('refresh');}catch(e){}
 					$(".linkDetail").click(goDetailCreditMemo);
 			}
