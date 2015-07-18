@@ -541,39 +541,63 @@
 		return false;
 	}
 	
+	var finishProcessInvoice = false;
+	var errorStateDB = true;
+	var InvoiceAddRs;
+	var ListInvoiceAddRs;
+	var currentInvoiceIndex;
+	var message = "";
 	var currentInvoice;
 	function receiveSyncUpInvoicesMessage(message){
 		console.log('receiveSyncUpInvoicesMessage message=' + message);
-		var ListInvoiceAddRs = message.InvoiceAddRs;
-		var message = "";
-		for (var i in ListInvoiceAddRs){
-			var InvoiceAddRs;
-			if (ListInvoiceAddRs.length){
-				InvoiceAddRs =ListInvoiceAddRs[i]
-			}else{
-				InvoiceAddRs = ListInvoiceAddRs;
-			}
-			var statusMessage =InvoiceAddRs.statusMessage;
-			if (statusMessage == "Status OK"	){
-				var invoice = InvoiceAddRs.InvoiceRet;
-				message += "Success upload Invoice " + InvoiceAddRs.requestID + "<br>";
-				currentInvoice = invoice;
-				
-				invoiceDAO.delete(InvoiceAddRs.requestID,null,function() {
-					var invoiceVO = convertInvoiceFromQB(currentInvoice);
-					invoiceVO.origin = "synch";
-					invoiceDAO.store([invoiceVO]);
-				});
-			}else{
-				message += "Fail to upload invoice " + InvoiceAddRs.requestID + ":" + statusMessage + "<br>";
-			}
-			if (!ListInvoiceAddRs.length){
-				break;
-			}
-		}
+		ListInvoiceAddRs = message.InvoiceAddRs;
+		console.log("ListInvoiceAddRs=" + ListInvoiceAddRs);
+		currentInvoiceIndex = 0;
+		processNextInvoiceResponse();
+	}
 	
-		$("#btnSynchDialog").html("Accept");
-		$("#currentTask").html(message);
+	function processNextInvoiceResponse(){
+		console.log("currentInvoiceIndex=" +currentInvoiceIndex);
+		if (message!=null&& message!=""){
+			$("#currentTask").html(message);
+		}
+			if (!ListInvoiceAddRs.length && currentInvoiceIndex==1){
+				$("#btnSynchDialog").html("Accept");
+				return;
+			}else if (currentInvoiceIndex == ListInvoiceAddRs.length){
+				$("#btnSynchDialog").html("Accept");
+				return;
+			}
+		if (ListInvoiceAddRs.length){
+			InvoiceAddRs =ListInvoiceAddRs[currentInvoiceIndex]
+		}else{
+			InvoiceAddRs = ListInvoiceAddRs;
+		}
+		console.log("InvoiceAddRs=" +InvoiceAddRs);
+		var statusMessage =InvoiceAddRs.statusMessage;
+		if (statusMessage == "Status OK"	){
+			currentInvoice = convertInvoiceFromQB(InvoiceAddRs.InvoiceRet);
+			currentInvoice.origin = "synch";
+			
+			invoiceDAO.store([currentInvoice],errorStateDB,function(){
+				invoiceDAO.delete(currentInvoice.refNumber,errorStateDB, processedInvoice);
+			});
+		}else{
+			message += "Fail to upload invoice " + InvoiceAddRs.requestID + ":" + statusMessage + "<br>";
+		}
+	}
+	
+	function processedInvoice(){
+		currentInvoiceIndex++;
+		message += "Success upload Invoice " + InvoiceAddRs.requestID + "<br>";
+		processNextInvoiceResponse();
+	}
+	
+
+	function	errorStateDB(err) {
+		message += "Fail to store invoice " + InvoiceAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
+		currentInvoiceIndex++;
+		processNextInvoiceResponse();
 	}
 
 //SYNCHRONIZATION CreditMemos	
