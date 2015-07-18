@@ -134,12 +134,12 @@
 				}
 				var totalInvoice = taxTotal + subTot;
 
-				$('#salesTaxPercentage').html(InvoiceVO.salesTaxPercentage+' %');
-				$('#salesTaxTotal').html('$ '+taxTotal);
-				$('#subtotal').html('$ '+subTot);
-				$('#total').html('$ '+totalInvoice);
-				$('#appliedAmount').html('$ '+ifNull(InvoiceVO.appliedAmount,0.00));
-				$('#balanceRemaining').html('$ '+ifNull(InvoiceVO.balanceRemaining,0.00));
+				$('#salesTaxPercentage').html(NumberCast(InvoiceVO.salesTaxPercentage,2, 0.00)+' %');
+				$('#salesTaxTotal').html('$ '+NumberCast(taxTotal,2, 0.00));
+				$('#subtotal').html('$ '+NumberCast(subTot,2, 0.00));
+				$('#total').html('$ '+NumberCast(totalInvoice,2, 0.00));
+				$('#appliedAmount').html('$ '+NumberCast(InvoiceVO.appliedAmount,2, 0.00));
+				$('#balanceRemaining').html('$ '+NumberCast(InvoiceVO.balanceRemaining,2, 0.00));
 
 				$('#customer_msg_FullName').html(InvoiceVO.customer_msg_FullName);
 
@@ -159,10 +159,10 @@
 						invoiceItems +=
 						'<tr>'
 						  +'<td><div class="TinyFont">'+InvoiceVO.items[i].Desc+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">$ '+InvoiceVO.items[i].Rate+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">'+InvoiceVO.items[i].Quantity+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">$ '+ifNull(parseFloat((''+InvoiceVO.items[i].Amount).replace(',','.')), 0.00)+'</div></td>';
-						invoiceItems += '<td><div class="TinyFont">'+ifNull(InvoiceVO.items[i].salesTax_Name, '')+'</div></td>';
+						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(InvoiceVO.items[i].Rate,2, 0.00)+'</div></td>'
+						  +'<td><div align="right" class="TinyFont">'+NumberCast(InvoiceVO.items[i].Quantity,0, 0)+'</div></td>'
+						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(InvoiceVO.items[i].Amount,2, 0.00)+'</div></td>';
+						invoiceItems += '<td><div class="TinyFont">'+NumberCast(InvoiceVO.items[i].salesTax_Name,0, '')+'</div></td>';
 						invoiceItems +='</tr>';
 						TotItems += InvoiceVO.items[i].Quantity;
 						}
@@ -170,19 +170,19 @@
 				else {
 					invoiceItems +=
 						'<tr>'
-							+'<td colspan="6"><div align="center" class="TinyFont">No items</div></td>'
+							+'<td colspan="5"><div align="center" class="TinyFont">No items</div></td>'
 						+'</tr>';
 				}
 				invoiceItems +=
 					'<tr>'
-						+'<td colspan="3"><div align="right" class="TinyFont">Total Items</div></td>'
-						+'<td><div align="right" class="TinyFont">'+TotItems+'</div></td>'
+						+'<td colspan="2"><div align="right" class="TinyFont">Total Items</div></td>'
+						+'<td><div align="right" class="TinyFont">'+NumberCast(TotItems,0, '')+'</div></td>'
 						+'<td colspan="2"></td>'
-					+'</tr>';				
+					+'</tr>';
 				invoiceItems += '</tbody></table>';
 				$("#tableBodyItems").html(invoiceItems); 
 				}
-				//print();
+				print();
 			} 
 		</script>
 		<style type="text/css">

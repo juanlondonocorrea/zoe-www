@@ -134,12 +134,12 @@
 				}
 				var totalCreditMemo = taxTotal + subTot;
 
-				$('#salesTaxPercentage').html(CreditMemoVO.salesTaxPercentage+' %');
-				$('#salesTaxTotal').html('$ '+taxTotal);
-				$('#subtotal').html('$ '+subTot);
-				$('#total').html('$ '+totalCreditMemo);
-				$('#appliedAmount').html('$ '+ifNull(CreditMemoVO.appliedAmount,0.00));
-				$('#balanceRemaining').html('$ '+ifNull(CreditMemoVO.balanceRemaining,0.00));
+				$('#salesTaxPercentage').html(NumberCast(CreditMemoVO.salesTaxPercentage,2, 0.00)+' %');
+				$('#salesTaxTotal').html('$ '+NumberCast(taxTotal,2, 0.00));
+				$('#subtotal').html('$ '+NumberCast(subTot,2, 0.00));
+				$('#total').html('$ '+NumberCast(totalCreditMemo,2, 0.00));
+				$('#appliedAmount').html('$ '+NumberCast(CreditMemoVO.appliedAmount,2, 0.00));
+				$('#balanceRemaining').html('$ '+NumberCast(CreditMemoVO.balanceRemaining,2, 0.00));
 
 				$('#customer_msg_FullName').html(CreditMemoVO.customer_msg_FullName);
 
@@ -159,10 +159,10 @@
 						creditMemoItems +=
 						'<tr>'
 						  +'<td><div class="TinyFont">'+CreditMemoVO.items[i].Desc+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">$ '+CreditMemoVO.items[i].Rate+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">'+CreditMemoVO.items[i].Quantity+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">$ '+ifNull(CreditMemoVO.items[i].Amount, 0.00)+'</div></td>';
-					  	creditMemoItems += '<td><div class="TinyFont">'+ifNull(CreditMemoVO.items[i].salesTax_Name, '')+'</div></td>';
+						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(CreditMemoVO.items[i].Rate,2, 0.00)+'</div></td>'
+						  +'<td><div align="right" class="TinyFont">'+NumberCast(CreditMemoVO.items[i].Quantity,0, 0)+'</div></td>'
+						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(CreditMemoVO.items[i].Amount,2, 0.00)+'</div></td>';
+					  	creditMemoItems += '<td><div class="TinyFont">'+NumberCast(CreditMemoVO.items[i].salesTax_Name,0, '')+'</div></td>';
 						creditMemoItems +='</tr>';
 						TotItems += CreditMemoVO.items[i].Quantity;
 						}
@@ -170,13 +170,13 @@
 				else {
 					creditMemoItems += 
 							'<tr>'
-								+'<td colspan="6"><div align="center" class="TinyFont">No items</div></td>'
+								+'<td colspan="5"><div align="center" class="TinyFont">No items</div></td>'
 							+'</tr>';
 				}
 				creditMemoItems +=
 					'<tr>'
-						+'<td colspan="3"><div align="right" class="TinyFont">Total Items</div></td>'
-						+'<td><div align="right" class="TinyFont">'+TotItems+'</div></td>'
+						+'<td colspan="2"><div align="right" class="TinyFont">Total Items</div></td>'
+						+'<td><div align="right" class="TinyFont">'+NumberCast(TotItems,0, '')+'</div></td>'
 						+'<td colspan="2"></td>'
 					+'</tr>';
 				creditMemoItems += '</tbody></table>';

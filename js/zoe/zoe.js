@@ -249,6 +249,7 @@ function isFloat(n){
         return   n===Number(n)  && n%1!==0;
 }
 
+// Convierte la variable a Número, número de decimales si es real, valor por defecto 
 function NumberCast(variable,decimales, defaultValue) {
 	var Num = 0;
 	variable = parseFloat((''+variable).replace(',','.'));
