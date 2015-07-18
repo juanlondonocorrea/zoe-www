@@ -101,7 +101,8 @@
 				}
 			}
 
-/*			$(document).ready(function(){ 
+/*			// Esto es para colorear en rojo los valores negativos - PENDIENTE POR TERMINA
+			$(document).ready(function(){ 
 			$("td .ms-vb2").each(function () {
 			   if($(this).val().indexof('-') > -1)
 				{
@@ -279,7 +280,7 @@
 						TotAmount += parseFloat(arrayListInvoicesByCust[i].appliedAmount);
 					}
 					htmlString2 += '</ul>';
-					htmlString2 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Applied Amount</td><td>Total Balance Remaining</td></tr><tr><td>'+TotBalanceRem+'</td><td>'+TotAmount+'</td></tr></table>';
+					htmlString2 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Balance Remaining</td><td>Total Applied Amount</td></tr><tr><td>'+NumberCast(TotBalanceRem,2, 0.00)+'</td><td>'+NumberCast(TotAmount,2, 0.00)+'</td></tr></table>';
 					$('#InvoiceList').html(htmlString2);
 					$(".linkDetail").click(goDetailInvoice);
 			}
@@ -470,25 +471,6 @@
 			var selectedIndex3;			
 			function receiveCreditMemos(arrayListCreditMemosByCust){
 				listCreditMemos = arrayListCreditMemosByCust; // Copy local array to global array
-				logZoe("Receive ====== CreditMemos");
-			/*	id_creditMemo, ListID, po_number, 
-				txnDate, shipDate, dueDate, 
-
-				id_term,
-				id_salesrep,
-				
-				billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, 
-				shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, 
-
-				isPaid, isPending, 
-				refNumber, 
-				appliedAmount, balanceRemaining,				
-				salesTaxPercentage, salesTaxTotal, 
-				subtotal, 
- 
-				customerMsg_ListID,
-				 memo, 
-				 origin  */
 				
 				// Build customers' Credit memos by Customer, list with <ul> <li>
 				var TotBalanceRemCM = 0.00;
@@ -509,7 +491,7 @@
 						TotAmountCM += parseFloat(arrayListCreditMemosByCust[i].appliedAmount);
 					}
 					htmlString3 += '</ul>';
-					htmlString3 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Applied Amount</td><td>Total Balance Remaining</td></tr><tr><td>'+ifNull(TotBalanceRemCM,'')+'</td><td>'+ifNull(TotAmountCM,'')+'</td></tr></table>';
+					htmlString3 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Balance RemainingTotal Applied Amount</td><td>Total Applied Amount</td></tr><tr><td>'+NumberCast(TotBalanceRemCM,2, 0.00)+'</td><td>'+NumberCast(TotAmountCM,2, 0.00)+'</td></tr></table>';
 					try{$('#CreditMemoList').html(htmlString3).listview('refresh');}catch(e){}
 					$(".linkDetail").click(goDetailCreditMemo);
 			}
@@ -519,13 +501,12 @@
 				 $('.ActivitiesLists').hide();
 					$('#' +$('#selActivities').val()).show();
 					switch($('#selActivities').val()){
-						case 'InvoiceCreditMemoList': // invoiceDAO.listByCustomer(listCustomers[index].ListID, receiveInvoices, errListInvoicesByCustomer);
-													  // creditMemoDAO.listByCustomer(listCustomers[index].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
+						case 'InvoiceCreditMemoList': invoiceDAO.listByCustomer(listCustomers[selectedIndex2].ListID, receiveInvoices, errListInvoicesByCustomer);
+													  creditMemoDAO.listByCustomer(listCustomers[selectedIndex3].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
 													  break;
-						case 'InvoiceList'			: invoiceDAO.listByCustomer(listCustomers[selectedIndex].ListID, receiveInvoices, errListInvoicesByCustomer);
-
+						case 'InvoiceList'			: invoiceDAO.listByCustomer(listCustomers[selectedIndex2].ListID, receiveInvoices, errListInvoicesByCustomer);
 													  break;
-						case 'CreditMemoList'		: creditMemoDAO.listByCustomer(listCustomers[selectedIndex].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
+						case 'CreditMemoList'		: creditMemoDAO.listByCustomer(listCustomers[selectedIndex3].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
 													  break;
 					
 					}
@@ -978,13 +959,13 @@
                             <!-- BEGIN Invoices List and overdue -->
                             <div data-role="content" id="InvoiceList" class="ActivitiesLists" style="display:none">
                                 <!-- Injection-->
-                                <span>InvoiceList</span>
+                                <span></span>
                             </div>
                             <!-- END Invoices List and overdue -->	
                             <!-- BEGIN Credit Memo List -->
                             <div data-role="content" id="CreditMemoList" class="ActivitiesLists" style="display:none">
                                 <!-- Injection-->
-                                <span>CreditMemoList</span>
+                                <span></span>
                                 
                             </div>
                             <!-- END Credit Memo List --> 						
