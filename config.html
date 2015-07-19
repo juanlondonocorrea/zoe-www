@@ -620,10 +620,11 @@
 		return false;
 	}
 	
+	var creditMemosVO = [];
 	function receiveCreditMemosMessage(message){
 		var creditMemos = message.CreditMemoQueryRs.CreditMemoRet;
 		var i;
-		var creditMemosVO = [];
+		creditMemosVO = [];
 		for (i=0;i<creditMemos.length;i++){
 			var creditMemo = creditMemos[i];
 			
@@ -633,7 +634,10 @@
 				
 		}
 			
-		creditMemoDAO.deleteAll(errCreditMemoInsert);
+		creditMemoDAO.deleteAll(errCreditMemoInsert,storeCreditMemos);
+	}
+	
+	function storeCreditMemos(){
 		creditMemoDAO.store(creditMemosVO, errCreditMemoInsert, successCreditMemoInsert,'remote');
 	}
 	
