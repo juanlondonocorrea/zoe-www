@@ -62,8 +62,13 @@
       			<input type="text" id="login" name="login">
       			<label> Password </label>
      			<input type="password" id="password" name="password" >
-      			<input type="submit" value="Login" id="btnLogin">
-                <a href="config.html" data-role="button" data-ajax="false" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear" >Config</a>
+                <fieldset class="ui-grid-a">
+                    <div class="ui-block-a">
+	      			<input type="submit" value="Login" id="btnLogin">
+    	            </div>
+                    <div class="ui-block-b">
+                <a onClick="navigator.app.exitApp();" data-role="button" data-ajax="false" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear" >Exit</a>
+                </div>
     		</form>		
 	</div>
 </div>
