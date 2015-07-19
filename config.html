@@ -33,6 +33,9 @@
 		$(document).bind("pagebeforecreate", function(event) {
 			console.log("en pagebeforecreate config.html salesRepName=" + window.localStorage.getItem(
 	"salesRepName"));
+			if (event.target && event.target.id && event.target.id.toUpperCase().indexOf("CONFIG")==-1){
+				return;
+			}
 			initAnyPage(event.target);
 			initThisPage(event);
 		});
