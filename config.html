@@ -386,6 +386,7 @@
 		return false;
 	}
 
+	var invoicesVO = [];
 	function receiveInvoicesMessage(message){
 		var invoices = message.InvoiceQueryRs.InvoiceRet;
 		var i;
@@ -400,7 +401,10 @@
 				
 		}
 			
-		invoiceDAO.deleteAll(errCustomerInsert);
+		invoiceDAO.deleteAll(errCustomerInsert,null,  storeInvoices);
+	}
+	
+	function storeInvoices(){
 		invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert);
 	}
 	
