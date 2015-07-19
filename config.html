@@ -611,69 +611,30 @@
 		var cache="creditMemo";
 		var xpathExp = '//CreditMemoRet[SalesRepRef/ListID="'+ salesrepVO.id_salesrep + '"]';
 		
-		consumeWS(mensaje, "JSON", receiveSyncUpCreditMemosMessage, cache, xpathExp);
+		consumeWS(mensaje, "JSON", receiveCreditMemosMessage, cache, xpathExp);
 		});
 		return false;
 	}
-
-
-	var CreditMemoAddRs;
-	var ListCreditMemoAddRs;
-	var currentCreditMemoIndex;
-	var currentCreditMemo;
-	function receiveSyncUpCreditMemosMessage(message){
-		console.log('receiveSyncUpCreditMemosMessage message=' + message);
-		ListCreditMemoAddRs = message.CreditMemoAddRs;
-		console.log("ListCreditMemoAddRs=" + ListCreditMemoAddRs);
-		currentCreditMemoIndex = 0;
-		message = "";
-		processNextCreditMemoResponse();
-	}
 	
-	function processNextCreditMemoResponse(){
-		console.log("currentCreditMemoIndex=" +currentCreditMemoIndex);
-		if (message!=null&& message!=""){
-			$("#currentTask").html(message);
-		}
-			if (!ListCreditMemoAddRs.length && currentCreditMemoIndex==1){
-				$("#btnSynchDialog").html("Accept");
-				return;
-			}else if (currentCreditMemoIndex == ListCreditMemoAddRs.length){
-				$("#btnSynchDialog").html("Accept");
-				return;
-			}
-		if (ListCreditMemoAddRs.length){
-			CreditMemoAddRs =ListCreditMemoAddRs[currentCreditMemoIndex]
-		}else{
-			CreditMemoAddRs = ListCreditMemoAddRs;
-		}
-		console.log("CreditMemoAddRs=" +CreditMemoAddRs);
-		var statusMessage =CreditMemoAddRs.statusMessage;
-		if (statusMessage == "Status OK"	){
-			currentCreditMemo = convertCreditMemoFromQB(CreditMemoAddRs.CreditMemoRet);
-			currentCreditMemo.origin = "synch";
+	function receiveCreditMemosMessage(message){
+		var creditMemos = message.CreditMemoQueryRs.CreditMemoRet;
+		var i;
+		var creditMemosVO = [];
+		for (i=0;i<creditMemos.length;i++){
+			var creditMemo = creditMemos[i];
 			
-			creditMemoDAO.store([currentCreditMemo],errorCreditMemoDB,function(){
-				creditMemoDAO.delete(currentCreditMemo.refNumber,errorCreditMemoDB, processedCreditMemo);
-			});
-		}else{
-			message += "Fail to upload creditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
+			var creditMemoVO = convertCreditMemoFromQB(creditMemo);
+			creditMemoVO.origin = "remote";
+			creditMemosVO[i] = creditMemoVO;
+				
 		}
-	}
-	
-	function processedCreditMemo(){
-		currentCreditMemoIndex++;
-		message += "Success upload CreditMemo " + CreditMemoAddRs.requestID + "<br>";
-		processNextCreditMemoResponse();
+			
+		creditMemoDAO.deleteAll(errCreditMemoInsert);
+		creditMemoDAO.store(creditMemosVO, errCreditMemoInsert, successCreditMemoInsert,'remote');
 	}
 	
 
-	function	errorCreditMemoDB(err) {
-		message += "Fail to store creditMemo " + CreditMemoAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
-		currentCreditMemoIndex++;
-		processNextCreditMemoResponse();
-	}
-	
+
 	function convertCreditMemoFromQB(creditMemo){
 			logZoe("creditMemo=" + JSON.stringify(creditMemo));
 			logZoe("creditMemo.TermsRef=" + JSON.stringify(creditMemo.TermsRef));
@@ -790,39 +751,63 @@
 		return false;
 	}
 	
+	var CreditMemoAddRs;
+	var ListCreditMemoAddRs;
+	var currentCreditMemoIndex;
 	var currentCreditMemo;
 	function receiveSyncUpCreditMemosMessage(message){
 		console.log('receiveSyncUpCreditMemosMessage message=' + message);
-		var ListCreditMemoAddRs = message.CreditMemoAddRs;
-		var message = "";
-		for (var i in ListCreditMemoAddRs){
-			var CreditMemoAddRs;
-			if (ListCreditMemoAddRs.length){
-				CreditMemoAddRs =ListCreditMemoAddRs[i]
-			}else{
-				CreditMemoAddRs = ListCreditMemoAddRs;
-			}
-			var statusMessage =CreditMemoAddRs.statusMessage;
-			if (statusMessage == "Status OK"	){
-				var creditMemo = CreditMemoAddRs.CreditMemoRet;
-				currentCreditMemo =creditMemo;
-				message += "Success upload CreditMemo " + CreditMemoAddRs.requestID + "<br>";
-				creditMemoDAO.delete(CreditMemoAddRs.requestID,null,function() {
-				var creditMemoVO = convertCreditMemoFromQB(currentCreditMemo);
-				creditMemoVO.origin="synch";
-				creditMemoDAO.store([creditMemoVO]);
-				});
-			}else{
-				message += "Fail to upload creditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
-			}
-			if (!ListCreditMemoAddRs.length){
-				break;
-			}
-		}
-	
-		$("#btnSynchDialog").html("Accept");
-		$("#currentTask").html(message);
+		ListCreditMemoAddRs = message.CreditMemoAddRs;
+		console.log("ListCreditMemoAddRs=" + ListCreditMemoAddRs);
+		currentCreditMemoIndex = 0;
+		message = "";
+		processNextCreditMemoResponse();
 	}
+	
+	function processNextCreditMemoResponse(){
+		console.log("currentCreditMemoIndex=" +currentCreditMemoIndex);
+		if (message!=null&& message!=""){
+			$("#currentTask").html(message);
+		}
+			if (!ListCreditMemoAddRs.length && currentCreditMemoIndex==1){
+				$("#btnSynchDialog").html("Accept");
+				return;
+			}else if (currentCreditMemoIndex == ListCreditMemoAddRs.length){
+				$("#btnSynchDialog").html("Accept");
+				return;
+			}
+		if (ListCreditMemoAddRs.length){
+			CreditMemoAddRs =ListCreditMemoAddRs[currentCreditMemoIndex]
+		}else{
+			CreditMemoAddRs = ListCreditMemoAddRs;
+		}
+		console.log("CreditMemoAddRs=" +CreditMemoAddRs);
+		var statusMessage =CreditMemoAddRs.statusMessage;
+		if (statusMessage == "Status OK"	){
+			currentCreditMemo = convertCreditMemoFromQB(CreditMemoAddRs.CreditMemoRet);
+			currentCreditMemo.origin = "synch";
+			
+			creditMemoDAO.store([currentCreditMemo],errorCreditMemoDB,function(){
+				creditMemoDAO.delete(currentCreditMemo.refNumber,errorCreditMemoDB, processedCreditMemo);
+			});
+		}else{
+			message += "Fail to upload creditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
+		}
+	}
+	
+	function processedCreditMemo(){
+		currentCreditMemoIndex++;
+		message += "Success upload CreditMemo " + CreditMemoAddRs.requestID + "<br>";
+		processNextCreditMemoResponse();
+	}
+	
+
+	function	errorCreditMemoDB(err) {
+		message += "Fail to store creditMemo " + CreditMemoAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
+		currentCreditMemoIndex++;
+		processNextCreditMemoResponse();
+	}
+	
 
 
 //SYNCHRONIZATION inventory
