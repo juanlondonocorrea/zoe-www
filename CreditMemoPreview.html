@@ -29,7 +29,7 @@
 				initAnyPage(event.target);
 				initThisPage(event);
 			});
-
+			
 			function initThisPage(event){
 				if (event.currentTarget.URL && event.currentTarget.URL.indexOf("?")>-1){
 					var parameters = event.currentTarget.URL.split("?")[1].split("&");
