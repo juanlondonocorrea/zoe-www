@@ -276,8 +276,8 @@
 						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>';
 					    htmlString2 +='<a class="ui-btn ui-btn-icon-notext ui-icon-camera" data-ajax="false" onClick="onClickGetPhoto(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>';
 						htmlString2 +='</div></li>';
-						TotBalanceRem += parseFloat(arrayListInvoicesByCust[i].balanceRemaining);
-						TotAmount += parseFloat(arrayListInvoicesByCust[i].appliedAmount);
+						TotBalanceRem += NumberCast(arrayListInvoicesByCust[i].balanceRemaining,2, 0.00);
+						TotAmount += NumberCast(arrayListInvoicesByCust[i].appliedAmount,2, 0.00);
 					}
 					htmlString2 += '</ul>';
 					htmlString2 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Balance Remaining</td><td>Total Applied Amount</td></tr><tr><td>'+NumberCast(TotBalanceRem,2, 0.00)+'</td><td>'+NumberCast(TotAmount,2, 0.00)+'</td></tr></table>';
@@ -485,8 +485,8 @@
 						htmlString3 +='<a href="CreditMemoPreview.html?id_creditMemo=' + arrayListCreditMemosByCust[i].id_creditMemo +
 						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListCreditMemosByCust[i].id_creditMemo + '\'); return true;"></a>' + 
 						'</div></li>';
-						TotBalanceRemCM += parseFloat(arrayListCreditMemosByCust[i].balanceRemaining);
-						TotAmountCM += parseFloat(arrayListCreditMemosByCust[i].appliedAmount);
+						TotBalanceRemCM += NumberCast(arrayListCreditMemosByCust[i].balanceRemaining,2, 0.00);
+						TotAmountCM += NumberCast(arrayListCreditMemosByCust[i].appliedAmount,2, 0.00);
 					}
 					htmlString3 += '</ul>';
 					htmlString3 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Balance Remaining</td><td>Total Applied Amount</td></tr><tr><td>'+NumberCast(TotBalanceRemCM,2, 0.00)+'</td><td>'+NumberCast(TotAmountCM,2, 0.00)+'</td></tr></table>';
