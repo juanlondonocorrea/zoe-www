@@ -1004,7 +1004,7 @@
 				var items = pricelevels[i].PriceLevelPerItemRet;
 				console.log("items=" + items);
 				var j;
-				for (j=0;j<items.length;j++){
+				for (j=0;items && j<items.length;j++){
 						var itemVO = {
 							pricelevel_ListID: pricelevelVO.ListID,
 							inventory_ListID: items[j].ItemRef.ListID,
