@@ -304,7 +304,7 @@
 				var index =  event.currentTarget.id;
 				logZoe("goDetail Credit Memo index: "+index)
 				index = index.substring(index.indexOf("_")+1);
-				selectedIndex3 = index;
+				selectedIndex2 = index;
 			}	
 			
 			var CustomerAddress='';
@@ -496,15 +496,19 @@
 						
 			// Makes sure the code contained doesn't run until all the DOM elements have loaded
 			function changeActivityList() {
+				console.log("selectedIndex=" + selectedIndex);
 				 $('.ActivitiesLists').hide();
-					$('#' +$('#selActivities').val()).show();
 					switch($('#selActivities').val()){
-						case 'InvoiceCreditMemoList': invoiceDAO.listByCustomer(listCustomers[selectedIndex2].ListID, receiveInvoices, errListInvoicesByCustomer);
-													  creditMemoDAO.listByCustomer(listCustomers[selectedIndex3].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
+						case 'InvoiceCreditMemoList': $("#InvoiceList").show();
+													  $("#CreditMemoList").show();
+													  invoiceDAO.listByCustomer(listCustomers[selectedIndex].ListID, receiveInvoices, errListInvoicesByCustomer);
+													  creditMemoDAO.listByCustomer(listCustomers[selectedIndex].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
 													  break;
-						case 'InvoiceList'			: invoiceDAO.listByCustomer(listCustomers[selectedIndex2].ListID, receiveInvoices, errListInvoicesByCustomer);
+						case 'InvoiceList'			: $("#InvoiceList").show(); 
+													invoiceDAO.listByCustomer(listCustomers[selectedIndex].ListID, receiveInvoices, errListInvoicesByCustomer);
 													  break;
-						case 'CreditMemoList'		: creditMemoDAO.listByCustomer(listCustomers[selectedIndex3].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
+						case 'CreditMemoList'		: $("#CreditMemoList").show(); 
+													creditMemoDAO.listByCustomer(listCustomers[selectedIndex].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
 													  break;
 					
 					}
