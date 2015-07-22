@@ -35,7 +35,7 @@
 			if (salesRepVO.Password == CryptoJS.SHA256($('#password').val())){
 				window.localStorage.setItem("currentUser",$('#login').val());
 				window.localStorage.setItem("lastAccess",Date.now());
-				window.location ="index.html";
+				window.location ="CustomerRoute.html#Customers?type=route";
 			}else{
 				alert("invalid user or password");
 				window.localStorage.setItem("currentUser",null);
