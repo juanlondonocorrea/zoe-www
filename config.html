@@ -390,7 +390,7 @@
 	function receiveInvoicesMessage(message){
 		var invoices = message.InvoiceQueryRs.InvoiceRet;
 		var i;
-		var invoicesVO = [];
+		invoicesVO = [];
 		for (i=0;i<invoices.length;i++){
 			var invoice = invoices[i];
 			
