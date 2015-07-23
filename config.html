@@ -155,6 +155,8 @@
 				syncTaxes();
 			}else if (whatToDownload[currentDown] == "syncTerms" ){
 				syncTerms();
+			}else if (whatToDownload[currentDown] == "syncClasses" ){
+				syncClasses();
 			}else if (whatToDownload[currentDown] == "syncDownInventory" ){
 				syncInventoryItems();
 			}else if (whatToDownload[currentDown] == "syncDownPricelevel" ){
@@ -971,6 +973,43 @@
 		alert("DB Error synch tax: "+JSON.stringify(err));
 	}
 	
+	function syncClasses(form){
+		console.log("entre a syncClasses");
+		var mensaje = 	
+		'<ClassQueryRq  requestID="Class1"><ActiveStatus>ActiveOnly</ActiveStatus></ClassQueryRq>';
+		var cache="class";
+		
+		consumeWS(mensaje, "JSON", receiveClassesMessage, cache);
+		return false;
+	}
+
+	function receiveClassesMessage(message){
+		var classes = message.ClassQueryRs.ClassRet;
+		var i;
+		var classesVO = [];
+		for (i=0;i<classes.length;i++){
+			logZoe("classes[i]=" + JSON.stringify(classes[i]));
+			var classVO = {
+				ListID:classes[i].ListID,
+				name : classes[i].Name
+			}
+			classesVO[i] = classVO;
+			
+		}
+			
+		classDAO.deleteAll(errClassInsert);
+		classDAO.store(classesVO, errClassInsert, successClassInsert);
+	}
+
+
+	function successClassInsert(){
+		downNext();
+	}
+	
+	function errClassInsert(err){
+		alert("DB Error synch classes: "+JSON.stringify(err));
+	}
+
 //SYNCHRONIZATION pricelevel	
 	function syncPricelevel(form){
 		console.log("entre a syncPricelevel");
@@ -1160,6 +1199,7 @@
                         <option value="syncDownSalesRep">Sales Rep</option>
                         <option value="syncTaxes">Taxes</option>
                         <option value="syncTerms">Terms</option>
+                        <option value="syncTerms">Classes</option>
                         <option value="syncCustomerMsgs">Customer Messages</option>
                         <option value="syncDownInventory">Inventory</option>
                         <option value="syncDownPricelevel">Pricelevel</option>
