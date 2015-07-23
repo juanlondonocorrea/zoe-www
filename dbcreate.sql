@@ -18,6 +18,7 @@ DROP INDEX IF EXISTS IX_Relationship22@
 DROP INDEX IF EXISTS IX_Relationship18@
 DROP INDEX IF EXISTS IX_Relationship21@
 DROP INDEX IF EXISTS IX_Relationship23@
+DROP INDEX IF EXISTS IX_Relationship24@
 DROP INDEX IF EXISTS IX_Relationship15@
 DROP INDEX IF EXISTS IX_Relationship14@
 DROP INDEX IF EXISTS IX_Relationship16@
@@ -45,6 +46,7 @@ DROP INDEX IF EXISTS idx_salesrep_1@
 
 -- Drop tables section ---------------------------------------------------
 
+DROP TABLE IF EXISTS class@
 DROP TABLE IF EXISTS log@
 DROP TABLE IF EXISTS InvoiceLinkedTxn@
 DROP TABLE IF EXISTS paymentMethod@
@@ -291,10 +293,12 @@ CREATE TABLE creditMemo
   signature TEXT,
   photo TEXT,
   signaturePNG TEXT,
+  class_ListID TEXT,
   CONSTRAINT Key4 PRIMARY KEY (id_creditMemo),
   CONSTRAINT Relationship18 FOREIGN KEY (ListID) REFERENCES customer (ListID),
   CONSTRAINT Relationship21 FOREIGN KEY (id_term) REFERENCES term (id_term),
-  CONSTRAINT Relationship23 FOREIGN KEY (customerMsg_ListID) REFERENCES customer_msg (ListID)
+  CONSTRAINT Relationship23 FOREIGN KEY (customerMsg_ListID) REFERENCES customer_msg (ListID),
+  CONSTRAINT Relationship24 FOREIGN KEY (class_ListID) REFERENCES class (ListID)
 )@
 
 CREATE INDEX IX_Relationship18 ON creditMemo (ListID)@
@@ -302,6 +306,8 @@ CREATE INDEX IX_Relationship18 ON creditMemo (ListID)@
 CREATE INDEX IX_Relationship21 ON creditMemo (id_term)@
 
 CREATE INDEX IX_Relationship23 ON creditMemo (customerMsg_ListID)@
+
+CREATE INDEX IX_Relationship24 ON creditMemo (class_ListID)@
 
 -- Table invoice_item
 
@@ -505,6 +511,15 @@ CREATE TABLE log
   curtime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   log TEXT,
   CONSTRAINT id UNIQUE (id)
+)@
+
+-- Table class
+
+CREATE TABLE class
+(
+  ListID TEXT NOT NULL,
+  Name TEXT,
+  CONSTRAINT Key14 PRIMARY KEY (ListID)
 )@
 
 
