@@ -532,7 +532,7 @@
 				border-width:medium;
 				border:thick;
 			
-				box-shadow: inset 2px 2px 1px 1px rgba(50, 50, 50, 0.75);
+				/*box-shadow: inset 2px 2px 1px 1px rgba(50, 50, 50, 0.75);*/
 			}
 			
 			/* ADD 6(e) and 7(f) column grid */
@@ -593,7 +593,7 @@
 		<!-- BEGIN CUSTOMERS DETAILS-->
 		<div data-role="page" id="CustomersDetails"  data-title="Customers Detail" data-theme="a">
 			<div data-role="content" >
-				<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+				<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
                     <div class="ui-grid-a" style="height:70px">
                         <div class="ui-block-a" style="height:100%"> 
                             <div align="left">
@@ -640,10 +640,10 @@
 						<li data-tab="2">Activities</li>
 					</ul>
 					<!-- CUSTOMERS DETAILS CONTENT  - TAB 1 -->
-					<div data-tab="1" id="TabCustomerDetails">
+					<div data-tab="1" id="TabCustomerDetails" style="width:100%">
 						<form id="formulario" >
 							<!-- Relational Info --> 
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<legend><h4>Sales Representant Info</h4></legend>
 								<div data-role="fieldcontain">
 									<div>
@@ -654,7 +654,7 @@
 								</div>
 							</fieldset>    
 							<!-- Identification Info -->
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<div data-role="fieldcontain">
 									<div>
 									<input type="hidden" data-theme="b" name="ListID" id="ListID" value=""/>
@@ -677,7 +677,7 @@
 								</div>
 							</fieldset> 
 							<!-- Contact Info -->
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px"> 
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px"> 
 								<legend><h4>Contact Info</h4></legend>                       
 								<div data-role="fieldcontain">
 									<div>
@@ -705,7 +705,7 @@
 								</div>
 							</fieldset>
 							<!-- Billing Address -->
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<legend><h4>Billing Address</h4></legend>
 								<div data-role="fieldcontain">
 									<div>
@@ -764,7 +764,7 @@
                                 </div>
 							</fieldset>
 							<!-- Shiping Address -->
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<legend><h4>Shiping Address</h4></legend>
 								<div data-role="fieldcontain">
 									<div>
@@ -816,7 +816,7 @@
 								</div>
 							</fieldset> 
 							<!-- Balance Info -->
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<legend><h4>Balance Info</h4></legend>
 								<div class="ui-grid-a" style="height:95px">
 									<div class="ui-block-a" style="height:100%"> 
@@ -838,7 +838,7 @@
 								</div>
 							</fieldset>           
 							<!-- Terms Info --> 
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<div data-role="fieldcontain" id="CustomerTerms">
 								  <div>
 									<label for="Terms" class="select">Terms:</label>
@@ -849,7 +849,7 @@
 								</div>
 							</fieldset> 
 							<!-- Other Info -->                       
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<div data-role="fieldcontain">
 									<div>
 										<label for="OtherDetails">Other Details:</label>
@@ -859,7 +859,7 @@
 							</fieldset> 
 
 							<!-- Route days info -->
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<legend><h4>Route Info</h4></legend>
 
                                     <div data-role="fieldcontain">
@@ -907,7 +907,7 @@
                                     </div> 
 							</fieldset>
 							<!-- Price Level Info -->                       
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<div data-role="fieldcontain" id="CustomerPriceLevel">
 								  <div>
 									<label for="priceLevel" class="select">Price Level:</label>
@@ -918,7 +918,7 @@
 								</div>
 							</fieldset>                                                         
 							<!-- Done and Cancel Buttons -->
-                            <fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px;">
+                            <fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px;">
                                 <div class="ui-grid-a" style="height:45px">
                                     <div class="ui-block-a ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="cancel" data-add-back-btn="true" data-theme="b">Cancel</button></div>
                                     <div class="ui-block-b ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="btnUpdateCustomer"  onClick="UpdateCustomer(); return false;" data-theme="c">Done</button></div>	
@@ -941,17 +941,6 @@
 								<option value="CreditMemoList">Credit memos last month</option>
 							  </select>
 							</div>
-							<div data-role="collapsible">
-							<h4>Add a Note</h4>
-							<p>Add a note to the invoice</p>
-								<div data-role="fieldcontain">					
-									<div>
-										<label for="creditMemo">Credit memo:</label>
-									</div>
-									<input type="text" data-theme="b" name="creditMemo" id="creditMemo" value=""  />
-								</div>
-							</div>
-							<br/><hr>
                             <!-- BEGIN Invoices & Credit Memo List -->
                             <div data-role="content" id="InvoiceCreditMemoList" class="ActivitiesLists" style="display:none">
                                 <!-- Injection-->
