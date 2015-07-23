@@ -18,10 +18,10 @@
 		  console.log("target=" + target);
 		  console.log("toPage=" + toPage);
 		  if(!toPage || toPage.indexOf("Login") < 0  && toPage.indexOf("config")<0) {
-			checkSession();
+			//checkSession();
 		  }
 
-		  checkNeedToSync();
+		  //checkNeedToSync();
 		};
 
 		function extractTitleFromTarget(target){
