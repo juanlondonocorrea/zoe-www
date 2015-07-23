@@ -15,10 +15,10 @@ Database: SQLite 3.7
 DROP INDEX IF EXISTS IX_Relationship19@
 DROP INDEX IF EXISTS IX_Relationship20@
 DROP INDEX IF EXISTS IX_Relationship22@
+DROP INDEX IF EXISTS IX_Relationship25@
 DROP INDEX IF EXISTS IX_Relationship18@
 DROP INDEX IF EXISTS IX_Relationship21@
 DROP INDEX IF EXISTS IX_Relationship23@
-DROP INDEX IF EXISTS IX_Relationship24@
 DROP INDEX IF EXISTS IX_Relationship15@
 DROP INDEX IF EXISTS IX_Relationship14@
 DROP INDEX IF EXISTS IX_Relationship16@
@@ -293,12 +293,10 @@ CREATE TABLE creditMemo
   signature TEXT,
   photo TEXT,
   signaturePNG TEXT,
-  class_ListID TEXT,
   CONSTRAINT Key4 PRIMARY KEY (id_creditMemo),
   CONSTRAINT Relationship18 FOREIGN KEY (ListID) REFERENCES customer (ListID),
   CONSTRAINT Relationship21 FOREIGN KEY (id_term) REFERENCES term (id_term),
-  CONSTRAINT Relationship23 FOREIGN KEY (customerMsg_ListID) REFERENCES customer_msg (ListID),
-  CONSTRAINT Relationship24 FOREIGN KEY (class_ListID) REFERENCES class (ListID)
+  CONSTRAINT Relationship23 FOREIGN KEY (customerMsg_ListID) REFERENCES customer_msg (ListID)
 )@
 
 CREATE INDEX IX_Relationship18 ON creditMemo (ListID)@
@@ -306,8 +304,6 @@ CREATE INDEX IX_Relationship18 ON creditMemo (ListID)@
 CREATE INDEX IX_Relationship21 ON creditMemo (id_term)@
 
 CREATE INDEX IX_Relationship23 ON creditMemo (customerMsg_ListID)@
-
-CREATE INDEX IX_Relationship24 ON creditMemo (class_ListID)@
 
 -- Table invoice_item
 
@@ -368,10 +364,12 @@ CREATE TABLE creditMemo_item
   Amount NUMERIC,
   SalesTax_ListID TEXT,
   id_creditMemo TEXT,
+  class_ListID TEXT,
   CONSTRAINT Key5 PRIMARY KEY (LineID),
   CONSTRAINT Relationship19 FOREIGN KEY (id_creditMemo) REFERENCES creditMemo (id_creditMemo),
   CONSTRAINT Relationship20 FOREIGN KEY (inventory_ListID) REFERENCES Inventory (ListID),
-  CONSTRAINT Relationship22 FOREIGN KEY (SalesTax_ListID) REFERENCES salesTax (ListID)
+  CONSTRAINT Relationship22 FOREIGN KEY (SalesTax_ListID) REFERENCES salesTax (ListID),
+  CONSTRAINT Relationship25 FOREIGN KEY (class_ListID) REFERENCES class (ListID)
 )@
 
 -- Create triggers for table creditMemo_item
@@ -401,6 +399,8 @@ CREATE INDEX IX_Relationship19 ON creditMemo_item (id_creditMemo)@
 CREATE INDEX IX_Relationship20 ON creditMemo_item (inventory_ListID)@
 
 CREATE INDEX IX_Relationship22 ON creditMemo_item (SalesTax_ListID)@
+
+CREATE INDEX IX_Relationship25 ON creditMemo_item (class_ListID)@
 
 -- Table pricelevel
 
