@@ -18,10 +18,10 @@
 		  console.log("target=" + target);
 		  console.log("toPage=" + toPage);
 		  if(!toPage || toPage.indexOf("Login") < 0  && toPage.indexOf("config")<0) {
-			//checkSession();
+			checkSession();
 		  }
 
-		  //checkNeedToSync();
+		  checkNeedToSync();
 		};
 
 		function extractTitleFromTarget(target){
@@ -63,10 +63,13 @@ logZoe("redirige al listo");
 logZoe("actualiza lastAccess="+window.localStorage.getItem('lastAccess'));
 				}
 			}
-			
+		
+var db=null;			
 function openDatabaseZoe(){
 	logZoe("openDatabaseZoe");
-	db = window.openDatabase("Database", "1.0", "Zoe Database", 2*1024*1024);
+	if (db==null){
+		db = window.openDatabase("Database", "1.0", "Zoe Database", 2*1024*1024);
+	}
 	return db;
 }
 
