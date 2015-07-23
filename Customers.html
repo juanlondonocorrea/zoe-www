@@ -7,13 +7,11 @@
 		<link rel="stylesheet" href="css/themes/zoe.min.css" />
 		<link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
 		<link rel="stylesheet" href="js/jquery-mobile/jquery.mobile.structure-1.4.5.min.css" />
-		<link rel="stylesheet" href="js/jqm-inlinetabs/jqm-inlinetabs.min.css" />
 
 		<!--  <link rel="stylesheet" href="js/jquery-mobile/jquery.mobile-1.4.5.min.css" />  -->
 		<script src="js/jquery-mobile/jquery-2.1.4.js"></script>
 		<script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
 		<script type="text/javascript" src="cordova.js"></script>
-		<script src="js/jqm-inlinetabs/jqm-inlinetabs.min.js"></script>        
 		<script src="js/zoe/zoe.js"></script>
 		<script src="js/zoe/customerDAO.js"></script>
         <script src="js/zoe/termDAO.js"></script>
@@ -516,6 +514,20 @@
 	
 		</script>
 		<style type="text/css">
+		
+		.inlinetabs .ui-tabs-nav .ui-btn {
+			border: 1px solid #ddd;
+			border-top-left-radius: .6em;
+			border-top-right-radius: .6em;
+			padding:0px 2px 0px 0px;
+		}
+		
+		.inlinetabs .ui-tabs-nav > li {
+			margin: 0 2px;
+			width: 80%;
+			clear: none;
+		}		
+
 			thead {color:black;}
 			tbody {color:gray;}
 			tfoot {
@@ -526,7 +538,6 @@
 				border: 1px solid black;
 			}
 			.control-group {
-				margin-bottom: 9px;
 				background-color:#FFFFFF;
 				border-color:#000000;
 				border-width:medium;
@@ -535,33 +546,6 @@
 				/*box-shadow: inset 2px 2px 1px 1px rgba(50, 50, 50, 0.75);*/
 			}
 			
-			/* ADD 6(e) and 7(f) column grid */
-			.ui-grid-e, .ui-grid-f { overflow: hidden; }
-			
-			/* grid e: 16/16/16/16/16/16 */
-			.ui-grid-e .ui-block-a, .ui-grid-e .ui-block-b, .ui-grid-e .ui-block-c, .ui-grid-e .ui-block-d, .ui-grid-e .ui-block-e, .ui-grid-e .ui-block-f { width: 16.59166666666667%; }
-			.ui-grid-e > :nth-child(n) { width: 16.66666666666667%; }
-			.ui-grid-e .ui-block-a { clear: left; }
-			
-			/* grid f: 14/14/14/14/14 */
-			.ui-grid-f .ui-block-a, .ui-grid-f .ui-block-b, .ui-grid-f .ui-block-c, .ui-grid-f .ui-block-d, .ui-grid-f .ui-block-e, .ui-grid-f .ui-block-f, .ui-grid-f .ui-block-g { width: 14.21071428571429%; }
-			.ui-grid-f > :nth-child(n) { width: 14.28571428571429%; }
-			.ui-grid-f .ui-block-a { clear: left; }
-			
-			/* ADD 6th (f) and 7th (g) blocks in grid */
-			.ui-header .ui-navbar .ui-grid-e li.ui-block-f .ui-btn,
-			.ui-footer .ui-navbar .ui-grid-e li.ui-block-f .ui-btn { margin-right: -3px; }/* NOT TESTED */
-			
-			.ui-header .ui-navbar .ui-grid-f li.ui-block-g .ui-btn,
-			.ui-footer .ui-navbar .ui-grid-f li.ui-block-g .ui-btn { margin-right: -2px; }/* NOT TESTED */
-			
-			.ui-grid-e .ui-btn, .ui-grid-f .ui-btn { margin-right: 5px; margin-left: 5px; }
-			
-			.ui-block-f, .ui-block-g { margin: 0; padding: 0; border: 0; float: left; min-height: 1px; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; }
-			
-			.ui-header .ui-navbar .ui-grid-e li.ui-block-f .ui-btn-icon-right .ui-icon,
-			.ui-footer .ui-navbar .ui-grid-f li.ui-block-g .ui-btn-icon-right .ui-icon { right: 8px; }
-
 			#lblFullName {color:black; font-weight:bolder; font-size:large;}
 			#lblOpenBalance1 {color:black; font-weight:bolder; font-size:large;}
 			#lblOpenBalance2 {color:grey; font-weight:bolder; font-size:medium;}
@@ -593,7 +577,7 @@
 		<!-- BEGIN CUSTOMERS DETAILS-->
 		<div data-role="page" id="CustomersDetails"  data-title="Customers Detail" data-theme="a">
 			<div data-role="content" >
-				<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
+				<fieldset data-role="controlgroup" data-type="vertical" class="control-group">
                     <div class="ui-grid-a" style="height:70px">
                         <div class="ui-block-a" style="height:100%"> 
                             <div align="left">
@@ -634,16 +618,18 @@
                     </div>
                 </fieldset>
 				<!-- CUSTOMERS DETAILS (LIST DETAILS, EDIT, ADD/ACTIVITIES) -->
-				<div data-role="inlinetabs"  data-theme="a" > <!-- inlinetabs -->
-					<ul>
-						<li data-tab="1">Details</li>
-						<li data-tab="2">Activities</li>
-					</ul>
-					<!-- CUSTOMERS DETAILS CONTENT  - TAB 1 -->
-					<div data-tab="1" id="TabCustomerDetails" style="width:100%">
+                
+                <div data-role="tabs" id="tabs" class="inlinetabs">
+                  <div data-role="navbar"  class="ui-navbar">
+                    <ul data-inset="true">
+                      <li class="ui-btn-active"><a href="#TabCustomerDetails" data-ajax="false">Details</a></li>
+                      <li><a href="#TabActivities" data-ajax="false">Activities</a></li>
+                    </ul>
+                  </div>
+					<div  id="TabCustomerDetails" class="ui-content">
 						<form id="formulario" >
 							<!-- Relational Info --> 
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group">
 								<legend><h4>Sales Representant Info</h4></legend>
 								<div data-role="fieldcontain">
 									<div>
@@ -928,8 +914,8 @@
 
 					</div>
 					<!-- ACTIVITIES CONTENT - TAB 2 -->
-					<div data-tab="2" id="TabActivities">
-						<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:2px">
+					<div id="TabActivities">
+						<fieldset data-role="controlgroup" data-type="vertical" class="control-group">
 							<div data-role="fieldcontain">
 							  <div>
 								<label for="selActivities" class="select">Select Activities:</label>

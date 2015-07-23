@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 15/07/2015
+Modified: 23/07/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -290,6 +290,7 @@ CREATE TABLE creditMemo
   id_salesrep TEXT,
   signature TEXT,
   photo TEXT,
+  signaturePNG TEXT,
   CONSTRAINT Key4 PRIMARY KEY (id_creditMemo),
   CONSTRAINT Relationship18 FOREIGN KEY (ListID) REFERENCES customer (ListID),
   CONSTRAINT Relationship21 FOREIGN KEY (id_term) REFERENCES term (id_term),
