@@ -478,7 +478,7 @@
 						'<div>Amount: <span id="overdueBal">'+ifNull(arrayListCreditMemosByCust[i].appliedAmount,'')+'</span><br/>Balance Remaining:<span> '+ifNull(arrayListCreditMemosByCust[i].balanceRemaining,'')+'</span><br/>';
 						htmlString3 +='</div></div><div class="ui-block-b" style="width:20%">';
 						if (arrayListCreditMemosByCust[i].origin == 'local'){
-							htmlString3 += '<a href="CreditMemoPreview.html?id_creditMemo=' + arrayListCreditMemosByCust[i].id_creditMemo + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
+							htmlString3 += '<a href="CreditMemo.html?id_creditMemo=' + arrayListCreditMemosByCust[i].id_creditMemo + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
 						}
 						htmlString3 +='<a href="CreditMemoPreview.html?id_creditMemo=' + arrayListCreditMemosByCust[i].id_creditMemo +
 						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListCreditMemosByCust[i].id_creditMemo + '\'); return true;"></a>' + 
@@ -536,6 +536,10 @@
     background: #fff;
     border-radius: .6em;
     border: 1px solid #ddd;
+}
+
+.inlinetabs > p {
+     margin: 0px;
 }
 			thead {color:black;}
 			tbody {color:gray;}
@@ -628,14 +632,13 @@
                 </fieldset>
 				<!-- CUSTOMERS DETAILS (LIST DETAILS, EDIT, ADD/ACTIVITIES) -->
                 
-                <div data-role="tabs" id="tabs" class="inlinetabs" style="width:100%">
+                <div data-role="tabs" id="tabs" class="inlinetabs">
                   <div data-role="navbar">
                     <ul data-inset="true">
                       <li><a href="#TabCustomerDetails" data-ajax="false">Details</a></li>
                       <li><a href="#TabActivities" data-ajax="false">Activities</a></li>
                     </ul>
-                  </div>
-					<div  id="TabCustomerDetails">
+                  </div><div  id="TabCustomerDetails">
 						<form id="formulario" >
 							<!-- Relational Info --> 
 							<fieldset data-role="controlgroup" data-type="vertical" class="control-group">
