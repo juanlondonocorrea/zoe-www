@@ -122,19 +122,20 @@ function doSelectCreditMemo(tx){
 	" salesrep.Name as salesrep_Name, customer.companyName as customer_companyName,  " +
 	" vendor.Name as vendor_name , vendor.addr1 as vendor_addr1, vendor.addr2 as vendor_addr2," +
 	" vendor.addr3 as vendor_addr3 , vendor.city as vendor_city, vendor.state as vendor_state," +
-	" vendor.country as vendor_country " +
+	" vendor.country as vendor_country, class.Name as class_name " +
 	" FROM creditMemo " +
 	" LEFT JOIN salesrep ON salesrep.id_salesrep = creditMemo.id_salesrep " +
 	" LEFT JOIN customer ON customer.ListID = customer.ListID " +
 	" LEFT JOIN vendor ON vendor.ListID = customer.vendor_ListID " +
 	" LEFT JOIN term ON term.id_term = creditMemo.id_term " +
 	" LEFT JOIN customer_msg as cm ON cm.ListID = creditMemo.customerMsg_ListID " +
+	" LEFT JOIN class ON class.ListID = creditMemo.class_ListID " +
 	" WHERE creditMemo.id_creditMemo = ?", [filterDataCreditMemo],creditMemoLocalReceiveFunction, creditMemoErrFunc);
 }
 
 function doSalesrepCreditMemos(tx){
 	logZoe("doSelectSelesrepCreditMemos");
-	tx.executeSql("SELECT id_creditMemo, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term,id_salesrep, customerMsg_ListID, memo, origin FROM creditMemo WHERE id_salesrep = ?", [filterDataCreditMemo],creditMemoLocalListReceiveFunction, creditMemoErrFunc);
+	tx.executeSql("SELECT id_creditMemo, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term,id_salesrep, customerMsg_ListID, memo, origin, class_ListID FROM creditMemo WHERE id_salesrep = ?", [filterDataCreditMemo],creditMemoLocalListReceiveFunction, creditMemoErrFunc);
 }
 
 function doListCreditMemosToUpload(tx){
@@ -157,9 +158,9 @@ function creditMemoLocalReceiveFunction(tx,results){
 		creditMemoVO=results.rows.item(0);
 			if (includeCreditMemoDetails){
 					tx.executeSql("SELECT LineID, id_creditMemo, Inventory_ListID, creditMemo_item.Desc, " +
-					" Quantity, Rate, Amount, SalesTax_ListID, salesTax.Name as salesTax_Name"+
+					" Quantity, Rate, Amount, SalesTax_ListID, salesTax.Name as salesTax_Name, class.Name as class_Name"+
 					" FROM creditMemo_item " +
-					" LEFT JOIN salesTax ON salesTax.ListID = creditMemo_item.SalesTax_ListID " +
+					" LEFT JOIN salesTax ON salesTax.ListID = creditMemo_item.SalesTax_ListID LEFT JOIN class ON class.ListID = creditMemo_item.class_ListID " +
 					" Where id_creditMemo = ?", [filterDataCreditMemo],creditMemoItemsLocalReceiveFunction, creditMemoLocalErrFunc);
 			}else{
 				creditMemoReceiveFunction(creditMemoVO);
@@ -268,7 +269,8 @@ function creditMemoLocalListToUploadReceiveFunction(tx,results){
 				Quantity:rec.Quantity,
 				Rate:rec.Rate,
 				Amount:rec.Amount,
-				SalesTax_ListID:rec.SalesTax_ListID
+				SalesTax_ListID:rec.SalesTax_ListID,
+				class_ListID:rec.class_ListID,
 		}
 
 		creditMemoVO.items[indexItem] = creditMemoItemVO;
@@ -285,7 +287,7 @@ function doGetCreditMemoItems(tx){
 	currentI += 1;
 	if (currentI<arrayCreditMemos.length){
 		var currentCreditMemo = arrayCreditMemos[i];
-		tx.executeSql("SELECT LineID, id_creditMemo, Inventory_ListID, Desc, Quantity, Rate, Amount, SalesTax_ListID FROM creditMemo_item Where id_creditMemo = ?", [currentCreditMemo.id_creditMemo],creditMemoItemLocalReceiveFunction, creditMemoErrFunc);
+		tx.executeSql("SELECT LineID, id_creditMemo, Inventory_ListID, Desc, Quantity, Rate, Amount, SalesTax_ListID, class_ListID FROM creditMemo_item Where id_creditMemo = ?", [currentCreditMemo.id_creditMemo],creditMemoItemLocalReceiveFunction, creditMemoErrFunc);
 	}
 }
 
@@ -318,7 +320,7 @@ function doStoreOneCreditMemo(tx, rec){
 			 var item = rec.items[i];
 			 console.log("item=" + JSON.stringify(item));
 			 console.log("elementos=" + JSON.stringify([item.LineID,rec.id_creditMemo,item.Inventory_ListID,item.Desc,item.Quantity,item.Rate,item.Amount,item.salesTax_ListID]));
-			 tx.executeSql('INSERT OR REPLACE INTO creditMemo_item(LineID,id_creditMemo,Inventory_ListID,Desc,Quantity,Rate,Amount,SalesTax_ListID) VALUES(?,?,?,?,?,?,?,?)',[item.LineID,rec.id_creditMemo,ifUndefNull(item.Inventory_ListID),item.Desc,item.Quantity,item.Rate,item.Amount,ifUndefNull(item.salesTax_ListID)]);
+			 tx.executeSql('INSERT OR REPLACE INTO creditMemo_item(LineID,id_creditMemo,Inventory_ListID,Desc,Quantity,Rate,Amount,SalesTax_ListID, class_ListID) VALUES(?,?,?,?,?,?,?,?,?)',[item.LineID,rec.id_creditMemo,ifUndefNull(item.Inventory_ListID),item.Desc,item.Quantity,item.Rate,item.Amount,ifUndefNull(item.salesTax_ListID),ifUndefNull(item.class_ListID)]);
 		 }
 	 }
 }
