@@ -109,7 +109,8 @@ function doListInventorySite(tx){
 
 function doListInventoryByCustomer(tx){
 	logZoe("doListInventoryByCustomer");
-	tx.executeSql("select * from(Select i.*,pli.customprice FROM inventory i LEFT JOIN pricelevel_item pli ON pli.inventory_listid = i.listid LEFT JOIN pricelevel pl ON pl.listid=pli.pricelevel_listid LEFT JOIN customer c ON c.pricelevel_listid = pl.listid WHERE c.listid=? UNION SELECT i.*, null as customprice from inventory i Order by salesdesc) where inventorysite_listid is not null AND QuantityOnHand>0", [filterDataInventory],inventoryLocalListReceiveFunction, inventoryErrFunc);
+	tx.executeSql("SELECT * FROM(SELECT i.*, null as customprice from inventory i Where i.ListID not IN (Select i.ListID FROM inventory i LEFT JOIN pricelevel_item pli ON pli.inventory_listid = i.listid LEFT JOIN pricelevel pl ON pl.listid=pli.pricelevel_listid LEFT JOIN customer c ON c.pricelevel_listid = pl.listid WHERE c.listid=?) UNION ALL Select i.*,pli.customprice FROM inventory i LEFT JOIN pricelevel_item pli ON pli.inventory_listid = i.listid LEFT JOIN pricelevel pl ON pl.listid=pli.pricelevel_listid LEFT JOIN customer c ON c.pricelevel_listid = pl.listid WHERE c.listid=?) WHERE  QuantityOnHand>0 ORDER BY SalesDesc", 
+		[filterDataInventory,filterDataInventory],inventoryLocalListReceiveFunction, inventoryErrFunc);
 }
 
 
