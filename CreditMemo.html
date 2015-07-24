@@ -19,6 +19,7 @@
   <script src="js/zoe/termDAO.js"></script>
   <script src="js/zoe/taxDAO.js"></script>
   <script src="js/zoe/customerMsgDAO.js"></script>
+  <script src="js/zoe/classDAO.js"></script>
   
 <script src="js/signature/modernizr.js"></script>
 <script src="js/signature/jSignature.js"></script>
@@ -66,6 +67,8 @@ $(document).ready(function() {
 				taxDAO.list(receiveTaxes,errReceive);
 				customerMsgDAO.list(receiveCustomerMsgs,errReceive);
 				salesRepDAO.getByName(window.localStorage.getItem("salesRepName"),receiveSalesrep);
+				classDAO.list(receiveClasses,errReceive);
+				
 				if (id_creditMemo){
 					creditMemoDAO.getById(id_creditMemo, true, receiveCreditMemo, errReceiveCreditMemo);
 				}
@@ -222,6 +225,20 @@ $(document).ready(function() {
 				$('#selProduct').trigger("chosen:updated");
 			}
 			
+			var listItemClasses = new Array();;
+			var ItemClassSelectedIndex;
+			function receiveClasses(list){
+			listItemClasses = list;
+			console.log("receiveClasses length =========> "+list.length);
+			$('#selItemClass').empty();
+			$('#selItemClass').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');				
+			for (var i in list) {
+				console.log("class =" + JSON.stringify(list[i]));
+				$('#selItemClass').append('<option value="' + list[i].ListID +'">'+list[i].Name+'</option>');
+			}
+			$('#selItemClass').trigger("chosen:updated");
+			}
+						
 			var productSelectedIndex;
 			function selProductChange(event, ui){
 				console.log("selProductChange val=" + $( "#selProduct" ).val());
@@ -263,10 +280,12 @@ $(document).ready(function() {
 					"Rate": parseFloat($("#RatePrice").val()).toFixed(2),
 					"Amount": parseFloat($("#Amount").val()).toFixed(2),
 					"position":currentItems.length,
+					"class_ListID": $("#selItemClass").val(),
+					"class_name": listItemClasses[ItemClassSelectedIndex].Name,
 					"salesTax_ListID":null
 				}
 				
-				console.log("addItem aItem=" + JSON.stringify(aItem)) 
+				console.log("addItem aItem=" + JSON.stringify(aItem));
 				currentItems[currentItems.length] = aItem;
 				clearItem();
 				renderItems();
@@ -277,6 +296,8 @@ $(document).ready(function() {
 				$("#Quantity").val("");
 				$("#RatePrice").val("");
 				$("#Amount").val("");
+				$("#selItemClass")[0].selectedIndex =0;
+				$( "#selItemClass" ).selectmenu("refresh");
 				$( "#selProduct" )[0].selectedIndex =0;
 				$( "#selProduct" ).selectmenu("refresh");
 				$("#addItem").collapsible("collapse");
@@ -297,6 +318,7 @@ $(document).ready(function() {
 					html += "<td><div align='right'><font size=1>"+currentItems[i].Quantity+"</div></font></td>\n";
 					html += "<td><div align='right'><font size=1>"+parseFloat(currentItems[i].Rate).toFixed(2)+"<font></div></td>\n";
 					html += "<td><div align='right'><font size=1>"+parseFloat(currentItems[i].Amount).toFixed(2)+"</font></div></td>\n";
+					html += "<td><div align='left'><font size=1>"+currentItems[i].class_name+"</font></div></td>\n";
 					html +=  "</tr>\n";
 					totalQuantity += currentItems[i].Quantity*1;
 					totalAmount += currentItems[i].Amount*1;
@@ -362,6 +384,12 @@ $(document).ready(function() {
 				taxSelectedIndex = $("#selTax")[0].selectedIndex-1;
 				calcCreditMemo();
 			}
+			
+			function selItemClassChange(){
+				ItemClassSelectedIndex = $("#selItemClass")[0].selectedIndex-1;
+				console.log("ItemClassSelectedIndex ======> " + JSON.stringify(listItemClasses[ItemClassSelectedIndex]));
+				console.log("selItemClassChange listClass[ItemClassSelectedIndex] ======> " + JSON.stringify(listItemClasses[ItemClassSelectedIndex]));
+			}
 
 			function storeCreditMemo(){
 				console.log("storeCreditMemo");
@@ -413,6 +441,7 @@ $(document).ready(function() {
 				console.log("storeCreditMemo CreditMemoVO=" + JSON.stringify(CreditMemoVO));
 				var CreditMemosVO = [CreditMemoVO];
 				creditMemoDAO.store(CreditMemosVO, errCreditMemoInsert, successCreditMemoInsert);
+
 				return false;
 			}
 		
@@ -448,38 +477,35 @@ $(document).ready(function() {
 				window.location = "InvoicePreview.html?id_creditMemo=" + $("#refNumber").val();
 			}
 
+		var id_creditMemoPhoto;
+		function onClickGetPhoto(){
+			if ($("#isPersisted").val() == "false"){
+				alert("Please, save CreditMemo first!");
+				return false;
+			}
+			id_creditMemoPhoto = $('#refNumber').val();
+			navigator.camera.getPicture( photoSuccess, photoError, {quality: 20, destinationType: Camera.DestinationType.DATA_URL, encodingType: Camera.EncodingType.JPEG} );
+		}
 		
-			var id_creditMemoPhoto;
-			function onClickGetPhoto(){
-				if ($("#isPersisted").val() == "false"){
-					alert("Please, save CreditMemo first!");
-					return false;
-				}
-				id_creditMemoPhoto = $('#refNumber').val();
-				navigator.camera.getPicture( photoSuccess, photoError, {quality: 20, destinationType: Camera.DestinationType.DATA_URL, encodingType: Camera.EncodingType.JPEG} );
+		function photoSuccess(imageData){
+			var CreditMemoVO = {
+				id_creditMemo: id_creditMemoPhoto,
+				photo: imageData
 			}
-			
-			function photoSuccess(imageData){
-				var CreditMemoVO = {
-					id_creditMemo: id_creditMemoPhoto,
-					photo: imageData
-				}
-				creditMemoDAO.storePhoto(CreditMemoVO, photoStoreFail, photoStoreSuccess);
-			}
-			
-			function photoStoreSuccess(){
-				alert("success: photo stored");
-			}
-			
-			function photoStoreFail(err){
-				alert("fail: the photo was not stored error:" + JSON.stringify(err));
-			}
-
-			function photoError(){
-				alert("error photo");
-			}
+			creditMemoDAO.storePhoto(CreditMemoVO, photoStoreFail, photoStoreSuccess);
+		}
 		
+		function photoStoreSuccess(){
+			alert("success: photo stored");
+		}
 		
+		function photoStoreFail(err){
+			alert("fail: the photo was not stored error:" + JSON.stringify(err));
+		}
+	
+		function photoError(){
+			alert("error photo");
+		}
 
   </script>
 <style type="text/css">
@@ -497,7 +523,7 @@ table, th, td {
  
 <body> 
 
-<div data-role="page" id="CreditMemo" data-theme="a" data-title="Invoice new">
+<div data-role="page" id="CreditMemo" data-theme="a" data-title="Credit Memo new">
     
 	<div data-role="content">	
 		<form id="formulario" >
@@ -607,7 +633,15 @@ table, th, td {
                     <input type="number" step="0.01" name="Amount" id="Amount" align="right" readonly>
                   </div>
                 </div>
-    
+
+                <div data-role="fieldcontain">
+                  <div>
+                  <label for="selItemClass" class="select">Select a class:</label>
+                  </div>
+                  <select name="selItemClass" id="selItemClass" onChange="selItemClassChange()">
+                  </select>
+                </div>
+
                 <div class="ui-grid-b" style="width:100%">
                     <div class="ui-block-a" style="width:49%"><button type="button" id="add" data-theme="b" onClick="addItem()">Add</button></div>	   
                     <div class="ui-block-b" style="width:2%"></div>	   
@@ -615,8 +649,6 @@ table, th, td {
                 </div> 
             </div>
 <!-- END   ADD ITEM -->
-
-
 
 
             <div class="ui-grid-a" >                
@@ -628,6 +660,7 @@ table, th, td {
                       <th>Qty</th>
                       <th>Price</th>
                       <th>Amount</th>
+                      <th>Class</th>
                     </tr>
                   </thead>
                   <tfoot id="tableFoot">
