@@ -7,19 +7,18 @@
 		<link rel="stylesheet" href="css/themes/zoe.min.css" />
 		<link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
 		<link rel="stylesheet" href="js/jquery-mobile/jquery.mobile.structure-1.4.5.min.css" />
-		<link rel="stylesheet" href="js/jqm-inlinetabs/jqm-inlinetabs.min.css" />
 
 		<!--  <link rel="stylesheet" href="js/jquery-mobile/jquery.mobile-1.4.5.min.css" />  -->
 		<script src="js/jquery-mobile/jquery-2.1.4.js"></script>
 		<script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
 		<script type="text/javascript" src="cordova.js"></script>
-		<script src="js/jqm-inlinetabs/jqm-inlinetabs.min.js"></script>        
 		<script src="js/zoe/zoe.js"></script>
 		<script src="js/zoe/customerDAO.js"></script>
         <script src="js/zoe/termDAO.js"></script>
         <script src="js/zoe/pricelevelDAO.js"></script>
         <script src="js/zoe/invoiceDAO.js"></script>
         <script src="js/zoe/salesRepDAO.js"></script>
+        <script src="js/zoe/creditMemoDAO.js"></script>
 		<script> 
 
 			$(document).bind("pageinit", function(event) {
@@ -49,9 +48,7 @@
 				}else{
 					customerDAO.list(receiveCustomers, errReceiveCustomers);
 				}
-				
 				salesRepDAO.getByName(window.localStorage.getItem("salesRepName"), receiveSalesRep);
-				
 			}
 			
 			var salesRepVO;
@@ -75,6 +72,9 @@
 			function errListInvoicesByCustomer(err){
 				alert("DB Error ListInvoicesByCustomer: "+JSON.stringify(err));
 			}
+			function errListCreditMemosByCustomer(err){
+				alert("DB Error ListCreditMemosByCustomer: "+JSON.stringify(err));
+			}			
 			// END functions on error case
 			
 			$(document).bind('pagechange', function() {
@@ -99,7 +99,8 @@
 				}
 			}
 
-/*			$(document).ready(function(){ 
+/*			// Esto es para colorear en rojo los valores negativos - PENDIENTE POR TERMINA
+			$(document).ready(function(){ 
 			$("td .ms-vb2").each(function () {
 			   if($(this).val().indexof('-') > -1)
 				{
@@ -138,7 +139,32 @@
 				console.log("onClickInvoicePreview current_index_customer=" + window.localStorage.getItem("current_index_customer"));
 				window.localStorage.setItem("current_type", type);
 			}
+			
+			var id_invoicePhoto;
+			function onClickGetPhoto(id_invoice){
+				id_invoicePhoto = id_invoice;
+				navigator.camera.getPicture( photoSuccess, photoError, {quality: 20, destinationType: Camera.DestinationType.DATA_URL, encodingType: Camera.EncodingType.JPEG} );
+			}
+			
+			function photoSuccess(imageData){
+				var invoiceVO = {
+					id_invoice: id_invoicePhoto,
+					photo: imageData
+				}
+				invoiceDAO.storePhoto(invoiceVO, photoStoreFail, photoStoreSuccess);
+			}
+			
+			function photoStoreSuccess(){
+				alert("success: photo stored");
+			}
+			
+			function photoStoreFail(err){
+				alert("fail: the photo was not stored error:" + JSON.stringify(err));
+			}
 
+			function photoError(){
+				alert("error photo");
+			}
 			
 			// Función para calcular los días transcurridos entre dos fechas
 			restaFechas = function(f1,f2)
@@ -156,19 +182,6 @@
 			var listCustomers = new Array();
 			var selectedIndex;
 			function receiveCustomers(arrayCustomers){
-/*				var arrayCustomers = new Array();
-				arrayCustomers[0] = {ListId:'1',FullName:'Juan', openBalance:'1000.00'};
-				arrayCustomers[1] = {ListId:'2',FullName:'Lina', openBalance:'10000.00'};
-				arrayCustomers[2] = {ListId:'3',FullName:'Jose', openBalance:'100000.00'};
-				arrayCustomers[3] = {ListId:'4',FullName:'Lisa', openBalance:'1000000.00'};
-				arrayCustomers[4] = {ListId:'5',FullName:'Cris', openBalance:'10000000.00'};
-				arrayCustomers[5] = {ListId:'6',FullName:'Isa',  openBalance:'-100000000.00'};
-				arrayCustomers[6] = {ListId:'7',FullName:'Ana',  openBalance:'1000000000.00'};
-				arrayCustomers[7] = {ListId:'8',FullName:'Tati', openBalance:'10000000000.00'};
-				arrayCustomers[8] = {ListId:'9',FullName:'Yeny', openBalance:'100000000000.00'};
-				arrayCustomers[9] = {ListId:'10',FullName:'Juli', openBalance:'1000000000000.00'};
-				arrayCustomers[10] = {ListId:'11',FullName:'Xime', openBalance:'10000000000000.00'};
-*/			
 				console.log("receiveCustomers arrayCustomers=" + JSON.stringify(arrayCustomers));
 				listCustomers = arrayCustomers; // Copy local array to global array
 				console.log("========= INICIO LISTA =========");
@@ -230,10 +243,15 @@
 			
 			
 			// List Invoices by Customer 
+			var listInvoices = new Array();
+			var selectedIndex2;
 			function receiveInvoices(arrayListInvoicesByCust){
+				listInvoices = arrayListInvoicesByCust; // Copy local array to global array
 				// Build customers' invoices by Customer, list with <ul> <li>
-				var htmlString2 = '<ul id="listInvoiceByCust" data-role="listview" data-filter="true" data-filter-placeholder="Search invoice..." data-inset="true">';
+				var htmlString2 = '<ul id="listInvoiceByCust" data-role="listview" data-filter="true" data-filter-placeholder="Search invoice..." >';
 				var hoy=Date.now(); // Current date in milliseconds
+				var TotBalanceRem = 0.00;
+				var TotAmount = 0.00;
 				
 				for(var i=0; i< arrayListInvoicesByCust.length; i++) {
 						var dueDays = restaFechas(arrayListInvoicesByCust[i].dueDate,hoy); // Date in format yyyy-mm-dd
@@ -243,7 +261,7 @@
 						var monsthsAgo = dueDays/30;
 						monsthsAgo = monsthsAgo.toFixed(1); // Calc months with 1 decimal number
 						htmlString2 += '<li data-filtertext="' + arrayListInvoicesByCust[i].id_invoice + '">'+
-						'<div class="ui-grid-b"><div class="ui-block-a" style="width:80%">Invoice #' + arrayListInvoicesByCust[i].refNumber +
+						'<div class="ui-grid-a"  ><div class="ui-block-a" style="width:70%">Invoice #' + arrayListInvoicesByCust[i].refNumber +
 						'<div>Amount: <span id="overdueBal">'+arrayListInvoicesByCust[i].appliedAmount+'</span><br/>Balance Remaining:<span> '+arrayListInvoicesByCust[i].balanceRemaining+'</span><br/>';
 						if (dueDays>0){
 							htmlString2 +='<span id="OberdueBy">Overdue by '+dueDays+' days</span><br/><span id="AddedMonthsAgo">Added '+monsthsAgo+' months ago</span>';
@@ -253,10 +271,14 @@
 							htmlString2 += '<a href="invoice.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
 						}
 						htmlString2 +='<a href="InvoicePreview.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice +
-						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>' + 
-						'</div></li>';
+						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>';
+					    htmlString2 +='<a class="ui-btn ui-btn-icon-notext ui-icon-camera" data-ajax="false" onClick="onClickGetPhoto(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>';
+						htmlString2 +='</div></li>';
+						TotBalanceRem += NumberCast(arrayListInvoicesByCust[i].balanceRemaining,2, 0.00);
+						TotAmount += NumberCast(arrayListInvoicesByCust[i].appliedAmount,2, 0.00);
 					}
 					htmlString2 += '</ul>';
+					htmlString2 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Balance Remaining</td><td>Total Applied Amount</td></tr><tr><td>'+NumberCast(TotBalanceRem,2, 0.00)+'</td><td>'+NumberCast(TotAmount,2, 0.00)+'</td></tr></table>';
 					$('#InvoiceList').html(htmlString2);
 					$(".linkDetail").click(goDetailInvoice);
 			}
@@ -271,16 +293,22 @@
 			
 			function goDetailInvoice(event){
 				var index =  event.currentTarget.id;
-				logZoe("goDetail2 index: "+index)
+				logZoe("goDetail Invoice index: "+index)
 				index = index.substring(index.indexOf("_")+1);
-				selectedIndex = index;
-				//renderDetail(index);
+				selectedIndex2 = index;
 			}			
+			
+			function goDetailCreditMemo(event){
+				var index =  event.currentTarget.id;
+				logZoe("goDetail Credit Memo index: "+index)
+				index = index.substring(index.indexOf("_")+1);
+				selectedIndex2 = index;
+			}	
 			
 			var CustomerAddress='';
 			var CustomerEmail='';
 			var CustomerPhone='';
-			
+
 			function renderDetail(index){
 				logZoe("renderDetail index=" + index);
 				logZoe("renderDetail =" + JSON.stringify(listCustomers[index]));
@@ -342,7 +370,8 @@
 				
 				termDAO.list(receiveTerms,errReceiveTerms);
 				pricelevelDAO.list(receivePriceLevel,errPriceLevel);
-				invoiceDAO.listByCustomer(listCustomers[index].ListID,receiveInvoices, errListInvoicesByCustomer);
+				invoiceDAO.listByCustomer(listCustomers[index].ListID, receiveInvoices, errListInvoicesByCustomer);
+				creditMemoDAO.listByCustomer(listCustomers[index].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
 			}
 			
 			function LocateAddress(){
@@ -432,9 +461,90 @@
 			function errCustomermarkToSync(err){
 				alert("DB Error on mark to Sync update customers: "+JSON.stringify(err));
 			}
+			
+			// List Credit Memos by Customers
+			var listCreditMemos = new Array();
+			var selectedIndex3;			
+			function receiveCreditMemos(arrayListCreditMemosByCust){
+				listCreditMemos = arrayListCreditMemosByCust; // Copy local array to global array
+				
+				// Build customers' Credit memos by Customer, list with <ul> <li>
+				var TotBalanceRemCM = 0.00;
+				var TotAmountCM = 0.00;				
+				var htmlString3 = '<ul id="ListCreditMemosByCust" data-role="listview" data-filter="true" data-filter-placeholder="Search Credit Memo..." data-inset="true">';
+				for(var i=0; i< arrayListCreditMemosByCust.length; i++) {
+						htmlString3 += '<li data-filtertext="' + arrayListCreditMemosByCust[i].refNumber + '">'+
+						'<div class="ui-grid-b"><div class="ui-block-a" style="width:80%">Credit Memo #' + arrayListCreditMemosByCust[i].refNumber +
+						'<div>Amount: <span id="overdueBal">'+ifNull(arrayListCreditMemosByCust[i].appliedAmount,'')+'</span><br/>Balance Remaining:<span> '+ifNull(arrayListCreditMemosByCust[i].balanceRemaining,'')+'</span><br/>';
+						htmlString3 +='</div></div><div class="ui-block-b" style="width:20%">';
+						if (arrayListCreditMemosByCust[i].origin == 'local'){
+							htmlString3 += '<a href="CreditMemo.html?id_creditMemo=' + arrayListCreditMemosByCust[i].id_creditMemo + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
+						}
+						htmlString3 +='<a href="CreditMemoPreview.html?id_creditMemo=' + arrayListCreditMemosByCust[i].id_creditMemo +
+						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListCreditMemosByCust[i].id_creditMemo + '\'); return true;"></a>' + 
+						'</div></li>';
+						TotBalanceRemCM += NumberCast(arrayListCreditMemosByCust[i].balanceRemaining,2, 0.00);
+						TotAmountCM += NumberCast(arrayListCreditMemosByCust[i].appliedAmount,2, 0.00);
+					}
+					htmlString3 += '</ul>';
+					htmlString3 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Balance Remaining</td><td>Total Applied Amount</td></tr><tr><td>'+NumberCast(TotBalanceRemCM,2, 0.00)+'</td><td>'+NumberCast(TotAmountCM,2, 0.00)+'</td></tr></table>';
+					try{$('#CreditMemoList').html(htmlString3).listview('refresh');}catch(e){}
+					$(".linkDetail").click(goDetailCreditMemo);
+			}
+						
+			// Makes sure the code contained doesn't run until all the DOM elements have loaded
+			function changeActivityList() {
+				console.log("selectedIndex=" + selectedIndex);
+				 $('.ActivitiesLists').hide();
+					switch($('#selActivities').val()){
+						case 'InvoiceCreditMemoList': $("#InvoiceList").show();
+													  $("#CreditMemoList").show();
+													  invoiceDAO.listByCustomer(listCustomers[selectedIndex].ListID, receiveInvoices, errListInvoicesByCustomer);
+													  creditMemoDAO.listByCustomer(listCustomers[selectedIndex].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
+													  break;
+						case 'InvoiceList'			: $("#InvoiceList").show(); 
+													invoiceDAO.listByCustomer(listCustomers[selectedIndex].ListID, receiveInvoices, errListInvoicesByCustomer);
+													  break;
+						case 'CreditMemoList'		: $("#CreditMemoList").show(); 
+													creditMemoDAO.listByCustomer(listCustomers[selectedIndex].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
+													  break;
+					
+					}
+			}			
 	
 		</script>
 		<style type="text/css">
+		
+.inlinetabs .ui-navbar {
+    margin: 0 2px;
+	height: 53px;
+}
+
+.inlinetabs .ui-tabs-nav > li {
+    margin: 0 2px;
+    width: auto;
+    clear: none;
+	height:25px;
+}
+
+.inlinetabs .ui-tabs-nav .ui-btn {
+    border: 1px solid #ddd;
+    border-bottom: none;
+    border-top-left-radius: .6em;
+    border-top-right-radius: .6em;
+}
+
+.inlinetabs .ui-tabs-panel {
+    background: #fff;
+    border-radius: .6em;
+    border: 1px solid #ddd;
+}
+
+.inlinetabs div {
+   margin:2px 2px 2px 2px;
+    outline:none;
+   vertical-align: top;
+}
 			thead {color:black;}
 			tbody {color:gray;}
 			tfoot {
@@ -445,42 +555,15 @@
 				border: 1px solid black;
 			}
 			.control-group {
-				margin-bottom: 9px;
 				background-color:#FFFFFF;
 				border-color:#000000;
 				border-width:medium;
 				border:thick;
+				margin: 2px 2px 2px 2px;
 			
-				box-shadow: inset 2px 2px 1px 1px rgba(50, 50, 50, 0.75);
+				/*box-shadow: inset 2px 2px 1px 1px rgba(50, 50, 50, 0.75);*/
 			}
 			
-			/* ADD 6(e) and 7(f) column grid */
-			.ui-grid-e, .ui-grid-f { overflow: hidden; }
-			
-			/* grid e: 16/16/16/16/16/16 */
-			.ui-grid-e .ui-block-a, .ui-grid-e .ui-block-b, .ui-grid-e .ui-block-c, .ui-grid-e .ui-block-d, .ui-grid-e .ui-block-e, .ui-grid-e .ui-block-f { width: 16.59166666666667%; }
-			.ui-grid-e > :nth-child(n) { width: 16.66666666666667%; }
-			.ui-grid-e .ui-block-a { clear: left; }
-			
-			/* grid f: 14/14/14/14/14 */
-			.ui-grid-f .ui-block-a, .ui-grid-f .ui-block-b, .ui-grid-f .ui-block-c, .ui-grid-f .ui-block-d, .ui-grid-f .ui-block-e, .ui-grid-f .ui-block-f, .ui-grid-f .ui-block-g { width: 14.21071428571429%; }
-			.ui-grid-f > :nth-child(n) { width: 14.28571428571429%; }
-			.ui-grid-f .ui-block-a { clear: left; }
-			
-			/* ADD 6th (f) and 7th (g) blocks in grid */
-			.ui-header .ui-navbar .ui-grid-e li.ui-block-f .ui-btn,
-			.ui-footer .ui-navbar .ui-grid-e li.ui-block-f .ui-btn { margin-right: -3px; }/* NOT TESTED */
-			
-			.ui-header .ui-navbar .ui-grid-f li.ui-block-g .ui-btn,
-			.ui-footer .ui-navbar .ui-grid-f li.ui-block-g .ui-btn { margin-right: -2px; }/* NOT TESTED */
-			
-			.ui-grid-e .ui-btn, .ui-grid-f .ui-btn { margin-right: 5px; margin-left: 5px; }
-			
-			.ui-block-f, .ui-block-g { margin: 0; padding: 0; border: 0; float: left; min-height: 1px; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; }
-			
-			.ui-header .ui-navbar .ui-grid-e li.ui-block-f .ui-btn-icon-right .ui-icon,
-			.ui-footer .ui-navbar .ui-grid-f li.ui-block-g .ui-btn-icon-right .ui-icon { right: 8px; }
-
 			#lblFullName {color:black; font-weight:bolder; font-size:large;}
 			#lblOpenBalance1 {color:black; font-weight:bolder; font-size:large;}
 			#lblOpenBalance2 {color:grey; font-weight:bolder; font-size:medium;}
@@ -512,7 +595,7 @@
 		<!-- BEGIN CUSTOMERS DETAILS-->
 		<div data-role="page" id="CustomersDetails"  data-title="Customers Detail" data-theme="a">
 			<div data-role="content" >
-				<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+				<fieldset data-role="controlgroup" data-type="vertical" class="control-group">
                     <div class="ui-grid-a" style="height:70px">
                         <div class="ui-block-a" style="height:100%"> 
                             <div align="left">
@@ -553,16 +636,17 @@
                     </div>
                 </fieldset>
 				<!-- CUSTOMERS DETAILS (LIST DETAILS, EDIT, ADD/ACTIVITIES) -->
-				<div data-role="inlinetabs"  data-theme="a" > <!-- inlinetabs -->
-					<ul>
-						<li data-tab="1">Details</li>
-						<li data-tab="2">Activities</li>
-					</ul>
-					<!-- CUSTOMERS DETAILS CONTENT  - TAB 1 -->
-					<div data-tab="1" id="TabCustomerDetails">
+                
+                <div data-role="tabs" id="tabs" class="inlinetabs">
+                  <div data-role="navbar" class="ui-navbar">
+                    <ul data-inset="true">
+                      <li><a href="#TabCustomerDetails" data-ajax="false">Details</a></li>
+                      <li><a href="#TabActivities" data-ajax="false">Activities</a></li>
+                    </ul>
+                  </div><div  id="TabCustomerDetails">
 						<form id="formulario" >
 							<!-- Relational Info --> 
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group">
 								<legend><h4>Sales Representant Info</h4></legend>
 								<div data-role="fieldcontain">
 									<div>
@@ -573,7 +657,7 @@
 								</div>
 							</fieldset>    
 							<!-- Identification Info -->
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<div data-role="fieldcontain">
 									<div>
 									<input type="hidden" data-theme="b" name="ListID" id="ListID" value=""/>
@@ -596,7 +680,7 @@
 								</div>
 							</fieldset> 
 							<!-- Contact Info -->
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px"> 
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px"> 
 								<legend><h4>Contact Info</h4></legend>                       
 								<div data-role="fieldcontain">
 									<div>
@@ -624,7 +708,7 @@
 								</div>
 							</fieldset>
 							<!-- Billing Address -->
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<legend><h4>Billing Address</h4></legend>
 								<div data-role="fieldcontain">
 									<div>
@@ -683,7 +767,7 @@
                                 </div>
 							</fieldset>
 							<!-- Shiping Address -->
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<legend><h4>Shiping Address</h4></legend>
 								<div data-role="fieldcontain">
 									<div>
@@ -735,7 +819,7 @@
 								</div>
 							</fieldset> 
 							<!-- Balance Info -->
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<legend><h4>Balance Info</h4></legend>
 								<div class="ui-grid-a" style="height:95px">
 									<div class="ui-block-a" style="height:100%"> 
@@ -757,7 +841,7 @@
 								</div>
 							</fieldset>           
 							<!-- Terms Info --> 
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<div data-role="fieldcontain" id="CustomerTerms">
 								  <div>
 									<label for="Terms" class="select">Terms:</label>
@@ -768,7 +852,7 @@
 								</div>
 							</fieldset> 
 							<!-- Other Info -->                       
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<div data-role="fieldcontain">
 									<div>
 										<label for="OtherDetails">Other Details:</label>
@@ -778,7 +862,7 @@
 							</fieldset> 
 
 							<!-- Route days info -->
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<legend><h4>Route Info</h4></legend>
 
                                     <div data-role="fieldcontain">
@@ -826,7 +910,7 @@
                                     </div> 
 							</fieldset>
 							<!-- Price Level Info -->                       
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
+							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<div data-role="fieldcontain" id="CustomerPriceLevel">
 								  <div>
 									<label for="priceLevel" class="select">Price Level:</label>
@@ -837,7 +921,7 @@
 								</div>
 							</fieldset>                                                         
 							<!-- Done and Cancel Buttons -->
-                            <fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px;">
+                            <fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px;">
                                 <div class="ui-grid-a" style="height:45px">
                                     <div class="ui-block-a ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="cancel" data-add-back-btn="true" data-theme="b">Cancel</button></div>
                                     <div class="ui-block-b ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="btnUpdateCustomer"  onClick="UpdateCustomer(); return false;" data-theme="c">Done</button></div>	
@@ -847,34 +931,34 @@
 
 					</div>
 					<!-- ACTIVITIES CONTENT - TAB 2 -->
-					<div data-tab="2" id="TabActivities">
-						<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:2px">
+					<div id="TabActivities" style="width:100%">
+						<fieldset data-role="controlgroup" data-type="vertical" class="control-group">
 							<div data-role="fieldcontain">
 							  <div>
 								<label for="selActivities" class="select">Select Activities:</label>
 							  </div>
-							  <select name="selActivities" id="selActivities" data-theme="a">
-								<option value="option1">All Activities</option>
-								<option value="option2">Invoices last month</option>
-								<option value="option3">Credit memos last month</option>
+							  <select name="selActivities" id="selActivities" data-theme="a" onChange="changeActivityList()">
+                              	<option value="" selected="selected">Select an option</option>
+								<option value="InvoiceCreditMemoList">All Activities</option>
+								<option value="InvoiceList">Invoices last month</option>
+								<option value="CreditMemoList">Credit memos last month</option>
 							  </select>
 							</div>
-							<div data-role="collapsible">
-							<h4>Add a Note</h4>
-							<p>Add a note to the invoice</p>
-								<div data-role="fieldcontain">					
-									<div>
-										<label for="creditMemo">Credit memo:</label>
-									</div>
-									<input type="text" data-theme="b" name="creditMemo" id="creditMemo" value=""  />
-								</div>
-							</div>
-							<br/><hr>
-                            <!-- BEGIN Invoices List and overdue -->
-                            <div data-role="content" id="InvoiceList">
+                            <!-- BEGIN Invoices & Credit Memo List -->
+                            <div data-role="content" id="InvoiceCreditMemoList" class="ActivitiesLists" style="display:none">
                                 <!-- Injection-->
                             </div>
-                            <!-- END Invoices List and overdue -->							
+                            <!-- END Invoices & Credit Memo List -
+                            <!-- BEGIN Invoices List and overdue -->
+                            <div data-role="content" id="InvoiceList" class="ActivitiesLists" style="display:none">
+                                <!-- Injection-->
+                            </div>
+                            <!-- END Invoices List and overdue -->	
+                            <!-- BEGIN Credit Memo List -->
+                            <div data-role="content" id="CreditMemoList" class="ActivitiesLists" style="display:none">
+                                <!-- Injection-->
+                            </div>
+                            <!-- END Credit Memo List --> 						
 					</fieldset> 
 					</div>
 				</div>				
