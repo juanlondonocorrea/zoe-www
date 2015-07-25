@@ -158,7 +158,7 @@
 					for (var i=0; i < CreditMemoVO.items.length; i++) {
 						creditMemoItems +=
 						'<tr>'
-						  +'<td><div class="TinyFont">'+CreditMemoVO.items[i].Desc+'</div></td>'
+						  +'<td><div class="TinyFont">'+CreditMemoVO.items[i].Inventory_FullName+'-'+CreditMemoVO.items[i].Desc+'</div></td>'
 						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(CreditMemoVO.items[i].Rate,2, 0.00)+'</div></td>'
 						  +'<td><div align="right" class="TinyFont">'+NumberCast(CreditMemoVO.items[i].Quantity,0, 0)+'</div></td>'
 						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(CreditMemoVO.items[i].Amount,2, 0.00)+'</div></td>';
