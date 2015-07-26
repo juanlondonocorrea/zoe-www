@@ -122,14 +122,13 @@ function doSelectCreditMemo(tx){
 	" salesrep.Name as salesrep_Name, customer.companyName as customer_companyName,  " +
 	" vendor.Name as vendor_name , vendor.addr1 as vendor_addr1, vendor.addr2 as vendor_addr2," +
 	" vendor.addr3 as vendor_addr3 , vendor.city as vendor_city, vendor.state as vendor_state," +
-	" vendor.country as vendor_country, class.Name as class_name " +
+	" vendor.country as vendor_country " +
 	" FROM creditMemo " +
 	" LEFT JOIN salesrep ON salesrep.id_salesrep = creditMemo.id_salesrep " +
-	" LEFT JOIN customer ON customer.ListID = customer.ListID " +
+	" LEFT JOIN customer ON customer.ListID = creditMemo.ListID " +
 	" LEFT JOIN vendor ON vendor.ListID = customer.vendor_ListID " +
 	" LEFT JOIN term ON term.id_term = creditMemo.id_term " +
 	" LEFT JOIN customer_msg as cm ON cm.ListID = creditMemo.customerMsg_ListID " +
-	" LEFT JOIN class ON class.ListID = creditMemo.class_ListID " +
 	" WHERE creditMemo.id_creditMemo = ?", [filterDataCreditMemo],creditMemoLocalReceiveFunction, creditMemoErrFunc);
 }
 
@@ -158,9 +157,10 @@ function creditMemoLocalReceiveFunction(tx,results){
 		creditMemoVO=results.rows.item(0);
 			if (includeCreditMemoDetails){
 					tx.executeSql("SELECT LineID, id_creditMemo, Inventory_ListID, creditMemo_item.Desc, " +
-					" Quantity, Rate, Amount, SalesTax_ListID, salesTax.Name as salesTax_Name, class.Name as class_Name"+
+					" Quantity, Rate, Amount, creditMemo_item.SalesTax_ListID, salesTax.Name as salesTax_Name, class.Name as class_Name, inventory.FullName as Inventory_FullName"+
 					" FROM creditMemo_item " +
 					" LEFT JOIN salesTax ON salesTax.ListID = creditMemo_item.SalesTax_ListID LEFT JOIN class ON class.ListID = creditMemo_item.class_ListID " +
+					" LEFT JOIN inventory ON inventory.ListID = creditMemo_item.inventory_ListID "+
 					" Where id_creditMemo = ?", [filterDataCreditMemo],creditMemoItemsLocalReceiveFunction, creditMemoLocalErrFunc);
 			}else{
 				creditMemoReceiveFunction(creditMemoVO);

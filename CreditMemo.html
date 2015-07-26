@@ -51,7 +51,7 @@ $(document).ready(function() {
 				console.log("initThisPage credit memo event.currentTarget.URL=" + event.currentTarget.URL);
 				if (event.currentTarget.URL && event.currentTarget.URL.indexOf("?")>-1){
 					var parameters = event.currentTarget.URL.split("?")[1].split("&");
-					console.log("parameters=" + parameters);
+					console.log("parameters ======> " + parameters);
 					for (var i in parameters){
 						var parameterDupla = parameters[i].split("=");
 						if (parameterDupla[0]=="id_creditMemo"){
@@ -70,16 +70,17 @@ $(document).ready(function() {
 				classDAO.list(receiveClasses,errReceive);
 				
 				if (id_creditMemo){
+					console.log("id_creditMemo: =====> "+id_creditMemo);
 					creditMemoDAO.getById(id_creditMemo, true, receiveCreditMemo, errReceiveCreditMemo);
 				}
 			}
 			
 			var currentCreditMemo;
 			function receiveCreditMemo(CreditMemo){
+				console.log("CreditMemo.html receiveCreditMemo=" + JSON.stringify(CreditMemo));
 				$("#isPersisted").val("true");
 				isPersistedChange();
 				currentCreditMemo = CreditMemo;
-				console.log("CreditMemo.html receiveCreditMemo=" + JSON.stringify(CreditMemo));
 				setTimeout(waitAllLoad, 300);
 			}
 			
@@ -220,7 +221,7 @@ $(document).ready(function() {
 				$('#selProduct').empty();
 				$('#selProduct').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');				
 				for (var i in list) {
-					$('#selProduct').append('<option value="' + list[i].ListID +'">('+ list[i].QuantityOnHand + ') ' + list[i].salesDesc+ '</option>');
+					$('#selProduct').append('<option value="' + list[i].ListID +'">('+ list[i].QuantityOnHand + ') ' + list[i].FullName + '-'+list[i].salesDesc+ '</option>');
 				}
 				$('#selProduct').trigger("chosen:updated");
 			}
@@ -268,13 +269,10 @@ $(document).ready(function() {
 			function addItem(){
 				console.log("addItem listCustomers[customerSelectedIndex]=" + JSON.stringify(listCustomers[customerSelectedIndex]));
 				console.log("addItem listItems[productSelectedIndex]=" + JSON.stringify(listItems[productSelectedIndex]));
-				if (listItems[productSelectedIndex].QuantityOnHand *1< $("#Quantity").val()*1){
-					alert("Cannot set quantity " + $("#Quantity").val() + " over inventory available " + listItems[productSelectedIndex].QuantityOnHand);
-					return false;
-				}
 				var aItem = {"LineID":generateKey(), 
 					"id_creditMemo": listCustomers[customerSelectedIndex].id_creditMemo,
 					"Inventory_ListID": listItems[productSelectedIndex].ListID,
+					"Inventory_FullName": listItems[productSelectedIndex].FullName,
 					"Desc": listItems[productSelectedIndex].salesDesc,
 					"Quantity": $("#Quantity").val(),
 					"Rate": parseFloat($("#RatePrice").val()).toFixed(2),
@@ -314,7 +312,7 @@ $(document).ready(function() {
 					console.log("renderItems currentItems[i]=" + JSON.stringify(currentItems[i]));
 					html += "<tr>\n";
 					html +=  "<td><a class='ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all rmItem' id='"+ i+  "'></a></td>\n";
-					html +=  "<td><font size=1>"+currentItems[i].Desc+"</font></td>\n";
+					html +=  "<td><font size=1>"+currentItems[i].Inventory_FullName+'-'+currentItems[i].Desc+"</font></td>\n";
 					html += "<td><div align='right'><font size=1>"+currentItems[i].Quantity+"</div></font></td>\n";
 					html += "<td><div align='right'><font size=1>"+parseFloat(currentItems[i].Rate).toFixed(2)+"<font></div></td>\n";
 					html += "<td><div align='right'><font size=1>"+parseFloat(currentItems[i].Amount).toFixed(2)+"</font></div></td>\n";
