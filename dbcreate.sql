@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 23/07/2015
+Modified: 25/07/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -12,6 +12,11 @@ Database: SQLite 3.7
 
 -- Drop indexes section -------------------------------------------------
 
+DROP INDEX IF EXISTS IX_Relationship26@
+DROP INDEX IF EXISTS IX_Relationship27@
+DROP INDEX IF EXISTS IX_Relationship30@
+DROP INDEX IF EXISTS Idx_payment_1@
+DROP INDEX IF EXISTS idx_payment_2@
 DROP INDEX IF EXISTS IX_Relationship19@
 DROP INDEX IF EXISTS IX_Relationship20@
 DROP INDEX IF EXISTS IX_Relationship22@
@@ -46,6 +51,9 @@ DROP INDEX IF EXISTS idx_salesrep_1@
 
 -- Drop tables section ---------------------------------------------------
 
+DROP TABLE IF EXISTS paymentAppliedTo@
+DROP TABLE IF EXISTS Payment@
+DROP TABLE IF EXISTS PaymentMethod@
 DROP TABLE IF EXISTS class@
 DROP TABLE IF EXISTS log@
 DROP TABLE IF EXISTS InvoiceLinkedTxn@
@@ -520,6 +528,60 @@ CREATE TABLE class
   ListID TEXT NOT NULL,
   Name TEXT,
   CONSTRAINT Key14 PRIMARY KEY (ListID)
+)@
+
+-- Table PaymentMethod
+
+CREATE TABLE PaymentMethod
+(
+  ListID TEXT NOT NULL,
+  Name TEXT,
+  Type TEXT,
+  CONSTRAINT Key15 PRIMARY KEY (ListID)
+)@
+
+-- Table Payment
+
+CREATE TABLE Payment
+(
+  id_payment TEXT NOT NULL,
+  TxnDate DATETIME,
+  refNumber TEXT,
+  totalAmount NUMERIC,
+  memo TEXT,
+  ListID TEXT,
+  paymentMethod_ListID TEXT,
+  id_creditMemo TEXT,
+  origin TEXT,
+  zoeUpdateDate INTEGER,
+  zoeSyncDate INTEGER,
+  needSync INTEGER,
+  CONSTRAINT Key16 PRIMARY KEY (id_payment),
+  CONSTRAINT Relationship26 FOREIGN KEY (ListID) REFERENCES customer (ListID),
+  CONSTRAINT Relationship27 FOREIGN KEY (paymentMethod_ListID) REFERENCES PaymentMethod (ListID),
+  CONSTRAINT Relationship30 FOREIGN KEY (id_creditMemo) REFERENCES creditMemo (id_creditMemo)
+)@
+
+CREATE INDEX IX_Relationship26 ON Payment (ListID)@
+
+CREATE INDEX IX_Relationship27 ON Payment (paymentMethod_ListID)@
+
+CREATE INDEX IX_Relationship30 ON Payment (id_creditMemo)@
+
+CREATE INDEX Idx_payment_1 ON Payment (origin,needSync)@
+
+CREATE INDEX idx_payment_2 ON Payment (needSync)@
+
+-- Table paymentAppliedTo
+
+CREATE TABLE paymentAppliedTo
+(
+  TxnID TEXT NOT NULL,
+  id_payment TEXT NOT NULL,
+  paymentAmount NUMERIC,
+  CONSTRAINT Key17 PRIMARY KEY (TxnID,id_payment),
+  CONSTRAINT Relationship28 FOREIGN KEY (TxnID) REFERENCES invoice (id_invoice),
+  CONSTRAINT Relationship29 FOREIGN KEY (id_payment) REFERENCES Payment (id_payment)
 )@
 
 
