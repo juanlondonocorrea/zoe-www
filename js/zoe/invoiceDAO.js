@@ -2,6 +2,8 @@
 
 var invoiceDAO = {listBySalesrep:listInvoicesBySalesrep, 
 				listByCustomer:listInvoicesByCustomer,
+				listByCustomerPending:listInvoicesByCustomerPending,
+				listByPayment:listInvoicesByPayment,
 				listToUpload:listInvoicesToUpload,
 				getById:getInvoiceById, 
 				store:storeInvoice, 
@@ -62,6 +64,24 @@ function listInvoicesByCustomer(customer_ListID, aReceiveFunction,aErrFunc){
 	invoiceErrFunc = aErrFunc;
 	filterDataInvoice = customer_ListID;
 	db.transaction(doCustomerInvoices, invoiceErrFunc);
+}
+
+function listInvoicesByCustomerPending(customer_ListID, aReceiveFunction,aErrFunc){
+	db = openDatabaseZoe();
+	logZoe("listInvoices db=" + db);
+	invoiceReceiveListFunction = aReceiveFunction;
+	invoiceErrFunc = aErrFunc;
+	filterDataInvoice = customer_ListID;
+	db.transaction(doCustomerInvoicesPending, invoiceErrFunc);
+}
+
+function listInvoicesByPayment(payment_id, aReceiveFunction,aErrFunc){
+	db = openDatabaseZoe();
+	logZoe("listInvoicesByPayment payment_id=" + payment_id);
+	invoiceReceiveListFunction = aReceiveFunction;
+	invoiceErrFunc = aErrFunc;
+	filterDataInvoice = payment_id;
+	db.transaction(doPaymentInvoices, invoiceErrFunc);
 }
 
 function listInvoicesToUpload(aReceiveFunction,aErrFunc){
@@ -156,8 +176,19 @@ function doListInvoicesToUpload(tx){
 
 
 function doCustomerInvoices(tx){
-	logZoe("doSelectSelesrepInvoices");
+	logZoe("doCustomerInvoices");
 	tx.executeSql("SELECT id_invoice, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, origin, signature, signaturePNG, photo FROM invoice WHERE ListID = ?", [filterDataInvoice],invoiceLocalListReceiveFunction, invoiceErrFunc);
+}
+
+function doCustomerInvoicesPending(tx){
+	logZoe("doCustomerInvoicesPending");
+	tx.executeSql("SELECT id_invoice, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, origin, signature, signaturePNG, photo FROM invoice WHERE ListID = ? AND balanceRemaining>0", [filterDataInvoice],invoiceLocalListReceiveFunction, invoiceErrFunc);
+}
+
+function doPaymentInvoices(tx){
+	logZoe("doPaymentInvoices");
+	tx.executeSql("SELECT id_invoice, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, paymentAmount, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, origin, signature, signaturePNG, photo" +
+	" FROM invoice LEFT JOIN payment ON invoice.id_invoice = payment.TxnID WHERE id_payment =?", [filterDataInvoice],invoiceLocalListReceiveFunction, invoiceErrFunc);
 }
 
 function invoiceLocalReceiveFunction(tx,results){
