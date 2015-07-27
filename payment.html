@@ -1,0 +1,714 @@
+<!DOCTYPE html> 
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Payments</title>
+  
+  <link rel="stylesheet" href="css/themes/zoe.min.css" />
+  <link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+  <link rel="stylesheet" href="js/jquery-mobile/jquery.mobile.structure-1.4.5.min.css" />
+
+  <script type="text/javascript" src="cordova.js"></script>
+  <script src="js/jquery-mobile/jquery-2.1.4.js"></script>
+  <script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+  <script src="js/zoe/zoe.js"></script>
+  <script src="js/zoe/salesRepDAO.js"></script>
+  <script src="js/zoe/paymentDAO.js"></script>
+  <script src="js/zoe/invoiceDAO.js"></script>
+  <script src="js/zoe/paymentMethodDAO.js"></script>
+  <script src="js/zoe/inventoryDAO.js"></script>
+  <script src="js/zoe/customerDAO.js"></script>
+  <script src="js/zoe/termDAO.js"></script>
+  <script src="js/zoe/taxDAO.js"></script>
+  <script src="js/zoe/customerMsgDAO.js"></script>
+  
+  <script>
+			$(document).bind("pagebeforecreate", function(event) {
+				console.log("Cargar Clientes");
+				initAnyPage(event.target);
+				initThisPage(event);
+			});
+			
+			function errReceive(err){
+				alert("Error " + JSON.stringify(err));
+			}
+			var id_payment = null;
+			function initThisPage(event){
+				console.log("initThisPage payment event.currentTarget.URL=" + event.currentTarget.URL);
+				if (event.currentTarget.URL && event.currentTarget.URL.indexOf("?")>-1){
+					var parameters = event.currentTarget.URL.split("?")[1].split("&");
+					console.log("parameters=" + parameters);
+					for (var i in parameters){
+						var parameterDupla = parameters[i].split("=");
+						if (parameterDupla[0]=="id_payment"){
+							id_payment = parameterDupla[1];
+						}
+					}
+				}else if (window.localStorage.getItem("id_payment")){
+					id_payment = window.localStorage.getItem("id_payment");
+					window.localStorage.removeItem("id_payment");
+				}
+				customerDAO.list(receiveCustomers,errReceive);
+				paymentMethodDAO.list(receivePaymentMethods,errReceive);
+				salesRepDAO.getByName(window.localStorage.getItem("salesRepName"),receiveSalesrep);
+				if (id_payment){
+					paymentDAO.getById(id_payment, true, receivePayment, errReceivePayment);
+				}
+			}
+			
+			var currentPayment;
+			function receivePayment(payment){
+				$("#isPersisted").val("true");
+				isPersistedChange();
+				currentPayment = payment;
+				console.log("payment.html receivePayment=" + JSON.stringify(payment));
+				setTimeout(waitAllLoad, 300);
+			}
+			
+			//TODO
+			function renderPayment(){
+				console.log("renderPayment");
+				$("#selCustomer").val(currentPayment.ListID).selectmenu('refresh');
+				selCustomerChange();
+				$("#selTerm").val(currentPayment.id_term).selectmenu('refresh');
+				$("#Date").val(currentPayment.txnDate);
+				$("#Due").val(currentPayment.dueDate);
+				$("#refNumber").val(currentPayment.refNumber);
+				$("#PONumber").val(currentPayment.po_number);
+				$("#SalesRep").val(currentPayment.salesrep_Name);
+				$("#RatePrice").val(currentPayment.salesTaxTotal);
+				$("#Amount").val(currentPayment.subtotal);
+				$("#memo").val(currentPayment.memo);
+				$("#selCustomerMsg").val(currentPayment.customerMsg_ListID).selectmenu('refresh');
+				console.log("currentPayment.signature=" + currentPayment.signature);
+				$("#signature").jSignature("setData", currentPayment.signature);
+				
+				//fill currentItems
+				currentItems = new Array();
+				for (var i in currentPayment.items){
+					var aItem = currentPayment.items[i];
+					aItem.position = i+1;
+					currentItems[i] = aItem;
+				}
+				renderItems();
+			}
+			
+			var allLoaded = false;
+			function waitAllLoad(){
+				console.log("waitAllLoad");
+				if (salesRepVO && listCustomers && listPaymentMethods){
+					allLoaded = true;
+					renderPayment();
+				}else{
+					setTimeout(waitAllLoad, 300);
+				}
+			}
+			
+			function errReceivePayment(tx, err){
+				alert("Could no get the payment error: " + JSON.stringify(err));
+			}
+			
+			var salesrepVO;
+			function receiveSalesrep(obj){
+				salesrepVO = obj;
+				console.log("salesRep=" + JSON.stringify(salesrepVO));
+				
+				$('#refNumber').val( paymentDAO.generateRefNum(salesrepVO.initial+ "") );
+				$('#PONumber').val($('#refNumber').val());
+				$("#SalesRep").val(window.localStorage.getItem("salesRepName"));
+
+				var now = new Date();
+				var day = ("0" + now.getDate()).slice(-2);
+				var month = ("0" + (now.getMonth() + 1)).slice(-2);
+				var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+
+				$("#Date").val(today);
+				console.log("currDate=" + today);
+
+			}
+			
+			var listCustomers;
+			function receiveCustomers(list){
+				listCustomers = list;
+				console.log("receiveCustomers length="+list.length); 
+				$('#selCustomer').empty();
+				$('#selCustomer').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');
+				for (var i in list) {
+					$('#selCustomer').append('<option value="' + list[i].ListID +'">'+list[i].FullName+'</option>');
+				}
+				$('#selCustomer').trigger("chosen:updated");
+			}
+			
+			var listTerms;
+			var termSelectedIndex;
+			function receiveTerms(list){
+				listTerms = list;
+				console.log("receiveTerms length="+list.length); 
+				$('#selTerm').empty();
+				$('#selTerm').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');
+				for (var i in list) {
+					console.log("term =" + JSON.stringify(list[i]));
+					$('#selTerm').append('<option value="' + list[i].id_term +'">'+list[i].name+'</option>');
+				}
+				$('#selTerm').trigger("chosen:updated");
+			}
+			
+			var listTaxes;
+			var taxSelectedIndex;
+			function receiveTaxes(list){
+				listTaxes = list;
+				console.log("receiveTaxes length="+list.length); 
+				$('#selTax').empty();
+				$('#selTax').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');				
+				for (var i in list) {
+										console.log("tax =" + JSON.stringify(list[i]));
+					$('#selTax').append('<option value="' + list[i].ListID +'">'+list[i].Name+'</option>');
+				}
+				$('#selTax').trigger("chosen:updated");
+			}
+
+			var listCustomerMsgs;
+			var customerMsgSelectedIndex;
+			function receiveCustomerMsgs(list){
+				listCustomerMsgs = list;
+				console.log("receiveCustomerMsgs length="+list.length); 
+				$('#selCustomerMsg').empty();
+				$('#selCustomerMsg').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');
+				for (var i in list) {
+					console.log("customerMsg =" + JSON.stringify(list[i]));
+					$('#selCustomerMsg').append('<option value="' + list[i].ListID +'">'+list[i].FullName+'</option>');
+				}
+				$('#selCustomerMsg').trigger("chosen:updated");
+			}
+
+			var customerSelectedIndex;
+			function selCustomerChange(event, ui){
+				console.log("selCustomerChange val=" + $( "#selCustomer" ).val());
+				customerSelectedIndex = $( "#selCustomer" )[0].selectedIndex-1;
+				console.log("selCustomerChange custseleccionado=" + JSON.stringify(listCustomers[customerSelectedIndex]));
+				inventoryDAO.listByCustomer($( "#selCustomer" ).val(),receiveItems,errReceive);
+				if (!currentPayment){
+					$("#selTerm").val(listCustomers[customerSelectedIndex].id_term).selectmenu("refresh");
+					selTermChange();
+				}
+				console.log("listCustomers[customerSelectedIndex].id_term=" + listCustomers[customerSelectedIndex].id_term);
+				console.log("$('#selTerm').val()" + $('#selTerm').val());
+				console.log("$('#selTerm')[0].selectedIndex" + $('#selTerm')[0].selectedIndex);
+			}
+		
+			var listItems = new Array();	
+			function receiveItems(list){
+				listItems = list;
+				console.log("receiveItems length="+list.length); 
+				$('#selProduct').empty();
+				$('#selProduct').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');				
+				for (var i in list) {
+					$('#selProduct').append('<option value="' + list[i].ListID +'">('+ list[i].QuantityOnHand + ') ' + list[i].salesDesc+ '</option>');
+				}
+				$('#selProduct').trigger("chosen:updated");
+			}
+			
+			var productSelectedIndex;
+			function selProductChange(event, ui){
+				console.log("selProductChange val=" + $( "#selProduct" ).val());
+				productSelectedIndex = $( "#selProduct" )[0].selectedIndex-1;
+				console.log("selProductChange productSelectedIndex=" + productSelectedIndex);
+				console.log("selProductChange customPrice=" + listItems[productSelectedIndex].customprice);
+				console.log("selProductChange salesPrice=" + listItems[productSelectedIndex].salesPrice);
+				if (listItems[productSelectedIndex].customprice){
+					$("#RatePrice").val((listItems[productSelectedIndex].customprice+"").replace(",","."));
+				}else{
+					$("#RatePrice").val((listItems[productSelectedIndex].salesPrice+"").replace(",","."));
+				}
+				if ($("#Quantity").val() == ""){
+					$("#Quantity").val("1");
+				}
+//				$("#RatePrice").trigger("change");
+				calcItem(event);
+				console.log("RatePrice=" + $("#RatePrice").val());
+			}
+			
+			function calcItem(event){
+				var amount =  $('#RatePrice').val() * $('#Quantity').val();
+				$('#Amount').val(parseFloat(amount).toFixed(2));
+			}
+			
+			var currentItems= new Array();
+			function addItem(){
+				console.log("addItem listCustomers[customerSelectedIndex]=" + JSON.stringify(listCustomers[customerSelectedIndex]));
+				console.log("addItem listItems[productSelectedIndex]=" + JSON.stringify(listItems[productSelectedIndex]));
+				if (listItems[productSelectedIndex].QuantityOnHand *1< $("#Quantity").val()*1){
+					alert("Cannot set quantity " + $("#Quantity").val() + " over inventory available " + listItems[productSelectedIndex].QuantityOnHand);
+					return false;
+				}
+				var aItem = {"LineID":generateKey(), 
+					"id_payment": listCustomers[customerSelectedIndex].id_payment,
+					"Inventory_ListID": listItems[productSelectedIndex].ListID,
+					"Desc": listItems[productSelectedIndex].salesDesc,
+					"Quantity": $("#Quantity").val(),
+					"Rate": parseFloat($("#RatePrice").val()).toFixed(2),
+					"Amount": parseFloat($("#Amount").val()).toFixed(2),
+					"position":currentItems.length,
+					"salesTax_ListID":null
+				}
+				
+				console.log("addItem aItem=" + JSON.stringify(aItem)) 
+				currentItems[currentItems.length] = aItem;
+				clearItem();
+				renderItems();
+				return false;
+			}
+			
+			function clearItem(){
+				$("#Quantity").val("");
+				$("#RatePrice").val("");
+				$("#Amount").val("");
+				$( "#selProduct" )[0].selectedIndex =0;
+				$( "#selProduct" ).selectmenu("refresh");
+				$("#addItem").collapsible("collapse");
+			}
+			
+			var totalQuantity=0;
+			var totalAmount=0;
+			function renderItems(){
+				$("#tableBodyItems").html("");
+				var html="";
+				totalQuantity=0;
+				totalAmount=0;
+				for (var i in currentItems){
+					console.log("renderItems currentItems[i]=" + JSON.stringify(currentItems[i]));
+					html += "<tr>\n";
+					html +=  "<td><a class='ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all rmItem' id='"+ i+  "'></a></td>\n";
+					html +=  "<td><font size=1>"+currentItems[i].Desc+"</font></td>\n";
+					html += "<td><div align='right'><font size=1>"+currentItems[i].Quantity+"</div></font></td>\n";
+					html += "<td><div align='right'><font size=1>"+parseFloat(currentItems[i].Rate).toFixed(2)+"<font></div></td>\n";
+					html += "<td><div align='right'><font size=1>"+parseFloat(currentItems[i].Amount).toFixed(2)+"</font></div></td>\n";
+					html +=  "</tr>\n";
+					totalQuantity += currentItems[i].Quantity*1;
+					totalAmount += currentItems[i].Amount*1;
+				}
+				console.log("html=" + html);
+				$("#tableBodyItems").html(html);
+				
+				html = "<tr><td></td><td>Totals</td>";
+                html += "<td><div align='right'><font size=1>" + parseFloat(totalQuantity) + "</font></div></td>";      
+                html += "<td><div align='right'></div></td>";      
+                html += "<td><div align='right'><font size=1>" + parseFloat(totalAmount).toFixed(2) + "</font></div></td>";      
+                html += "</tr>";
+				
+				$("#tableFoot").html(html);
+				
+				calcPayment();
+				
+				$(".rmItem").click(function(e) {
+					var index =  event.currentTarget.id;
+					logZoe("rm index: "+index)
+					index = index.substring(index.indexOf("_")+1);
+                    removeItem(index);
+                }); 
+
+			}
+			
+			var total;
+			function calcPayment(){
+				total = totalAmount + (totalAmount*tax);
+				$("#total").html("<strong>$" + totalAmount.toFixed(2) + "</strong>"); 
+			}
+			
+			function removeItem(index){
+				currentItems.splice(index,1);
+				renderItems();
+			}
+			
+			function selTermChange(event){
+				termSelectedIndex = $("#selTerm")[0].selectedIndex-1;
+
+				console.log("selTermChange #Date=" + $("#Date").val());
+				
+				var dateParts = $("#Date").val().split("-");
+
+				var due = new Date(dateParts[0],dateParts[1]-1,dateParts[2]);
+				console.log("selTermChange due=" + due);
+
+				console.log("selTermChange listTerms[termSelectedIndex]=" + JSON.stringify(listTerms[termSelectedIndex]));
+				due = new Date(due.getTime()+(listTerms[termSelectedIndex].stdDueDays*24*60*60*1000));
+				console.log("selTermChange due+term=" + due);
+				
+				var day = ("0" + due.getDate()).slice(-2);
+				var month = ("0" + (due.getMonth() + 1)).slice(-2);
+				var strDue = due.getFullYear()+"-"+(month)+"-"+(day) ;
+				
+				console.log("strDue=" + strDue);
+				
+				$("#Due").val(strDue);
+			}
+
+			var tax=0;
+			function selTaxChange(event){
+				taxSelectedIndex = $("#selTax")[0].selectedIndex-1;
+				calcPayment();
+			}
+
+			function storePayment(){
+				console.log("storePayment");
+				//first remove all payment if exist
+				paymentDAO.delete($('#refNumber').val(),errPaymentInsert, storePaymentCallback);
+			}
+			function storePaymentCallback(){
+				var datapair = $("#signature").jSignature("getData","base30");
+				var datapairPNG = $("#signature").jSignature("getData","image");
+				var customer = listCustomers[customerSelectedIndex];
+				var paymentVO = {
+					id_payment:$('#refNumber').val(),
+					ListID:customer.ListID,
+					po_number:$('#PONumber').val(),
+					dueDate:$('#Due').val(),
+					appliedAmount:0,
+					balanceRemaining:totalAmount,
+					billAddress_addr1:customer.billAddress1,
+					billAddress_addr2:customer.billAddress2,
+					billAddress_addr3:customer.billAddress3,
+					billAddress_city:customer.billAddresCity,
+					billAddress_state:customer.billAddresState,
+					billAddress_postalcode:customer.billAddresZipCode,
+					shipAddress_addr1:customer.shipAddress1,
+					shipAddress_addr2:customer.shipAddress1,
+					shipAddress_addr3:customer.shipAddress1,
+					shipAddress_city:customer.shipAddressCity,
+					shipAddress_state:customer.shipAddressState,
+					shipAddress_postalcode:customer.shipAddressZipcode,
+					id_salesrep:salesrepVO.id_salesrep,
+					isPaid:false,
+					isPending:true,
+					refNumber:$('#refNumber').val(),
+					TaxPercentage:0,
+					salesTaxTotal:0,
+					txnDate:$("#Date").val(),
+					shipDate:$("#Date").val(),
+					subtotal:totalAmount,
+					id_term:$("#selTerm").val(),
+					memo:$("#memo").val(),
+					customerMsg_ListID:($("#selCustomerMsg").val()=="choose-one")?null:$("#selCustomerMsg").val(),
+					signature:"data:"+ datapair[0] + "," + datapair[1],
+					signaturePNG:"data:"+ datapairPNG[0] + "," + datapairPNG[1],
+					items: new Array()
+				}
+				
+				paymentVO.items = currentItems;
+				paymentVO.origin = "local";
+				console.log("storePayment paymentVO=" + JSON.stringify(paymentVO));
+				var paymentsVO = [paymentVO];
+				paymentDAO.store(paymentsVO, errPaymentInsert, successPaymentInsert);
+				return false;
+			}
+		
+		function successPaymentInsert(){
+			$("#isPersisted").val("true");
+			paymentDAO.markToSync($('#refNumber').val(), errPaymentInsert, successPaymentInsertMark);
+			isPersistedChange();
+		}
+		
+		function successPaymentInsertMark(){
+			alert("Success in Payment store");
+		}
+
+		function errPaymentInsert(err){
+			alert("Fail to update payment:" + JSON.stringify(err));
+		}
+		
+		function isPersistedChange(){
+			if ($("#isPersisted").val() == "true"){
+				$("#signature").jSignature("disable");
+				$('#cameraButton').closest('.ui-btn').show();
+			}
+		}
+		
+		var id_paymentPhoto;
+		function onClickPrint(){
+				if ($("#isPersisted").val() == "false"){
+					alert("Please, save payment first!");
+					return false;
+				}
+				window.localStorage.setItem("id_payment", $("#refNumber").val());
+				console.log("onClickPaymentPreview id_payment=" + window.localStorage.getItem("id_payment"));
+				window.location = "PaymentPreview.html?id_payment=" + $("#refNumber").val();
+			}
+
+		
+			var id_paymentPhoto;
+			function onClickGetPhoto(){
+				if ($("#isPersisted").val() == "false"){
+					alert("Please, save payment first!");
+					return false;
+				}
+				id_paymentPhoto = $('#refNumber').val();
+				navigator.camera.getPicture( photoSuccess, photoError, {quality: 20, destinationType: Camera.DestinationType.DATA_URL, encodingType: Camera.EncodingType.JPEG} );
+			}
+			
+			function photoSuccess(imageData){
+				var paymentVO = {
+					id_payment: id_paymentPhoto,
+					photo: imageData
+				}
+				paymentDAO.storePhoto(paymentVO, photoStoreFail, photoStoreSuccess);
+			}
+			
+			function photoStoreSuccess(){
+				alert("success: photo stored");
+			}
+			
+			function photoStoreFail(err){
+				alert("fail: the photo was not stored error:" + JSON.stringify(err));
+			}
+
+			function photoError(){
+				alert("error photo");
+			}
+		
+		
+
+  </script>
+<style type="text/css">
+thead {color:black;}
+tbody {color:gray;}
+tfoot {
+	color:#ff770f;
+	font-weight:bolder;
+}
+table, th, td {
+    border: 1px solid black;
+}
+</style>
+</head>
+ 
+<body> 
+
+<div data-role="page" id="payment" data-theme="a" data-title="Payment new">
+    
+	<div data-role="content">	
+		<form id="formulario" >
+            <div data-role="fieldcontain">
+              <div>
+              <label for="selCustomer" class="select">Select a Customer:</label>
+              </div>
+              <select name="selCustomer" id="selCustomer" onChange="selCustomerChange()">
+              </select>
+            </div>
+            <div data-role="fieldcontain">
+              <div>
+              <label for="selTerm" class="select">Select a Term:</label>
+              </div>
+              <select name="selTerm" id="selTerm" onChange="selTermChange()">
+              </select>
+            </div>
+            
+            <div class="ui-grid-a" style="height:95px">
+              <div class="ui-block-a" style="height:100%">            
+                <div data-role="fieldcontain">
+                  <div>
+                  <label for="Date">Date:</label>
+                  </div>
+                  <input type="date" name="Date" id="Date" value="" readonly />
+                </div>
+              </div>
+            <div class="ui-block-b" style="height:100%">
+              <div data-role="fieldcontain">
+                <div>
+                <label for="Due">Due:</label>
+                </div>
+                <input type="date" name="Due" id="Due" value="" readonly />
+              </div>
+			</div>
+           </div>
+
+            <div class="ui-grid-a" style="height:95px">
+              <div class="ui-block-a" style="height:100%">            
+                <div data-role="fieldcontain">
+                  <div>
+                  <label for="refNumber">Ref#:</label>
+                  </div>
+                  <input type="text" name="refNumber" id="refNumber" value="" readonly />
+                </div>
+              </div>
+            <div class="ui-block-b" style="height:100%">
+              <div data-role="fieldcontain">
+                <div>
+                <label for="PONumber">PO Number:</label>
+                </div>
+                <input type="text" name="PONumber" id="PONumber" value=""/>
+              </div>
+			</div>
+           </div>
+
+              <div data-role="fieldcontain">
+	              <label for="SalesRep">Sales Rep:</label>
+	              <input type="text" name="SalesRep" id="SalesRep" readonly  />              
+             </div>
+
+
+
+        <!--    <a href="#" data-role="button" data-icon="plus" data-iconpos="left"><div align="left">Add Item</div></a> -->
+<!-- BEGIN ADD ITEM -->
+            <div data-role="collapsible" id="addItem">
+                <h4>Add Item</h4>
+                <p>Add items to the payment one by one.</p>
+				<div data-role="fieldcontain">					
+                    <div>
+						<label for="selProduct" class="select">Select a Product:</label>
+					</div>
+					<select name="selProduct" id="selProduct" onChange="selProductChange(event)">
+						<option value="option1"></option>
+					</select>            	
+				</div>
+
+                <div class="ui-grid-a" style="height:45px">
+                  <div class="ui-block-a" style="height:95%">
+                    <div class="ui-field-contain">
+                      <label for="Quantity">Quantity:</label>
+                    </div>
+                  </div>
+                  <div class="ui-block-b" style="height:100%" align="right">
+                    <input type="number" name="Quantity" id="Quantity" align="right" onChange="calcItem(event)">
+                  </div>
+                </div>
+                
+                <div class="ui-grid-a" style="height:45px">
+                  <div class="ui-block-a" style="height:95%">
+                    <div class="ui-field-contain" >
+                      <label for="RatePrice">Rate/Price Each:</label>
+                    </div>
+                  </div>
+                  <div class="ui-block-b" style="height:100%">
+                    <input type="number" step="0.01" name="RatePrice" id="RatePrice" align="right">
+                  </div>
+                </div>
+                
+                <div class="ui-grid-a" style="height:45px">
+                  <div class="ui-block-a" style="height:95%">
+                    <div class="ui-field-contain">
+                      <label for="Amount">Amount:</label>
+                    </div>
+                  </div>
+                  <div class="ui-block-b" style="height:100%">
+                    <input type="number" step="0.01" name="Amount" id="Amount" align="right" readonly>
+                  </div>
+                </div>
+    
+                <div class="ui-grid-b" style="width:100%">
+                    <div class="ui-block-a" style="width:49%"><button type="button" id="add" data-theme="b" onClick="addItem()">Add</button></div>	   
+                    <div class="ui-block-b" style="width:2%"></div>	   
+                    <div class="ui-block-c" style="width:49%"><button type="button" id="cancel" data-theme="c" onClick="clearItem()">Cancel</button></div>
+                </div> 
+            </div>
+<!-- END   ADD ITEM -->
+
+
+
+
+            <div class="ui-grid-a" >                
+                <table class="ui-table" width="100%" border="0" cellspacing="" cellpadding="0" align="center" id="tableItems">
+                  <thead class="ui-page-theme-a">
+                    <tr>
+                      <th>RM</th>
+                      <th>Product</th>
+                      <th>Qty</th>
+                      <th>Price</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tfoot id="tableFoot">
+                  </tfoot>
+                  <tbody id="tableBodyItems">
+                  </tbody>
+                </table> 
+            </div>
+
+             <div class="ui-grid-a" style="height:95px">
+                <div class="ui-block-a" style="height:100%">           
+                <div data-role="fieldcontain">
+                  <div>
+                  <label for="selTax" class="select">Sales Tax:</label>
+                  </div>
+                  <select name="selTax" id="selTax" onChange="selTaxChange()">
+                  </select>
+                </div>
+                </div>
+                <div class="ui-block-b" style="height:100%" align="right">
+                    <br><br><br>
+                    <label id="tax">$0.00</label>
+                </div>
+             </div>
+            <div class="ui-grid-a" style="height:65px">                
+                <div class="ui-block-a" style="height:100%">
+                  <br><br>
+                  <label>Total:</label>
+                </div>
+                <div class="ui-block-b" style="height: 100%; font-size: 2em;" align="right">
+                  <br>
+                  <label id="total"><strong>$0.00</strong></label>
+                </div>
+            </div>
+            <div class="ui-grid-a" style="height:45px">                
+                <div class="ui-block-a" style="height:100%">
+                  <label>Balance Due:</label>
+                </div>
+                <div class="ui-block-b" style="height: 100%; font-weight: bold; color: #6ACC24; font-size: 2em;" align="right">
+                  <label>$0.00</label>
+                </div>
+            </div>
+
+           <div data-role="fieldcontain">
+              <div>
+              <label for="selCustomerMsg">Customer Message:</label>
+              </div>
+              <select name="selCustomerMsg" id="selCustomerMsg"></select>
+              <div>
+              <label for="memo">Add a memo:</label>
+              </div>
+		      <textarea rows="8" name="memo" id="memo"></textarea>
+            </div>
+            
+
+              <div>
+              <label for="signature">Signature:</label>
+              </div>
+
+			<div style="background-color:#D3D3D3;">
+                <div id="signature" style="height:160px; border-top-style: solid;  border-right-style: solid;  border-bottom-style: solid; border-left-style: solid;"></div>
+            </div>
+          
+                        
+            <fieldset class="ui-grid-b">
+                <div class="ui-block-a">
+                	<a data-role="button" data-icon="delete" data-iconpos="left"  id="resetsignature" data-rel="back" onClick="$('#signature').jSignature('reset'); $('#signature').jSignature('enable'); return false;">reset signature</a>
+                 </div>
+                <div class="ui-block-b">
+                	<a id="cameraButton" data-role="button" data-icon="camera" data-iconpos="left" data-ajax="false" onClick="onClickGetPhoto(); return false;">Photo</a>
+                </div>
+                <div class="ui-block-c">
+                	<a id="printButton" data-role="button" data-icon="print" data-iconpos="left" data-ajax="false" onClick="onClickPrint(); return false;">Print</a>
+                </div>
+
+            </fieldset>
+                             
+            <fieldset class="ui-grid-a">
+                <div class="ui-block-a"><button type="button" id="submit" data-theme="b" onClick="storePayment(); return false;">Done</button></div>
+                <div class="ui-block-b"><button type="button" id="cancel" data-rel="back" data-theme="b">Cancel</button></div>	   
+            </fieldset>    
+            
+            
+            <input type="hidden" id="isPersisted" name="isPersisted" value="false" onChange="isPersistedChange()">          
+              
+
+      </form>		
+	</div>
+
+			<!-- divs de header, menu y footer-->
+			<div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
+			<div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
+			<div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
+			<!-- fin divs -->    
+
+</div>
+</body>
+</html>

@@ -158,6 +158,8 @@
 				syncTerms();
 			}else if (whatToDownload[currentDown] == "syncClasses" ){
 				syncClasses();
+			}else if (whatToDownload[currentDown] == "syncPaymentMethods" ){
+				syncPaymentMethods();
 			}else if (whatToDownload[currentDown] == "syncDownInventory" ){
 				syncInventoryItems();
 			}else if (whatToDownload[currentDown] == "syncDownPricelevel" ){
@@ -896,7 +898,7 @@
 		alert("DB Error synch inventory: "+JSON.stringify(err));
 	}
 
-//SYNCHRONIZATION Others	
+//SYNCHRONIZATION Terms	
 	function syncTerms(form){
 		console.log("entre a syncTerms");
 		var mensaje = 	
@@ -937,6 +939,8 @@
 		alert("DB Error synch terms: "+JSON.stringify(err));
 	}
 
+
+//SYNCHRONIZATION Taxes	
 	function syncTaxes(form){
 		console.log("entre a syncTaxes");
 		var mensaje = 	
@@ -1010,6 +1014,45 @@
 	
 	function errClassInsert(err){
 		alert("DB Error synch classes: "+JSON.stringify(err));
+	}
+
+//SYNCHRONIZATION PaymentMethods	
+	function syncPaymentMethods(form){
+		console.log("entre a syncPaymentMethods");
+		var mensaje = 	
+		'<PaymentMethodQueryRq  requestID="PaymentMethod1"><ActiveStatus>ActiveOnly</ActiveStatus></PaymentMethodQueryRq>';
+		var cache="paymentmethod";
+		
+		consumeWS(mensaje, "JSON", receivePaymentMethodsMessage, cache);
+		return false;
+	}
+
+	function receivePaymentMethodsMessage(message){
+		var paymentMethods = message.PaymentMethodQueryRs.PaymentMethodRet;
+		var i;
+		var paymentMethodsVO = [];
+		for (i=0;i<paymentMethods.length;i++){
+			logZoe("paymentMethods[i]=" + JSON.stringify(paymentMethods[i]));
+			var paymentMethodVO = {
+				ListID:paymentMethods[i].ListID,
+				name : paymentMethods[i].Name,
+				type : paymentMethods[i].PaymentMethodType
+			}
+			paymentMethodsVO[i] = paymentMethodVO;
+			
+		}
+			
+		paymentMethodDAO.deleteAll(errPaymentMethodInsert);
+		paymentMethodDAO.store(paymentMethodsVO, errPaymentMethodInsert, successPaymentMethodInsert);
+	}
+
+
+	function successPaymentMethodInsert(){
+		downNext();
+	}
+	
+	function errPaymentMethodInsert(err){
+		alert("DB Error synch paymentMethods: "+JSON.stringify(err));
 	}
 
 //SYNCHRONIZATION pricelevel	
@@ -1202,6 +1245,7 @@
                         <option value="syncTaxes">Taxes</option>
                         <option value="syncTerms">Terms</option>
                         <option value="syncClasses">Classes</option>
+                        <option value="syncPaymentMethods">Payment Methods</option>
                         <option value="syncCustomerMsgs">Customer Messages</option>
                         <option value="syncDownInventory">Inventory</option>
                         <option value="syncDownPricelevel">Pricelevel</option>
