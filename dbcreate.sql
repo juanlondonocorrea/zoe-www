@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 25/07/2015
+Modified: 27/07/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -25,9 +25,6 @@ DROP INDEX IF EXISTS IX_Relationship18@
 DROP INDEX IF EXISTS IX_Relationship21@
 DROP INDEX IF EXISTS IX_Relationship23@
 DROP INDEX IF EXISTS IX_Relationship15@
-DROP INDEX IF EXISTS IX_Relationship14@
-DROP INDEX IF EXISTS IX_Relationship16@
-DROP INDEX IF EXISTS IX_Relationship17@
 DROP INDEX IF EXISTS IX_VENDOR_NAME@
 DROP INDEX IF EXISTS IX_Inventory_fullName@
 DROP INDEX IF EXISTS IX_Relationship6@
@@ -57,8 +54,6 @@ DROP TABLE IF EXISTS PaymentMethod@
 DROP TABLE IF EXISTS class@
 DROP TABLE IF EXISTS log@
 DROP TABLE IF EXISTS InvoiceLinkedTxn@
-DROP TABLE IF EXISTS paymentMethod@
-DROP TABLE IF EXISTS Payments@
 DROP TABLE IF EXISTS Vendor@
 DROP TABLE IF EXISTS customer_msg@
 DROP TABLE IF EXISTS pricelevel_item@
@@ -458,40 +453,6 @@ CREATE TABLE Vendor
 )@
 
 CREATE INDEX IX_VENDOR_NAME ON Vendor (name)@
-
--- Table Payments
-
-CREATE TABLE Payments
-(
-  TxnID TEXT NOT NULL,
-  TxnDate NUMERIC NOT NULL,
-  ExchangeRate TEXT,
-  RefNumber TEXT,
-  TotalAmount TEXT,
-  memo TEXT,
-  paymentmethod_ListID TEXT,
-  customer_ListID TEXT,
-  CONSTRAINT Key12 PRIMARY KEY (TxnID),
-  CONSTRAINT TxnID UNIQUE (TxnID),
-  CONSTRAINT Relationship14 FOREIGN KEY (paymentmethod_ListID) REFERENCES paymentMethod (ListID),
-  CONSTRAINT Relationship16 FOREIGN KEY (paymentmethod_ListID) REFERENCES customer (ListID),
-  CONSTRAINT Relationship17 FOREIGN KEY (customer_ListID) REFERENCES customer (ListID)
-)@
-
-CREATE INDEX IX_Relationship14 ON Payments (paymentmethod_ListID)@
-
-CREATE INDEX IX_Relationship16 ON Payments (paymentmethod_ListID)@
-
-CREATE INDEX IX_Relationship17 ON Payments (customer_ListID)@
-
--- Table paymentMethod
-
-CREATE TABLE paymentMethod
-(
-  ListID TEXT NOT NULL,
-  FullName TEXT,
-  CONSTRAINT Key11 PRIMARY KEY (ListID)
-)@
 
 -- Table InvoiceLinkedTxn
 
