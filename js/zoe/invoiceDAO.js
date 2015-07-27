@@ -133,7 +133,7 @@ function doSelectInvoice(tx){
 	" vendor.country as vendor_country " +
 	" FROM invoice " +
 	" LEFT JOIN salesrep ON salesrep.id_salesrep = invoice.id_salesrep " +
-	" LEFT JOIN customer ON customer.ListID = customer.ListID " +
+	" LEFT JOIN customer ON customer.ListID = invoice.ListID " +
 	" LEFT JOIN vendor ON vendor.ListID = customer.vendor_ListID " +
 	" LEFT JOIN term ON term.id_term = invoice.id_term " +
 	" LEFT JOIN customer_msg as cm ON cm.ListID = invoice.customerMsg_ListID " +
@@ -168,9 +168,10 @@ function invoiceLocalReceiveFunction(tx,results){
 		invoiceVO=results.rows.item(0);
 			if (includeInvoiceDetails){
 					tx.executeSql("SELECT LineID, id_invoice, Inventory_ListID, invoice_item.Desc, " +
-					" Quantity, Rate, Amount, SalesTax_ListID, salesTax.Name as salesTax_Name"+
+					" Quantity, Rate, Amount, invoice_item.SalesTax_ListID, salesTax.Name as salesTax_Name, inventory.FullName as Inventory_FullName"+
 					" FROM invoice_item " +
 					" LEFT JOIN salesTax ON salesTax.ListID = invoice_item.SalesTax_ListID " +
+					" LEFT JOIN inventory ON inventory.ListID = invoice.inventory_ListID "+
 					" Where id_invoice = ?", [filterDataInvoice],invoiceItemsLocalReceiveFunction, invoiceLocalErrFunc);
 			}else{
 				invoiceReceiveFunction(invoiceVO);
