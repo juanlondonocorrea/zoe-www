@@ -12,7 +12,8 @@ var invoiceDAO = {listBySalesrep:listInvoicesBySalesrep,
 				delete:deleteInvoice, 
 				markToSync:markToSyncInvoice, 
 				markSynchronized:doMarkSynchorinizedInvoice,
-				generateRefNum:doGenerateRefNum
+				generateRefNum:doGenerateRefNum,
+				itemsSoldByDayRange:listItemsSoldByDateRange
 			};
 var filterDataInvoice;
 var invoiceReceiveFunction;
@@ -55,6 +56,15 @@ function listInvoicesBySalesrep(salesrep_ListID, aReceiveFunction,aErrFunc){
 	invoiceErrFunc = aErrFunc;
 	filterDataInvoice = salesrep_ListID;
 	db.transaction(doSalesrepInvoices, invoiceErrFunc);
+}
+
+function listItemsSoldByDateRange(initDate, finalDate, aReceiveFunction, aErrFunc){
+	db = openDatabaseZoe();
+	logZoe("listItemsSoldByDay db=" + db);
+	invoiceReceiveListFunction = aReceiveFunction;
+	invoiceErrFunc = aErrFunc;	
+	filterDataInvoice = [initDate,finalDate];
+	db.transaction(doItemsSoldByDateRange, invoiceErrFunc);
 }
 
 function listInvoicesByCustomer(customer_ListID, aReceiveFunction,aErrFunc){
@@ -165,6 +175,17 @@ function doSalesrepInvoices(tx){
 	tx.executeSql("SELECT id_invoice, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term,id_salesrep, customerMsg_ListID, memo, origin FROM invoice WHERE id_salesrep = ?", [filterDataInvoice],invoiceLocalListReceiveFunction, invoiceErrFunc);
 }
 
+function doItemsSoldByDateRange(){
+	logZoe("doItemsSoldByDateRange");
+	tx.executeSql("SELECT inventory.ListID, inventory.FullName, inventory.salesDesc, SUM(invoice_item.Quantity) AS Quantity " +
+	" FROM invoice " +
+	" LEFT JOIN invoice_item ON invoice_item.id_invoice = invoice.id_invoice " +
+	" LEFT JOIN inventory ON inventory.ListID = invoice_item.Inventory_ListID " +
+	" WHERE txnDate BETWEEN ? AND ? " +
+	" GROUP BY inventory.ListID " +
+	" ORDER BY Quantity DESC;", [filterDataInvoice],invoiceLocalListReceiveFunction, invoiceErrFunc);
+}
+
 function doListInvoicesToUpload(tx){
 	var selectStr = "SELECT invoice.*, invoice_item.*, inventorySite_ListID, customer.FullName as companyName " +
 	"FROM invoice LEFT JOIN invoice_item ON invoice.id_invoice = invoice_item.id_invoice " +
@@ -198,11 +219,11 @@ function invoiceLocalReceiveFunction(tx,results){
 	if (results.rows.length>0){
 		invoiceVO=results.rows.item(0);
 			if (includeInvoiceDetails){
-					tx.executeSql("SELECT LineID, id_invoice, Inventory_ListID, invoice_item.Desc, " +
+					tx.executeSql("SELECT LineID, id_invoice, invoice_item.Inventory_ListID, invoice_item.Desc, " +
 					" Quantity, Rate, Amount, invoice_item.SalesTax_ListID, salesTax.Name as salesTax_Name, inventory.FullName as Inventory_FullName"+
 					" FROM invoice_item " +
 					" LEFT JOIN salesTax ON salesTax.ListID = invoice_item.SalesTax_ListID " +
-					" LEFT JOIN inventory ON inventory.ListID = invoice.inventory_ListID "+
+					" LEFT JOIN inventory ON inventory.ListID = invoice_item.Inventory_ListID "+
 					" Where id_invoice = ?", [filterDataInvoice],invoiceItemsLocalReceiveFunction, invoiceLocalErrFunc);
 			}else{
 				invoiceReceiveFunction(invoiceVO);

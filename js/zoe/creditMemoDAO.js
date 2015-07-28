@@ -270,7 +270,7 @@ function creditMemoLocalListToUploadReceiveFunction(tx,results){
 				Rate:rec.Rate,
 				Amount:rec.Amount,
 				SalesTax_ListID:rec.SalesTax_ListID,
-				class_ListID:rec.class_ListID,
+				class_ListID:rec.class_ListID
 		}
 
 		creditMemoVO.items[indexItem] = creditMemoItemVO;
@@ -320,7 +320,7 @@ function doStoreOneCreditMemo(tx, rec){
 			 var item = rec.items[i];
 			 console.log("item=" + JSON.stringify(item));
 			 console.log("elementos=" + JSON.stringify([item.LineID,rec.id_creditMemo,item.Inventory_ListID,item.Desc,item.Quantity,item.Rate,item.Amount,item.salesTax_ListID]));
-			 tx.executeSql('INSERT OR REPLACE INTO creditMemo_item(LineID,id_creditMemo,Inventory_ListID,Desc,Quantity,Rate,Amount,SalesTax_ListID, class_ListID) VALUES(?,?,?,?,?,?,?,?,?)',[item.LineID,rec.id_creditMemo,ifUndefNull(item.Inventory_ListID),item.Desc,item.Quantity,item.Rate,item.Amount,ifUndefNull(item.salesTax_ListID),ifUndefNull(item.class_ListID)]);
+			 tx.executeSql('INSERT INTO creditMemo_item(LineID,id_creditMemo,Inventory_ListID,Desc,Quantity,Rate,Amount,SalesTax_ListID, class_ListID) VALUES(?,?,?,?,?,?,?,?,?)',[item.LineID,rec.id_creditMemo,ifUndefNull(item.Inventory_ListID),item.Desc,item.Quantity,item.Rate,item.Amount,ifUndefNull(item.salesTax_ListID),ifUndefNull(item.class_ListID)]);
 		 }
 	 }
 }
