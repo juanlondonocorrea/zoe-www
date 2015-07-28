@@ -13,7 +13,7 @@ var invoiceDAO = {listBySalesrep:listInvoicesBySalesrep,
 				markToSync:markToSyncInvoice, 
 				markSynchronized:doMarkSynchorinizedInvoice,
 				generateRefNum:doGenerateRefNum,
-				itemsSoldByDayRange:listItemsSoldByDateRange
+				itemsSoldByDateRange:listItemsSoldByDateRange
 			};
 var filterDataInvoice;
 var invoiceReceiveFunction;
@@ -63,6 +63,7 @@ function listItemsSoldByDateRange(initDate, finalDate, aReceiveFunction, aErrFun
 	logZoe("listItemsSoldByDay db=" + db);
 	invoiceReceiveListFunction = aReceiveFunction;
 	invoiceErrFunc = aErrFunc;	
+	filterDataInvoice = new Array();
 	filterDataInvoice = [initDate,finalDate];
 	db.transaction(doItemsSoldByDateRange, invoiceErrFunc);
 }
@@ -175,15 +176,16 @@ function doSalesrepInvoices(tx){
 	tx.executeSql("SELECT id_invoice, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term,id_salesrep, customerMsg_ListID, memo, origin FROM invoice WHERE id_salesrep = ?", [filterDataInvoice],invoiceLocalListReceiveFunction, invoiceErrFunc);
 }
 
-function doItemsSoldByDateRange(){
+function doItemsSoldByDateRange(tx){
 	logZoe("doItemsSoldByDateRange");
-	tx.executeSql("SELECT inventory.ListID, inventory.FullName, inventory.salesDesc, SUM(invoice_item.Quantity) AS Quantity " +
+	var selRange = "SELECT inventory.ListID, inventory.FullName, inventory.salesDesc, SUM(invoice_item.Quantity) AS Quantity " +
 	" FROM invoice " +
 	" LEFT JOIN invoice_item ON invoice_item.id_invoice = invoice.id_invoice " +
 	" LEFT JOIN inventory ON inventory.ListID = invoice_item.Inventory_ListID " +
 	" WHERE txnDate BETWEEN ? AND ? " +
 	" GROUP BY inventory.ListID " +
-	" ORDER BY Quantity DESC;", [filterDataInvoice],invoiceLocalListReceiveFunction, invoiceErrFunc);
+	" ORDER BY Quantity DESC;"
+	tx.executeSql(selRange, filterDataInvoice, invoiceLocalListReceiveFunction, invoiceErrFunc);
 }
 
 function doListInvoicesToUpload(tx){

@@ -23,19 +23,7 @@
 			});
 
  			function initThisPage(event){
-				if (event.currentTarget.URL && event.currentTarget.URL.indexOf("?")>-1){
-					var parameters = event.currentTarget.URL.split("?")[1].split("&");
-					for (var i in parameters){
-						var parameterDupla = parameters[i].split("=");
-						if (parameterDupla[0]=="id_invoice"){
-							id_invoice = parameterDupla[1];
-						}
-					}
-					
-				}				
-				if (id_invoice){
-					invoiceDAO.itemsSoldByDateRange('2015-06-01', '2015-06-19', receiveItemsSoldByDateRange,errReceiveItemsSoldByDateRange);
-				}
+				invoiceDAO.itemsSoldByDateRange('2015-06-01', '2015-06-19', receiveItemsSoldByDateRange,errReceiveItemsSoldByDateRange);
 			}
 
 		// Cordova Device Ready.
@@ -45,7 +33,7 @@
 				//Check whether the printer is available or not.
 				function (isAvailable) {
 					 //Enter the page location.
-					 var page = $('#InvoicePreview').html(); //location.href;
+					 var page = $('#itemsSoldByDay_1').html(); //location.href;
 					 cordova.plugins.printer.print(page, 'Document.html', function () {
 					 alert('printing finished or canceled')
 						});
@@ -62,7 +50,7 @@
 			}
 			// END functions on error case
 
-			function receiveItemsSoldByDateRange(InitialDate, FinalDate, itemsSold){
+			function receiveItemsSoldByDateRange(itemsSold, InitialDate, FinalDate){
 				var totalItems = 0.00;
 				var itemsSoldByDay = '<table class="tblItemsSold">'
 				  +'<tbody>'
@@ -77,13 +65,12 @@
 					for (var i=0; i < itemsSold.length; i++) {
 						itemsSoldByDay +=
 						'<tr>'
-						  +'<td><div class="TinyFont">'+itemsSold[i].ListID+'-'+InvoiceVO.items[i].Desc+'</div></td>'
+						  +'<td><div class="TinyFont">'+itemsSold[i].ListID+'</div></td>'
 						  +'<td><div class="TinyFont">$ '+itemsSold[i].FullName+'</div></td>'
 						  +'<td><div class="TinyFont">'+itemsSold[i].salesDesc+'</div></td>'
 						  +'<td><div class="TinyFont" align="right">'+NumberCast(itemsSold[i].Quantity,0)+'</div></td>';
 						itemsSoldByDay +='</tr>';
 						totalItems += itemsSold[i].Quantity;
-						logZoe("itemsSoldByDay: ============> "+itemsSoldByDay);
 						}
 				}
 				else {
@@ -98,7 +85,7 @@
 						+'<td><div align="right" class="TinyFont">'+NumberCast(totalItems,0, '')+'</div></td>'
 					+'</tr>';
 				itemsSoldByDay += '</tbody></table>';
-				$("#tableBodyItems").html(itemsSoldByDay); 
+				$("#tableBodyItemsSold").html(itemsSoldByDay); 
 				print();
 			} 
 		</script>
@@ -123,11 +110,11 @@
 			.tblHeader { 
 				border: 1px solid black;
 			}
-			.tblItems { 
+			.tblItemsSold { 
 				width: 100%; border-spacing: 0px;cellspacing: 0px;cellpadding: 0px;padding: 0px;
 			}
 
-			table.tblItems td{
+			table.tblItemsSold td{
 				border:1px solid black;
 			}
 
@@ -140,7 +127,7 @@
 	</head> 
 
 	<body>
-        <div data-role="page" id="itemsSoldByDay_1" data-title="Items sold byday" data-theme="a">
+        <div data-role="page" id="itemsSoldByDay_1" data-title="Items sold by day" data-theme="a">
             <div data-role="content">
               <div id="tableBodyItemsSold"></div>
             </div>
