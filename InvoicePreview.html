@@ -158,13 +158,14 @@
 					for (var i=0; i < InvoiceVO.items.length; i++) {
 						invoiceItems +=
 						'<tr>'
-						  +'<td><div class="TinyFont">'+InvoiceVO.items[i].Desc+'</div></td>'
+						  +'<td><div class="TinyFont">'+InvoiceVO.items[i].Inventory_FullName+'-'+InvoiceVO.items[i].Desc+'</div></td>'
 						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(InvoiceVO.items[i].Rate,2, 0.00)+'</div></td>'
 						  +'<td><div align="right" class="TinyFont">'+NumberCast(InvoiceVO.items[i].Quantity,0, 0)+'</div></td>'
 						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(InvoiceVO.items[i].Amount,2, 0.00)+'</div></td>';
 						invoiceItems += '<td><div class="TinyFont">'+NumberCast(InvoiceVO.items[i].salesTax_Name,0, '')+'</div></td>';
 						invoiceItems +='</tr>';
 						TotItems += InvoiceVO.items[i].Quantity;
+						logZoe("invoiceItems: ============> "+invoiceItems);
 						}
 				}
 				else {
