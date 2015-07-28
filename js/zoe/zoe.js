@@ -18,6 +18,9 @@
 		  console.log("target=" + target);
 		  console.log("toPage=" + toPage);
 		  if(!toPage || toPage.indexOf("Login") < 0  && toPage.indexOf("config")<0) {
+			  if (toPage && toPage.indexOf(".html")>-1){
+				   window.localStorage.setItem("pageToGoAfterLogin",toPage);
+			  }
 			checkSession();
 		  }
 
@@ -48,9 +51,9 @@
 				}
 				
 logZoe("en checkSession lastAccess=" + lastAccess);
-logZoe("actualiza lastAccess parseInt(lastAccess, 10) + 5*60*1000)="+(parseInt(lastAccess, 10) + 5*60*1000));
+logZoe("actualiza lastAccess parseInt(lastAccess, 10) + 5*60*1000)="+(parseInt(lastAccess, 10) + 480*60*1000));
 logZoe("actualiza lastAccess  Date.now()="+ Date.now());
-				if (lastAccess=="null" || lastAccess==null || (parseInt(lastAccess, 10) + 5*60*1000) < Date.now()) {
+				if (lastAccess=="null" || lastAccess==null || (parseInt(lastAccess, 10) + 480*60*1000) < Date.now()) {
 logZoe("redirige al login");
 					window.localStorage.setItem('lastAccess', null);
 logZoe("redirige al login2");

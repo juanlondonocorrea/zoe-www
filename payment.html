@@ -93,6 +93,47 @@
 				renderItems();
 			}
 			
+			var customerSelectedIndex;
+			function selCustomerChange(event, ui){
+				console.log("selCustomerChange val=" + $( "#selCustomer" ).val());
+				customerSelectedIndex = $( "#selCustomer" )[0].selectedIndex-1;
+				console.log("selCustomerChange custseleccionado=" + JSON.stringify(listCustomers[customerSelectedIndex]));
+				invoiceDAO.listByCustomerPending($( "#selCustomer" ).val(),receiveInvoices,errReceive);
+			}
+
+
+			var listPendingInvoices = new Array();	
+			function receiveInvoices(list){
+				if (list && list.length){
+					listPendingInvoices = list;
+				}else if (list && !list.length){
+					listPendingInvoices = [list];
+				}
+				console.log("receiveInvoices length="+list.length); 
+				var html = '';
+				var plantilla = $("#invoiceSelTemplate").html();
+				for (var i in listPendingInvoices) {
+					var text = plantilla;
+					text = replaceAll(text, "@id_invoice",listPendingInvoices[i].id_invoice);
+					text = replaceAll(text, "@refNumber",listPendingInvoices[i].refNumber);
+					text = replaceAll(text, "@dueDate",listPendingInvoices[i].dueDate);
+					text = replaceAll(text, "@balanceRemaining",NumberCast(listPendingInvoices[i].balanceRemaining,2,0));
+					text = replaceAll(text, "@paymentAmount",NumberCast(listPendingInvoices[i].paymentAmount,2,0));
+					text = replaceAll(text, "@i",i);
+					html += text;
+				}
+				$('#ui-listInvoices').html(html);
+				
+/*				 $('[type=checkbox]').checkboxradio().trigger('create');
+				 $('.group').controlgroup().trigger('create');*/
+				 $('#ui-listInvoices').trigger('create');
+				 
+				 
+
+				console.log("html=" +  html);
+			}
+			
+			
 			var allLoaded = false;
 			function waitAllLoad(){
 				console.log("waitAllLoad");
@@ -113,8 +154,7 @@
 				salesrepVO = obj;
 				console.log("salesRep=" + JSON.stringify(salesrepVO));
 				
-				$('#refNumber').val( paymentDAO.generateRefNum(salesrepVO.initial+ "") );
-				$('#PONumber').val($('#refNumber').val());
+				$('#id_payment').val( paymentDAO.generateRefNum(salesrepVO.initial+ "") );
 				$("#SalesRep").val(window.localStorage.getItem("salesRepName"));
 
 				var now = new Date();
@@ -122,7 +162,7 @@
 				var month = ("0" + (now.getMonth() + 1)).slice(-2);
 				var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
 
-				$("#Date").val(today);
+				$("#TxnDate").val(today);
 				console.log("currDate=" + today);
 
 			}
@@ -132,7 +172,7 @@
 				listCustomers = list;
 				console.log("receiveCustomers length="+list.length); 
 				$('#selCustomer').empty();
-				$('#selCustomer').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');
+				$('#selCustomer').append('<option value="" data-placeholder="true">Choose one...</option>');
 				for (var i in list) {
 					$('#selCustomer').append('<option value="' + list[i].ListID +'">'+list[i].FullName+'</option>');
 				}
@@ -145,7 +185,7 @@
 				listPaymentMethods = list;
 				console.log("receivePaymentMethods length="+list.length); 
 				$('#selPaymentMethod').empty();
-				$('#selPaymentMethod').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');
+				$('#selPaymentMethod').append('<option value="" data-placeholder="true">Choose one...</option>');
 				for (var i in list) {
 					console.log("term =" + JSON.stringify(list[i]));
 					$('#selPaymentMethod').append('<option value="' + list[i].id_paymentmethod +'">'+list[i].Name+'</option>');
@@ -156,6 +196,47 @@
 	
 			function storePayment(){
 				console.log("storePayment");
+				var totalAmount = $("#totalAmount").val()*1;
+				var sumPaymentAmount =  $("#sumPaymentAmount").val()*1;
+				var selPaymentMethod = $("#selPaymentMethod").val();
+				var selCustomer = $("#selCustomer").val();
+				if (selCustomer == ""){
+					alert("No customer selected");
+					return;
+				}
+				if (selPaymentMethod == ""){
+					alert("No payment method selected");
+					return;
+				}
+				if (totalAmount<=0){
+					alert("Total amount is not defined");
+					return false;
+				}
+				
+				if (sumPaymentAmount == 0){
+					alert("No invoice selected");
+					return false;
+				}
+				
+				if (sumPaymentAmount<totalAmount){
+					if (!confirm("Sum of invoice payment (" + sumPaymentAmount + ") is less than total amount(" + totalAmount + ").  Are you sure to store this payment?")){
+						return false;
+					}
+				}
+				
+				var paymentVO = {
+					id_payment: $("#id_payment").val(),
+					TxnDate: $("#TxnDate").val(),
+					refNumber: $("#refNumber").val(),
+					totalAmount: $("#totalAmount").val(),
+					memo: $("#memo").val(),
+					ListID: $("#selCustomer").val(),
+					origin:"local",
+					needSync:1,
+					items:new Array()
+				}
+				
+
 				//first remove all payment if exist
 				paymentDAO.delete($('#refNumber').val(),errPaymentInsert, storePaymentCallback);
 			}
@@ -221,6 +302,49 @@
 			alert("Fail to update payment:" + JSON.stringify(err));
 		}
 		
+		
+		function onChangeCheckInvoice(event){
+			var selectedIndex = event.target.value;
+			var invoice = listPendingInvoices[selectedIndex];
+			var totalAmount = $("#totalAmount").val()*1;
+			var sumPaymentAmount =  $("#sumPaymentAmount").val()*1;
+			
+			if (event.target.checked) {
+				invoice.selected = true;
+				if ($("#paymentAmount_"+selectedIndex).val()=="" || $("#paymentAmount_"+selectedIndex).val()*1==0){
+					var balanceRemaining = invoice.balanceRemaining;
+					if (balanceRemaining > totalAmount-sumPaymentAmount){
+						balanceRemaining =  totalAmount-sumPaymentAmount;
+					}
+					$("#paymentAmount_"+selectedIndex).val(NumberCast(balanceRemaining,2,0));
+					if (balanceRemaining == 0){
+						invoice.selected = false;
+					}
+				}
+			}else{
+				invoice.selected = false;
+				$("#paymentAmount_"+selectedIndex).val("");
+			}
+			$("#checkSelInvoice_"+selectedIndex).prop("checked",invoice.selected).checkboxradio("refresh");
+			recalcAll();
+		}
+		
+		function onChangePaymentAmount(event){
+			recalcAll();
+		}
+		
+		function recalcAll(){
+			var sumPaymentAmount=0;
+			for (i in listPendingInvoices){
+				var invoice = listPendingInvoices[i];
+				if (invoice.selected){
+					sumPaymentAmount += $("#paymentAmount_"+i).val()*1;
+				}
+			}
+			$("#sumPaymentAmount").val(NumberCast(sumPaymentAmount, 2,0));
+		}
+		
+		
   </script>
 <style type="text/css">
 thead {color:black;}
@@ -241,6 +365,7 @@ table, th, td {
     
 	<div data-role="content">	
 		<form id="formulario" >
+        	<input type="hidden" name="id_payment" id="id_payment">
             <div data-role="fieldcontain">
               <div>
               <label for="selCustomer" class="select">Select a Customer:</label>
@@ -252,63 +377,60 @@ table, th, td {
               <div>
               <label for="selPaymentMethod" class="select">Select a Payment Method:</label>
               </div>
-              <select name="selPaymentMethod" id="selPaymentMethod" onChange="selPaymentMethodChange()">
+              <select name="selPaymentMethod" id="selPaymentMethod">
               </select>
             </div>
             
             <div class="ui-grid-a" style="height:95px">
               <div class="ui-block-a" style="height:100%">            
                 <div data-role="fieldcontain">
-                  <div>
                   <label for="Date">Date:</label>
-                  </div>
-                  <input type="date" name="Date" id="Date" value="" readonly />
+                  <input type="date" name="TxnDate" id="TxnDate" value="" readonly />
+                </div>
+              </div>
+              <div class="ui-block-b" style="height:100%">            
+                <div data-role="fieldcontain">
+                  <label for="refNumber">Ref#:</label>
+                  <input type="text" name="refNumber" id="refNumber" value="" />
                 </div>
               </div>
            </div>
+
+         <div data-role="fieldcontain">
+              <label for="SalesRep">Sales Rep:</label>
+              <input type="text" name="SalesRep" id="SalesRep" readonly  />              
+         </div>
 
             <div class="ui-grid-a" style="height:95px">
               <div class="ui-block-a" style="height:100%">            
                 <div data-role="fieldcontain">
-                  <div>
-                  <label for="refNumber">Ref#:</label>
-                  </div>
-                  <input type="text" name="refNumber" id="refNumber" value="" readonly />
+                  <label for="totalAmount">Total Amount</label>
+                  <input type="number" name="totalAmount" id="totalAmount" step="0.01" required/>
+                </div>
+              </div>
+              <div class="ui-block-b" style="height:100%">            
+                <div data-role="fieldcontain">
+                  <label for="sumPaymentAmount">Sum payments</label>
+                  <input type="number" name="sumPaymentAmount" id="sumPaymentAmount" value="" readonly/>
                 </div>
               </div>
            </div>
-
-              <div data-role="fieldcontain">
-	              <label for="SalesRep">Sales Rep:</label>
-	              <input type="text" name="SalesRep" id="SalesRep" readonly  />              
-             </div>
-
-
-
-        <!--    <a href="#" data-role="button" data-icon="plus" data-iconpos="left"><div align="left">Add Item</div></a> -->
-<!-- BEGIN ADD ITEM -->
-            <div data-role="collapsible" id="addItem">
-                <h4>Add Invoice</h4>
-                <p>Add items to the payment one by one.</p>
-				<div data-role="fieldcontain">					
-                    <div>
-						<label for="selInvoice" class="select">Select a Invoice:</label>
-					</div>
-					<select name="selInvoice" id="selInvoice">
-						<option value="option1"></option>
-					</select>            	
-				</div>
-
     
-                <div class="ui-grid-b" style="width:100%">
-                    <div class="ui-block-a" style="width:49%"><button type="button" id="add" data-theme="b" onClick="addItem()">Add</button></div>	   
-                    <div class="ui-block-b" style="width:2%"></div>	   
-                    <div class="ui-block-c" style="width:49%"><button type="button" id="cancel" data-theme="c" onClick="clearItem()">Cancel</button></div>
-                </div> 
+    	<ul data-role="listview" id="ui-listInvoices" data-filter="true" data-filter-placeholder="Invoices..." data-inset="true">
+        	<!--inject-->
+        </ul>
+
+		   <!-- plantilla detalle de payment -->
+           <div id="invoiceSelTemplate" style="display:none">
+           		<li>
+	                <label for="checkSelInvoice_@i">@refNumber Due date: @dueDate</label><input type="checkbox" class="checkInvoices_class" name="checkSelInvoice_@i" id="checkSelInvoice_@i" onClick="onChangeCheckInvoice(event); return true;" value="@i"/>
+                	<fieldset class="ui-grid-a">
+                        <div class="ui-block-a"><label for="balanceRemaining_@i">Balance:</label><input type="number" name="balanceRemaining_@i" id="balanceRemaining_@i"  value="@balanceRemaining" readonly></div>
+                        <div class="ui-block-b"><label for="paymentAmount_@i">Payment:</label><input type="number" name="paymentAmount_@i" id="paymentAmount_@i"  value="@paymentAmount" onChange="onChangePaymentAmount(event)"></div>
+                    </fieldset>
+                    <input type="hidden" name="id_invoice_@i" value="@id_invoice">
+                </li>
             </div>
-<!-- END   ADD ITEM -->
-
-
 
 
             <fieldset class="ui-grid-a">
