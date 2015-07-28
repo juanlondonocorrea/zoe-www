@@ -37,6 +37,7 @@ DROP INDEX IF EXISTS IX_invoice_terms@
 DROP INDEX IF EXISTS IX_INVOICE_SYNC@
 DROP INDEX IF EXISTS IX_Relationship10@
 DROP INDEX IF EXISTS IX_Relationship11@
+DROP INDEX IF EXISTS idx_invoice_date@
 DROP INDEX IF EXISTS customer_idx1@
 DROP INDEX IF EXISTS IX_sales_rep_customer@
 DROP INDEX IF EXISTS IX_Relationship3@
@@ -254,6 +255,8 @@ CREATE INDEX IX_INVOICE_SYNC ON invoice (needSync)@
 CREATE INDEX IX_Relationship10 ON invoice (id_salesrep)@
 
 CREATE INDEX IX_Relationship11 ON invoice (customerMsg_ListID)@
+
+CREATE INDEX idx_invoice_date ON invoice (txnDate)@
 
 -- Table creditMemo
 

@@ -236,6 +236,18 @@
 					items:new Array()
 				}
 				
+				for (i in listPendingInvoices){
+					var invoice = listPendingInvoices[i];
+					if (invoice.selected){
+						var paymentAppliedToVO={
+							TxnID: invoice.id_invoice,
+							id_payment: paymentVO.id_payment,
+							paymentAmount: $("#paymentAmount_"+i).val()*1 
+						}
+						items[items.length] = paymentAppliedToVO;
+					}
+				}
+				
 
 				//first remove all payment if exist
 				paymentDAO.delete($('#refNumber').val(),errPaymentInsert, storePaymentCallback);

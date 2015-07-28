@@ -365,6 +365,14 @@ $(document).ready(function() {
 
 			function storeInvoice(){
 				console.log("storeInvoice");
+				if (termSelectedIndex<1){
+					alert("Please select a term");
+					return false;
+				}
+				if (!currentItems || currentItems.length<1){
+					alert("Please add at least one item");
+					return false;
+				}
 				//first remove all invoice if exist
 				invoiceDAO.delete($('#refNumber').val(),errInvoiceInsert, storeInvoiceCallback);
 			}
