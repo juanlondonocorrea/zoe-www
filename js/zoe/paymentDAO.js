@@ -201,32 +201,21 @@ function doStorePayment(tx){
 }
 
 function doStoreOnePayment(tx, rec){
-		tx.executeSql('INSERT OR REPLACE INTO payment(id_payment, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, signature,signaturePNG,  photo, origin) ' +
-		' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?,?,?, ?, ?)',
-		[rec.id_payment, rec.ListID, ifUndefNull(rec.po_number)+"", ifUndefNull(rec.txnDate), 
-		ifUndefNull(rec.dueDate), ifUndefNull(rec.appliedAmount), ifUndefNull(rec.balanceRemaining), 
-		ifUndefNull(rec.billAddress_addr1), ifUndefNull(rec.billAddress_addr2), 
-		ifUndefNull(rec.billAddress_addr3), ifUndefNull(rec.billAddress_city), 
-		ifUndefNull(rec.billAddress_state), ifUndefNull(rec.billAddress_postalcode), 
-		ifUndefNull(rec.shipAddress_addr1), ifUndefNull(rec.shipAddress_addr2), 
-		ifUndefNull(rec.shipAddress_addr3), ifUndefNull(rec.shipAddress_city), 
-		ifUndefNull(rec.shipAddress_state), ifUndefNull(rec.shipAddress_postalcode), 
-		ifUndefNull(rec.isPaid), ifUndefNull(rec.isPending), ifUndefNull(rec.refNumber)+"", 
-		ifUndefNull(rec.TaxPercentage), ifUndefNull(rec.salesTaxTotal), ifUndefNull(rec.shipDate), 
-		ifUndefNull(rec.subtotal), ifUndefNull(rec.id_term), ifUndefNull(rec.id_salesrep), 
-		ifUndefNull(rec.customerMsg_ListID), ifUndefNull(rec.memo), ifUndefNull(rec.signature), 
-		ifUndefNull(rec.signaturePNG), ifUndefNull(rec.photo), ifUndefNull(rec.origin)] );
+		tx.executeSql('INSERT OR REPLACE INTO payment(id_payment, TxnDate, refNumber, totalAmount, memo, ListID, paymentMethod_ListID, id_creditMemo, origin,zoeUpdateDate, zoeSyncDate, needSync) ' +
+		' values (?,?,?,?,?,?,?,?,?,?,?,?)',
+		[rec.id_payment, rec.TxnDate, ifUndefNull(rec.refNumber)+"", ifUndefNull(rec.totalAmount), 
+		ifUndefNull(rec.memo), ifUndefNull(rec.ListID), ifUndefNull(rec.paymentMethod_ListID), 
+		ifUndefNull(rec.id_creditMemo), ifUndefNull(rec.origin), 
+		$.datepicker.formatDate('yy-mm-dd', new Date()), null, rec.needSync] );
 		
 	 if (rec.items){
 	 	console.log("storing payment items")
 		 for (var i=0;i<rec.items.length;i++){
 			 var item = rec.items[i];
 			 console.log("item=" + JSON.stringify(item));
-			 console.log("elementos=" + JSON.stringify([item.LineID,rec.id_payment,item.Inventory_ListID,item.Desc,item.Quantity,item.Rate,item.Amount,item.salesTax_ListID]));
-			 tx.executeSql('INSERT INTO payment_item(LineID,id_payment,Inventory_ListID,Desc,Quantity,Rate,Amount,SalesTax_ListID) '+
-			 ' VALUES(?,?,?,?,?,?,?,?)',
-			 [item.LineID,rec.id_payment,ifUndefNull(item.Inventory_ListID),ifUndefNull(item.Desc),ifUndefNull(item.Quantity),
-			 ifUndefNull(item.Rate),ifUndefNull(item.Amount),ifUndefNull(item.salesTax_ListID)]);
+			 tx.executeSql('INSERT INTO payment_item(TxnID,id_payment,paymentAmount) '+
+			 ' VALUES(?,?,?)',
+			 [item.TxnID,rec.id_payment,ifUndefNull(item.paymentAmount)]);
 		 }
 	 }
 }

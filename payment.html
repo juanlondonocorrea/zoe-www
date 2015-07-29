@@ -224,6 +224,10 @@
 					}
 				}
 				
+				//first remove all payment if exist
+				paymentDAO.delete($('#id_payment').val(),errPaymentInsert, storePaymentCallback);
+			}
+			function storePaymentCallback(){
 				var paymentVO = {
 					id_payment: $("#id_payment").val(),
 					TxnDate: $("#TxnDate").val(),
@@ -248,53 +252,6 @@
 					}
 				}
 				
-
-				//first remove all payment if exist
-				paymentDAO.delete($('#refNumber').val(),errPaymentInsert, storePaymentCallback);
-			}
-			function storePaymentCallback(){
-				var datapair = $("#signature").jSignature("getData","base30");
-				var datapairPNG = $("#signature").jSignature("getData","image");
-				var customer = listCustomers[customerSelectedIndex];
-				var paymentVO = {
-					id_payment:$('#refNumber').val(),
-					ListID:customer.ListID,
-					po_number:$('#PONumber').val(),
-					dueDate:$('#Due').val(),
-					appliedAmount:0,
-					balanceRemaining:totalAmount,
-					billAddress_addr1:customer.billAddress1,
-					billAddress_addr2:customer.billAddress2,
-					billAddress_addr3:customer.billAddress3,
-					billAddress_city:customer.billAddresCity,
-					billAddress_state:customer.billAddresState,
-					billAddress_postalcode:customer.billAddresZipCode,
-					shipAddress_addr1:customer.shipAddress1,
-					shipAddress_addr2:customer.shipAddress1,
-					shipAddress_addr3:customer.shipAddress1,
-					shipAddress_city:customer.shipAddressCity,
-					shipAddress_state:customer.shipAddressState,
-					shipAddress_postalcode:customer.shipAddressZipcode,
-					id_salesrep:salesrepVO.id_salesrep,
-					isPaid:false,
-					isPending:true,
-					refNumber:$('#refNumber').val(),
-					TaxPercentage:0,
-					salesTaxTotal:0,
-					txnDate:$("#Date").val(),
-					shipDate:$("#Date").val(),
-					subtotal:totalAmount,
-					id_term:$("#selTerm").val(),
-					memo:$("#memo").val(),
-					customerMsg_ListID:($("#selCustomerMsg").val()=="choose-one")?null:$("#selCustomerMsg").val(),
-					signature:"data:"+ datapair[0] + "," + datapair[1],
-					signaturePNG:"data:"+ datapairPNG[0] + "," + datapairPNG[1],
-					items: new Array()
-				}
-				
-				paymentVO.items = currentItems;
-				paymentVO.origin = "local";
-				console.log("storePayment paymentVO=" + JSON.stringify(paymentVO));
 				var paymentsVO = [paymentVO];
 				paymentDAO.store(paymentsVO, errPaymentInsert, successPaymentInsert);
 				return false;
@@ -354,6 +311,7 @@
 				}
 			}
 			$("#sumPaymentAmount").val(NumberCast(sumPaymentAmount, 2,0));
+ 			$("#unapplied").val(NumberCast($("#totalAmount").val()*1 - sumPaymentAmount, 2,0));
 		}
 		
 		
@@ -413,17 +371,23 @@ table, th, td {
               <input type="text" name="SalesRep" id="SalesRep" readonly  />              
          </div>
 
-            <div class="ui-grid-a" style="height:95px">
+            <div class="ui-grid-b" style="height:95px">
               <div class="ui-block-a" style="height:100%">            
                 <div data-role="fieldcontain">
                   <label for="totalAmount">Total Amount</label>
-                  <input type="number" name="totalAmount" id="totalAmount" step="0.01" required/>
+                  <input type="number" name="totalAmount" id="totalAmount" step="0.01" align="right" required/>
                 </div>
               </div>
               <div class="ui-block-b" style="height:100%">            
                 <div data-role="fieldcontain">
                   <label for="sumPaymentAmount">Sum payments</label>
-                  <input type="number" name="sumPaymentAmount" id="sumPaymentAmount" value="" readonly/>
+                  <input type="number" name="sumPaymentAmount" id="sumPaymentAmount" value="" align="right" readonly/>
+                </div>
+              </div>
+              <div class="ui-block-c" style="height:100%">            
+                <div data-role="fieldcontain">
+                  <label for="Unapplied">Unapplied</label>
+                  <input type="number" name="unapplied" id="unapplied" value="" align="right"  readonly/>
                 </div>
               </div>
            </div>
@@ -443,6 +407,11 @@ table, th, td {
                     <input type="hidden" name="id_invoice_@i" value="@id_invoice">
                 </li>
             </div>
+
+         <div data-role="fieldcontain">
+              <label for="memo">Memo:</label>
+              <textarea rows="3" name="memo" id="memo"></textarea>              
+         </div>
 
 
             <fieldset class="ui-grid-a">
