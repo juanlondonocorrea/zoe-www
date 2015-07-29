@@ -259,7 +259,7 @@
 		
 		function successPaymentInsert(){
 			$("#isPersisted").val("true");
-			paymentDAO.markToSync($('#refNumber').val(), errPaymentInsert, successPaymentInsertMark);
+			paymentDAO.markToSync($('#id_payment').val(), errPaymentInsert, successPaymentInsertMark);
 			isPersistedChange();
 		}
 		

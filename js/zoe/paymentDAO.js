@@ -206,14 +206,14 @@ function doStoreOnePayment(tx, rec){
 		[rec.id_payment, rec.TxnDate, ifUndefNull(rec.refNumber)+"", ifUndefNull(rec.totalAmount), 
 		ifUndefNull(rec.memo), ifUndefNull(rec.ListID), ifUndefNull(rec.paymentMethod_ListID), 
 		ifUndefNull(rec.id_creditMemo), ifUndefNull(rec.origin), 
-		$.datepicker.formatDate('yy-mm-dd', new Date()), null, rec.needSync] );
+		formatDate(new Date(),'yyyy-mm-dd'), null, rec.needSync] );
 		
 	 if (rec.items){
 	 	console.log("storing payment items")
 		 for (var i=0;i<rec.items.length;i++){
 			 var item = rec.items[i];
 			 console.log("item=" + JSON.stringify(item));
-			 tx.executeSql('INSERT INTO payment_item(TxnID,id_payment,paymentAmount) '+
+			 tx.executeSql('INSERT INTO paymentAppliedTo(TxnID,id_payment,paymentAmount) '+
 			 ' VALUES(?,?,?)',
 			 [item.TxnID,rec.id_payment,ifUndefNull(item.paymentAmount)]);
 		 }
