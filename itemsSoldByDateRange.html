@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Customers</title>
+
+		<link rel="stylesheet" href="css/themes/zoe.min.css" />
+		<link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+		<link rel="stylesheet" href="js/jquery-mobile/jquery.mobile.structure-1.4.5.min.css" />
+		<link rel="stylesheet" href="js/jqm-inlinetabs/jqm-inlinetabs.min.css" />
+
+		<!--  <link rel="stylesheet" href="js/jquery-mobile/jquery.mobile-1.4.5.min.css" />  -->
+		<script src="js/jquery-mobile/jquery-2.1.4.js"></script>
+		<script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+		<script type="text/javascript" src="cordova.js"></script>
+		<script src="js/zoe/zoe.js"></script>
+        <script src="js/zoe/invoiceDAO.js"></script>
+
+		<script>
+			$(document).bind("pagebeforecreate", function(event) {
+				initAnyPage(event.target);
+				initThisPage(event);
+			});
+			
+			var currentDate = new Date();
+			var Date1;
+			var Date2;
+ 			function initThisPage(event){
+				currentDate = currentDate.getFullYear()+'-'+(currentDate.getMonth() +1)+'-'+currentDate.getDate();
+				Date1 = '2015-06-01'; // currentDate;
+			    Date2 = currentDate;
+				invoiceDAO.itemsSoldByDateRange(Date1, Date2, receiveItemsSoldByDateRange,errReceiveItemsSoldByDateRange);
+			}
+
+		// Cordova Device Ready.
+		function print() {
+			try{
+				cordova.plugins.printer.isAvailable(
+				//Check whether the printer is available or not.
+				function (isAvailable) {
+					 //Enter the page location.
+					 var page = $('#itemsSoldByDay_1').html(); //location.href;
+					 cordova.plugins.printer.print(page, 'Document.html', function () {
+					 alert('printing finished or canceled')
+						});
+				}
+			);
+			}catch(e){
+				console.log("could not print:" + e);
+			}
+		}			
+
+			// BEGIN Functions on error case
+			function errReceiveItemsSoldByDateRange(err){
+				alert("DB Error Items Sold By Date Range: "+JSON.stringify(err));
+			}
+			// END functions on error case
+
+			function receiveItemsSoldByDateRange(itemsSold, InitialDate, FinalDate){
+				var totalItems = 0.00;
+				$("#tableBodyItemsSold").html("");
+				var itemsSoldByDay = '<div class="MediumFont" align="center">Items Sold since '+Date1+' to '+Date2+'</div>'
+				+'<table class="tblItemsSold">'
+				  +'<tbody>'
+					+'<tr>' 
+					  +'<td><div class="TinyFont">Fullname</div></td>'
+					  +'<td><div class="TinyFont">Description</div></td>'
+					  +'<td><div class="TinyFont">Quantity</div></td>'
+					+'</tr>';
+				if (itemsSold){
+					for (var i=0; i < itemsSold.length; i++) {
+						itemsSoldByDay +=
+						'<tr>'
+						  +'<td><div class="TinyFont">'+itemsSold[i].FullName+'</div></td>'
+						  +'<td><div class="TinyFont">'+itemsSold[i].salesDesc+'</div></td>'
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(itemsSold[i].Quantity,0)+'</div></td>';
+						itemsSoldByDay +='</tr>';
+						totalItems += itemsSold[i].Quantity;
+						}
+				}
+				else {
+					itemsSoldByDay +=
+						'<tr>'
+							+'<td colspan="3"><div align="center" class="TinyFont">No items sold</div></td>'
+						+'</tr>';
+				}
+				itemsSoldByDay +=
+					'<tr>'
+						+'<td colspan="2"><div align="right" class="SmallFontN">Total Items Sold By Day</div></td>'
+						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalItems,0, '')+'</div></td>'
+					+'</tr>';
+				itemsSoldByDay += '</tbody></table>';
+				$("#tableBodyItemsSold").html(itemsSoldByDay); 
+				print();
+			} 
+		</script>
+		<style type="text/css">
+			.BigFont { font-family: Arial; color:black; font-weight:bolder; font-size:14px; vertical-align:top;}
+			.MediumFont {font-family: Arial; color:black; font-weight:bolder; font-size:12px; vertical-align:top;}
+			.SmallFontN {font-family: Arial; color:black; font-weight:bolder; font-size:10px; vertical-align:top;}
+			.SmallFont {font-family: Arial; color:black; font-weight:normal; font-size:10px; vertical-align:top;}
+			.TinyFont {font-family: Arial; color:black; font-weight:bolder; font-size:8px; vertical-align:bottom;}
+
+			.table {
+				margin: 0 auto;
+				border-collapse: collapse;
+				border-spacing: 0px;
+				cellspacing: 0px;
+				cellpadding: 0px;
+				padding: 5px;
+				width: 100%;
+				vertical-align: top;
+			}
+			
+			.tblHeader { 
+				border: 1px solid black;
+			}
+			.tblItemsSold { 
+				width: 100%; border-spacing: 0px;cellspacing: 0px;cellpadding: 0px;padding: 0px;
+			}
+
+			table.tblItemsSold td{
+				border:1px solid black;
+			}
+
+			.tblFooter { 
+				border: 1px solid black;
+			}
+			span { vertical-align:top; }
+			#Footer { float:right; width: 50%;}
+		</style> 
+	</head> 
+
+	<body>
+        <div data-role="page" id="itemsSoldByDay_1" data-title="Items sold by day" data-theme="a">
+            <div data-role="content">
+              <div id="tableBodyItemsSold"></div>
+            </div>
+		</div>				
+	</body>
+</html>
