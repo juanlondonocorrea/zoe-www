@@ -298,6 +298,7 @@ function replaceAll(str, find, replace) {
 //DATE FORMAT
 
     // EXAMPLE alert("now=" + new Date().format("yyyy-mm-dd"));
+    // EXAMPLE2 alert("now=" +dateFormat(new Date(),"yyyy-mm-dd"));
 	
     Date.prototype.format = function (mask, utc) {
         return dateFormat(this, mask, utc);

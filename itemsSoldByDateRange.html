@@ -26,8 +26,8 @@
 			var Date1;
 			var Date2;
  			function initThisPage(event){
-				currentDate = currentDate.getFullYear()+'-'+(currentDate.getMonth() +1)+'-'+currentDate.getDate();
-				Date1 = '2015-06-01'; // currentDate;
+				currentDate = dateFormat(currentDate,"yyyy-mm-dd");
+				Date1 = currentDate;
 			    Date2 = currentDate;
 				invoiceDAO.itemsSoldByDateRange(Date1, Date2, receiveItemsSoldByDateRange,errReceiveItemsSoldByDateRange);
 			}
@@ -67,7 +67,7 @@
 					  +'<td><div class="TinyFont">Description</div></td>'
 					  +'<td><div class="TinyFont">Quantity</div></td>'
 					+'</tr>';
-				if (itemsSold){
+				if (itemsSold && itemsSold.length>0){
 					for (var i=0; i < itemsSold.length; i++) {
 						itemsSoldByDay +=
 						'<tr>'
@@ -78,7 +78,7 @@
 						totalItems += itemsSold[i].Quantity;
 						}
 				}
-				else {
+				else  {
 					itemsSoldByDay +=
 						'<tr>'
 							+'<td colspan="3"><div align="center" class="TinyFont">No items sold</div></td>'
