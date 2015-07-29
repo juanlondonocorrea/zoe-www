@@ -115,7 +115,7 @@ function doListPaymentsToUpload(tx){
 
 function doCustomerPayments(tx){
 	logZoe("doSelectSelesrepPayments");
-	tx.executeSql("SELECT id_payment, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, origin, signature, signaturePNG, photo FROM payment WHERE ListID = ?", [filterDataPayment],paymentLocalListReceiveFunction, paymentErrFunc);
+	tx.executeSql("SELECT * FROM payment WHERE ListID = ?", [filterDataPayment],paymentLocalListReceiveFunction, paymentErrFunc);
 }
 
 function paymentLocalReceiveFunction(tx,results){
@@ -206,7 +206,7 @@ function doStoreOnePayment(tx, rec){
 		[rec.id_payment, rec.TxnDate, ifUndefNull(rec.refNumber)+"", ifUndefNull(rec.totalAmount), 
 		ifUndefNull(rec.memo), ifUndefNull(rec.ListID), ifUndefNull(rec.paymentMethod_ListID), 
 		ifUndefNull(rec.id_creditMemo), ifUndefNull(rec.origin), 
-		formatDate(new Date(),'yyyy-mm-dd'), null, rec.needSync] );
+		dateFormat(new Date(),'yyyy-mm-dd'), null, rec.needSync] );
 		
 	 if (rec.items){
 	 	console.log("storing payment items")
@@ -221,13 +221,13 @@ function doStoreOnePayment(tx, rec){
 }
 
 function doDeleteAllPayments(tx){
-	tx.executeSql('DELETE FROM payment_item',[]);
+	tx.executeSql('DELETE FROM paymentAppliedTo',[]);
 	tx.executeSql('DELETE FROM payment',[]);
 }
 
 function doDeletePayment(tx){
 	console.log("doDeletePayment filterDataPayment=" + filterDataPayment);
-	tx.executeSql('DELETE FROM payment_item where id_payment=?',[filterDataPayment+""]);
+	tx.executeSql('DELETE FROM paymentAppliedTo where id_payment=?',[filterDataPayment+""]);
 	tx.executeSql('DELETE FROM payment where id_payment = ?',[filterDataPayment+""]);
 }
 
@@ -240,7 +240,3 @@ function doMarkSynchorinizedPayment(tx){
 	tx.executeSql("UPDATE payment SET needSync=0, zoeSyncDate=datetime('now', 'localtime') where id_payment = ?",[filterDataPayment+""]);
 }
 
-function doStorePaymentPhoto(tx){
-	logZoe ("doStorePaymentPhoto record=" + JSON.stringify(recordPayment));
-	tx.executeSql("UPDATE payment SET photo=? where id_payment = ?",[recordPayment.photo, recordPayment.id_payment+""]);
-}

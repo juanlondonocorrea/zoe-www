@@ -188,7 +188,7 @@
 				$('#selPaymentMethod').append('<option value="" data-placeholder="true">Choose one...</option>');
 				for (var i in list) {
 					console.log("term =" + JSON.stringify(list[i]));
-					$('#selPaymentMethod').append('<option value="' + list[i].id_paymentmethod +'">'+list[i].Name+'</option>');
+					$('#selPaymentMethod').append('<option value="' + list[i].ListID +'">'+list[i].Name+'</option>');
 				}
 				$('#selPaymentMethod').trigger("chosen:updated");
 			}
@@ -233,6 +233,7 @@
 					TxnDate: $("#TxnDate").val(),
 					refNumber: $("#refNumber").val(),
 					totalAmount: $("#totalAmount").val(),
+					paymentMethod_ListID: $("#selPaymentMethod").val(),
 					memo: $("#memo").val(),
 					ListID: $("#selCustomer").val(),
 					origin:"local",
@@ -248,7 +249,7 @@
 							id_payment: paymentVO.id_payment,
 							paymentAmount: $("#paymentAmount_"+i).val()*1 
 						}
-						items[items.length] = paymentAppliedToVO;
+						paymentVO.items[paymentVO.items.length] = paymentAppliedToVO;
 					}
 				}
 				
@@ -272,6 +273,12 @@
 		}
 		
 		
+		function isPersistedChange(){
+			if ($("#isPersisted").val() == "true"){
+
+			}
+		}
+
 		function onChangeCheckInvoice(event){
 			var selectedIndex = event.target.value;
 			var invoice = listPendingInvoices[selectedIndex];
