@@ -168,8 +168,8 @@ function paymentLocalListReceiveFunction(tx,results){
 	for (i=0;i<results.rows.length;i++){
 	logZoe("paymentLocalListReceiveFunction " + JSON.stringify(results.rows.item(i)));
 		arrayPayments[i] = results.rows.item(i);
-		paymentReceiveListFunction(arrayPayments);
 	}
+	paymentReceiveListFunction(arrayPayments);
 }
 
 
