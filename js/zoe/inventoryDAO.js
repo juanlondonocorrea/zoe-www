@@ -121,8 +121,8 @@ function inventoryLocalReceiveFunction(tx,results){
 	if (results.rows.length>0){
 	logZoe("localReceiveFunction1 " + JSON.stringify(results.rows.item(0)));
 		inventoryVO=results.rows.item(0);
-		inventoryReceiveFunction(inventoryVO);
 	}
+	inventoryReceiveFunction(inventoryVO);
 	logZoe("localReceiveFunction fin");
 }
 

@@ -202,8 +202,8 @@ function creditMemoLocalListReceiveFunction(tx,results){
 	for (i=0;i<results.rows.length;i++){
 	logZoe("creditMemoLocalListReceiveFunction " + JSON.stringify(results.rows.item(i)));
 		arrayCreditMemos[i] = results.rows.item(i);
-		creditMemoReceiveListFunction(arrayCreditMemos);
 	}
+	creditMemoReceiveListFunction(arrayCreditMemos);
 }
 
 function creditMemoLocalListToUploadReceiveFunction(tx,results){

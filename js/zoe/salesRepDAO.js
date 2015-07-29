@@ -35,8 +35,8 @@ function localReceiveFunction(tx,results){
 	if (results.rows.length>0){
 	logZoe("localReceiveFunction1 " + JSON.stringify(results.rows.item(0)));
 		salesRepVO=results.rows.item(0);
-		salesRepReceiveFunction(salesRepVO);
 	}
+	salesRepReceiveFunction(salesRepVO);
 	logZoe("localReceiveFunction fin");
 }
 

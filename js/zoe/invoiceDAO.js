@@ -267,8 +267,8 @@ function invoiceLocalListReceiveFunction(tx,results){
 	for (i=0;i<results.rows.length;i++){
 	logZoe("invoiceLocalListReceiveFunction " + JSON.stringify(results.rows.item(i)));
 		arrayInvoices[i] = results.rows.item(i);
-		invoiceReceiveListFunction(arrayInvoices);
 	}
+	invoiceReceiveListFunction(arrayInvoices);
 }
 
 function invoiceLocalListToUploadReceiveFunction(tx,results){
