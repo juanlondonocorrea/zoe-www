@@ -365,7 +365,11 @@ $(document).ready(function() {
 
 			function storeInvoice(){
 				console.log("storeInvoice");
-				if (termSelectedIndex<1){
+				if (customerSelectedIndex<0){
+					alert("Please select a customer");
+					return false;
+				}
+				if (termSelectedIndex<0){
 					alert("Please select a term");
 					return false;
 				}
@@ -601,7 +605,7 @@ table, th, td {
                     </div>
                   </div>
                   <div class="ui-block-b" style="height:100%">
-                    <input type="number" step="0.01" name="RatePrice" id="RatePrice" align="right">
+                    <input type="number" step="0.01" name="RatePrice" id="RatePrice" align="right" onChange="calcItem(event)">
                   </div>
                 </div>
                 
