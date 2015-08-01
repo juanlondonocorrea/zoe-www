@@ -4,6 +4,7 @@ var invoiceDAO = {listBySalesrep:listInvoicesBySalesrep,
 				listByCustomer:listInvoicesByCustomer,
 				listByCustomerPending:listInvoicesByCustomerPending,
 				listByPayment:listInvoicesByPayment,
+				SalesByCustomerDateRange:listSalesByCustomerDateRange,
 				listToUpload:listInvoicesToUpload,
 				getById:getInvoiceById, 
 				store:storeInvoice, 
@@ -85,6 +86,17 @@ function listInvoicesByCustomerPending(customer_ListID, aReceiveFunction,aErrFun
 	filterDataInvoice = customer_ListID;
 	db.transaction(doCustomerInvoicesPending, invoiceErrFunc);
 }
+
+function listSalesByCustomerDateRange(initDate, finalDate, aReceiveFunction, aErrFunc){
+	db = openDatabaseZoe();
+	logZoe("listSalesByCustomerDateRange db=" + db);
+	invoiceReceiveListFunction = aReceiveFunction;
+	invoiceErrFunc = aErrFunc;	
+	filterDataInvoice = new Array();
+	filterDataInvoice = [initDate,finalDate];
+	db.transaction(doSalesByCustomerDateRange, invoiceErrFunc);
+}
+
 
 function listInvoicesByPayment(payment_id, aReceiveFunction,aErrFunc){
 	db = openDatabaseZoe();
@@ -206,6 +218,14 @@ function doCustomerInvoices(tx){
 function doCustomerInvoicesPending(tx){
 	logZoe("doCustomerInvoicesPending");
 	tx.executeSql("SELECT id_invoice, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, origin, signature, signaturePNG, photo FROM invoice WHERE ListID = ? AND balanceRemaining>0", [filterDataInvoice],invoiceLocalListReceiveFunction, invoiceErrFunc);
+}
+
+function doSalesByCustomerDateRange(tx){
+	logZoe("doSalesByCustomerDateRange");
+	tx.executeSql("SELECT customer.billAddress1, refNumber, txnDate, appliedAmount AS Amount, balanceRemaining AS OpenBalance " +
+	"FROM invoice, customer "+
+	"WHERE invoice.ListID = customer.ListID AND txnDate BETWEEN ? AND ? " +
+	"ORDER BY customer.billAddress1, invoice.txnDate ASC;", filterDataInvoice, invoiceLocalListReceiveFunction, invoiceErrFunc);
 }
 
 function doPaymentInvoices(tx){
