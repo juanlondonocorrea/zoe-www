@@ -11,7 +11,7 @@ var invoiceDAO = {listBySalesrep:listInvoicesBySalesrep,
 				deleteAll:deleteAllInvoices, 
 				delete:deleteInvoice, 
 				markToSync:markToSyncInvoice, 
-				markSynchronized:doMarkSynchorinizedInvoice,
+				markSynchronizedError:markSynchronizedErrorInvoice,
 				generateRefNum:doGenerateRefNum,
 				itemsSoldByDateRange:listItemsSoldByDateRange
 			};
@@ -142,14 +142,13 @@ function markToSyncInvoice(id_invoice,aErrFunc,successCB){
 	db.transaction(doMarkToSyncInvoice, errorCB, successCB);
 }
 
-function markSynchronizedCustomer(id_invoice,aErrFunc,successCB){
+function markSynchronizedErrorInvoice(id_invoice,aErrFunc,successCB){
 	db = openDatabaseZoe();
-	logZoe("markToSyncInvoice db=" + db);
+	logZoe("markSynchronizedErrorInvoice db=" + db);
 	customerErrFunc = aErrFunc;
 	filterDataInvoice = id_invoice;
-	db.transaction(doMarkToSynchronizedInvoice, errorCB, successCB);
+	db.transaction(doMarkSyncErrorInvoice, errorCB, successCB);
 }
-
 
 //----------------------
 //metodos privados
@@ -422,11 +421,11 @@ function doDeleteInvoice(tx){
 
 function doMarkToSyncInvoice(tx){
 	logZoe ("doMarkToSyncInvoice datafiler=" + filterDataInvoice);
-	tx.executeSql("UPDATE invoice SET needSync=1, zoeUpdateDate=datetime('now', 'localtime') where id_invoice = ?",[filterDataInvoice+""]);
+	tx.executeSql("UPDATE invoice SET needSync=1, zoeUpdateDate=datetime('now', 'localtime'), needCorrection=0 where id_invoice = ?",[filterDataInvoice+""]);
 }
 
-function doMarkSynchorinizedInvoice(tx){
-	tx.executeSql("UPDATE invoice SET needSync=0, zoeSyncDate=datetime('now', 'localtime') where id_invoice = ?",[filterDataInvoice+""]);
+function doMarkSyncErrorInvoice(tx){
+	tx.executeSql("UPDATE invoice SET needSync=0, zoeSycDate=datetime('now', 'localtime'), needCorrection=1 where id_invoice = ?",[filterDataInvoice+""]);
 }
 
 function doStoreInvoicePhoto(tx){
