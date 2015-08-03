@@ -259,6 +259,10 @@ $(document).ready(function() {
 					alert("Cannot set quantity " + $("#Quantity").val() + " over inventory available " + listItems[productSelectedIndex].QuantityOnHand);
 					return false;
 				}
+				if (isNaN($("#RatePrice").val()) || $("#RatePrice").val()==""){
+					alert("Rate price must be a number");
+					return false;
+				}
 				var aItem = {"LineID":generateKey(), 
 					"id_invoice": listCustomers[customerSelectedIndex].id_invoice,
 					"Inventory_ListID": listItems[productSelectedIndex].ListID,
