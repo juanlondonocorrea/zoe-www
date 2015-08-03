@@ -68,10 +68,10 @@ function listCreditMemosByCustomer(customer_ListID, aReceiveFunction,aErrFunc){
 function listCreditMemosByCustomerDateRange(initDate, finalDate, aReceiveFunction,aErrFunc){
 	db = openDatabaseZoe();
 	logZoe("listCreditMemosByCustomerDateRange db=" + db);
-	creditMemoReceiveFunction = aReceiveFunction;
+	creditMemoReceiveListFunction = aReceiveFunction;
 	creditMemoErrFunc = aErrFunc;
-	filterDataInvoice = new Array();
-	filterDataInvoice = [initDate,finalDate];	
+	filterDataCreditMemo = new Array();
+	filterDataCreditMemo = [initDate,finalDate];	
 	db.transaction(doCreditMemosByCustomerDateRange, creditMemoErrFunc);
 }
 
@@ -167,8 +167,8 @@ function doCreditMemosByCustomerDateRange(tx){
 	"WHERE creditMemo.ListID = customer.ListID AND txnDate BETWEEN ? AND ? " +
 	"ORDER BY customer.billAddress1, creditMemo.txnDate ASC";
 	logZoe("sql: "+sql);
-	logZoe("filterDataInvoice: "+JSON.stringify(filterDataInvoice));
-	tx.executeSql(sql, filterDataInvoice, creditMemoLocalReceiveFunction, creditMemoErrFunc);
+	logZoe("filterDataCreditMemo: "+JSON.stringify(filterDataCreditMemo));
+	tx.executeSql(sql, filterDataCreditMemo, creditMemoLocalListReceiveFunction, creditMemoErrFunc);
 }
 
 function creditMemoLocalReceiveFunction(tx,results){
