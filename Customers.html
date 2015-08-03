@@ -269,11 +269,11 @@
 						}
 						htmlString2 +='</div></td><td width="20%"  valign="top" style="border:none;">';
 						if (arrayListInvoicesByCust[i].origin == 'local'){
-							htmlString2 += '<a href="invoice.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
+							htmlString2 += '<a href="invoice.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-edit"  data-ajax="false"></a>';
 						}
 						htmlString2 +='<a href="InvoicePreview.html?id_invoice=' + arrayListInvoicesByCust[i].id_invoice +
-						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>';
-					    htmlString2 +='<a onClick="onClickGetPhoto(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;" class="ui-btn ui-btn-icon-notext ui-icon-camera"  data-ajax="false"></a>';
+						'" class="ui-btn ui-btn-icon-notext ui-icon-print ui-corner-all" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;"></a>';
+					    htmlString2 +='<a onClick="onClickGetPhoto(\''+ arrayListInvoicesByCust[i].id_invoice + '\'); return true;" class="ui-btn ui-btn-icon-notext ui-icon-camera ui-corner-all"  data-ajax="false"></a>';
 						htmlString2 +='</td></tr></table></li>';
 						console.log("appliedAmount " + arrayListInvoicesByCust[i].appliedAmount + ", casted=" + NumberCast(arrayListInvoicesByCust[i].appliedAmount,2, 0.00)  )
 						TotBalanceRem += NumberCast(arrayListInvoicesByCust[i].balanceRemaining,2, 0.00)*1;
@@ -486,7 +486,7 @@
 							htmlString3 += '<a href="CreditMemo.html?id_creditMemo=' + arrayListCreditMemosByCust[i].id_creditMemo + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
 						}
 						htmlString3 +='<a href="CreditMemoPreview.html?id_creditMemo=' + arrayListCreditMemosByCust[i].id_creditMemo +
-						'" class="ui-btn ui-btn-icon-notext ui-icon-print" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListCreditMemosByCust[i].id_creditMemo + '\'); return true;"></a>' + 
+						'" class="ui-btn ui-btn-icon-notext ui-icon-print ui-corner-all" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListCreditMemosByCust[i].id_creditMemo + '\'); return true;"></a>' + 
 						'</td></tr></table></li>';
 						TotBalanceRemCM += NumberCast(arrayListCreditMemosByCust[i].balanceRemaining,2, 0.00)*1;
 						TotAmountCM += NumberCast(arrayListCreditMemosByCust[i].appliedAmount,2, 0.00)*1;
@@ -624,14 +624,14 @@
                             <div align="left">
                                 <div class="ui-grid-b">
                                     <div class="ui-block-a">
-                                        <a id="PhoneCall" href="#" class="ui-btn ui-btn-icon-notext ui-icon-phone" onClick="CallPhone();"></a>
+                                        <a id="PhoneCall" href="#" class="ui-btn ui-btn-icon-notext ui-icon-phone ui-corner-all" onClick="CallPhone();"></a>
                                     </div>
                                     <div class="ui-block-b">
-                                        <a id="EmailAddress" href="#" class="ui-btn ui-btn-icon-notext ui-icon-mail" onClick="SendEmail();"></a> 
+                                        <a id="EmailAddress" href="#" class="ui-btn ui-btn-icon-notext ui-icon-mail ui-corner-all" onClick="SendEmail();"></a> 
                                     </div>
                                     <div class="ui-block-c">
                                         <address>
-											<a id="AddressMap" href="#" target="_blank" class="ui-btn ui-btn-icon-notext ui-icon-location" onClick="LocateAddress();"></a>
+											<a id="AddressMap" href="#" target="_blank" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-location" onClick="LocateAddress();"></a>
                                         </address>
                                     </div>
                                 </div><!-- /grid-b -->

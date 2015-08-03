@@ -169,53 +169,6 @@
 			span { vertical-align:top; }
 			#Footer { float:right; width: 50%;}
 			
-			/***FIRST STYLE THE BUTTON***/
-			input#Go{
-				/* display: inline-block;  */
-				display: block;
-				height: 30px;
-				width: 40px;
-				vertical-align: middle;
-				cursor:pointer; /*forces the cursor to change to a hand when the button is hovered*/
-				padding:0px 0px; /*add some padding to the inside of the button*/
-			/*	background:#35b128; the colour of the button*/
-			/*	border:1px solid #33842a; required or the default border for the browser will appear*/
-				/*give the button curved corners, alter the size as required*/
-				-moz-border-radius: 10px;
-				-webkit-border-radius: 10px;
-				border-radius: 10px;
-				/*style the text*/
-				color:#f3f3f3;
-				font-family: Arial; color:black; font-weight:bolder; font-size:10px;
-			}
-
-			.button {
-				display: block;
-				height: 30px;
-				width: 40px;
-				background: #34696f;
-				border: 2px solid rgba(33, 68, 72, 0.59);
-				 
-				/*Step 3: Text Styles*/
-				color: rgba(0, 0, 0, 0.55);
-				text-align: center;
-
-				vertical-align:text-bottom;
-
-				font-family: Arial; color:black; font-weight:bolder; font-size:10px;
-				background: #FFFFFF;			 
-				-webkit-border-radius: 5px;
-				-khtml-border-radius: 5px;
-				-moz-border-radius: 5px;
-				border-radius: 5px;
-
-				 
-			}
-			 
-			/*Step 3: Link Styling*/
-			a.button {
-				text-decoration: none;
-			}			
 		</style> 
 	</head>
 
@@ -223,29 +176,27 @@
         <div data-role="page" id="SalesByCustomer_1" data-title="Sales by Customer" data-theme="a">
             <div data-role="content">
             	<div id="dateRange">
-
-                    <div class="ui-grid-b" style="height:95px">
-                    	<div class="ui-block-a" style="height:100%">            
+                <table>
+                	<tr>
+                    	<td valign="bottom">            
                             <div data-role="fieldcontain" class="SmallFont">
                                 <div class="SmallFontN">Initial Date:</div>
                              	<input type="date" name="InitialDate" id="InitialDate" placeholder="Initial Date" value=""/>
                             </div>
-                    	</div>
-                        <div class="ui-block-b" style="height:100%">
+                         </td>
+                         <td valign="bottom">
                             <div data-role="fieldcontain" class="SmallFont">
                                 <div class="SmallFontN">Final Date:</div>
                                 <input type="date" name="FinalDate" id="FinalDate" placeholder="Final Date" value=""/>
                             </div>
-                        </div>
-                        <div class="ui-block-c" style="height:100%; vertical-align:bottom !important; border: 2px solid #8AC007;">
-                          <div  class="SmallFontN" style="vertical-align:bottom !important; border: 2px solid #8AC007;">
-                          	<!-- <input type="button" name="Go" id="Go" value="Go" onClick="selectSalesDateRange();"/> -->
-                            <a href="#" class="button" onClick="selectSalesDateRange();">Go</a>
-                          </div>
-                        </div>                        
-                   </div>
-                
-                </div>
+                          </td>
+                          <td valign="bottom">
+                              <div  class="SmallFontN">
+                                <a onClick="selectSalesDateRange();" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-carat-r" data-ajax="false">Go</a>
+                              </div>
+                           </td>
+                       </tr>
+                 </table>
               	<div id="tableBodySales"></div>
             </div>
 		</div>				
