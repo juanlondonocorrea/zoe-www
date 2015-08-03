@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 01/08/2015
+Modified: 03/08/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -301,6 +301,7 @@ CREATE TABLE creditMemo
   signature TEXT,
   photo TEXT,
   signaturePNG TEXT,
+  needCorrection INTEGER,
   CONSTRAINT Key4 PRIMARY KEY (id_creditMemo),
   CONSTRAINT Relationship18 FOREIGN KEY (ListID) REFERENCES customer (ListID),
   CONSTRAINT Relationship21 FOREIGN KEY (id_term) REFERENCES term (id_term),
@@ -524,6 +525,7 @@ CREATE TABLE Payment
   zoeUpdateDate INTEGER,
   zoeSyncDate INTEGER,
   needSync INTEGER,
+  needCorrection INTEGER,
   CONSTRAINT Key16 PRIMARY KEY (id_payment),
   CONSTRAINT Relationship26 FOREIGN KEY (ListID) REFERENCES customer (ListID),
   CONSTRAINT Relationship27 FOREIGN KEY (paymentMethod_ListID) REFERENCES PaymentMethod (ListID),
