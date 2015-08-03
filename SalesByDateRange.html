@@ -62,6 +62,7 @@
 			// END functions on error case
 
 			function receiveSalesByCustomerDateRange(sales, InitialDate, FinalDate){
+				console.log("receiveSalesByCustomerDateRange sales=" + JSON.stringify(sales));
 				var totalAmount = 0.00;
 				var totalOpenBalance = 0.00;				
 				$("#tableBodySales").html("");
@@ -73,15 +74,34 @@
 					  +'<td><div class="TinyFont">Invoice #</div></td>'
 					  +'<td><div class="TinyFont">Amount</div></td>'
 					  +'<td><div class="TinyFont">Open Balance</div></td>'
+					  +'<td><div class="TinyFont">Sync</div></td>'
 					+'</tr>';
 				if (sales && sales.length>0){
+					var ico = "";
 					for (var i=0; i < sales.length; i++) {
+						if (sales[i].origin=="local"){
+							if (sales[i].needCorrection=="1"){
+								ico = "warning.png";
+							}else if (sales[i].needSync=="1"){
+								ico = "nosync.png";
+							}else{
+								ico = "sync.png";
+							}
+						}else if (sales[i].origin=="synch"){
+								ico = "sync.png";
+						}
+						console.log("ico=" + ico);
 						salesByCustomer +=
 						'<tr>'
 						  +'<td><div class="TinyFont">'+sales[i].billAddress1+'</div></td>'
 						  +'<td><div class="TinyFont">'+sales[i].refNumber+'</div></td>'
 						  +'<td><div class="TinyFont" align="right">'+NumberCast(sales[i].Amount,0)+'</div></td>'
 						  +'<td><div class="TinyFont" align="right">'+NumberCast(sales[i].OpenBalance,0)+'</div></td>';
+						  if (ico!=""){
+						  	salesByCustomer +='<td><div class="TinyFont" align="right"><img src="css/themes/images/' + ico + '" height="10" width="10"></div></td>';
+						  }else{
+						  	salesByCustomer +='<td><div class="TinyFont" align="right"></div></td>';
+						  }
 						salesByCustomer +='</tr>';
 						logZoe("sales[i].Amount:=========> "+sales[i].Amount);
 						totalAmount += NumberCast(sales[i].Amount,0)*1;

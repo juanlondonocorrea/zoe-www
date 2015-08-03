@@ -221,7 +221,7 @@ function doCustomerInvoicesPending(tx){
 
 function doSalesByCustomerDateRange(tx){
 	logZoe("doSalesByCustomerDateRange");
-	tx.executeSql("SELECT customer.billAddress1, refNumber, txnDate, appliedAmount AS Amount, balanceRemaining AS OpenBalance " +
+	tx.executeSql("SELECT customer.billAddress1, refNumber, txnDate, appliedAmount AS Amount, balanceRemaining AS OpenBalance, invoice.needSync, invoice.needCorrection, invoice.origin " +
 	"FROM invoice, customer "+
 	"WHERE invoice.ListID = customer.ListID AND txnDate BETWEEN ? AND ? " +
 	"ORDER BY customer.billAddress1, invoice.txnDate ASC;", filterDataInvoice, invoiceLocalListReceiveFunction, invoiceErrFunc);
