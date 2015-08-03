@@ -397,17 +397,15 @@
 		var invoices = message.InvoiceQueryRs.InvoiceRet;
 		var i;
 		invoicesVO = [];
-		for (i=0;i<invoices.length;i++){
+		for (i=0;invoices && i<invoices.length;i++){
 			var invoice = invoices[i];
 			
 			var invoiceVO = convertInvoiceFromQB(invoice);
 			invoiceVO.origin = "remote";
 			invoicesVO[i] = invoiceVO;
-			
-				
 		}
-			
 		invoiceDAO.deleteAll(errCustomerInsert,storeInvoices);
+				
 	}
 	
 	function storeInvoices(){
@@ -584,7 +582,7 @@
 		}else{
 			InvoiceAddRs = ListInvoiceAddRs;
 		}
-		console.log("InvoiceAddRs=" +InvoiceAddRs);
+		console.log("InvoiceAddRs=" + JSON.stringify(InvoiceAddRs));
 		var statusMessage =InvoiceAddRs.statusMessage;
 		if (statusMessage == "Status OK"	){
 			currentInvoice = convertInvoiceFromQB(InvoiceAddRs.InvoiceRet);
@@ -594,7 +592,17 @@
 				invoiceDAO.delete(currentInvoice.refNumber,errorInvoiceDB, processedInvoice);
 			});
 		}else{
-			message += "Fail to upload invoice " + InvoiceAddRs.requestID + ":" + statusMessage + "<br>";
+			if ( InvoiceAddRs.statusCode=="3231" ){
+					message += "Invoice " + InvoiceAddRs.requestID + ":" + statusMessage + "<br>";
+					processNextInvoiceResponse();
+			}else {
+				invoiceDAO.markSynchronizedError(InvoiceAddRs.requestID, errorInvoiceDB,function(){
+					currentInvoiceIndex++;
+					message += "Fail to upload invoice " + InvoiceAddRs.requestID + ":" + statusMessage + "<br>";
+					message += "This invoice must be corrected and send it again<br>";
+					processNextInvoiceResponse();
+				});
+			}
 		}
 	}
 	
@@ -631,7 +639,7 @@
 		var creditMemos = message.CreditMemoQueryRs.CreditMemoRet;
 		var i;
 		creditMemosVO = [];
-		for (i=0;i<creditMemos.length;i++){
+		for (i=0;creditMemos && i<creditMemos.length;i++){
 			var creditMemo = creditMemos[i];
 			
 			var creditMemoVO = convertCreditMemoFromQB(creditMemo);

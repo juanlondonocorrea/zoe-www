@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 27/07/2015
+Modified: 01/08/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -24,6 +24,7 @@ DROP INDEX IF EXISTS IX_Relationship25@
 DROP INDEX IF EXISTS IX_Relationship18@
 DROP INDEX IF EXISTS IX_Relationship21@
 DROP INDEX IF EXISTS IX_Relationship23@
+DROP INDEX IF EXISTS IX_creditmemo_date@
 DROP INDEX IF EXISTS IX_Relationship15@
 DROP INDEX IF EXISTS IX_VENDOR_NAME@
 DROP INDEX IF EXISTS IX_Inventory_fullName@
@@ -239,6 +240,7 @@ CREATE TABLE invoice
   signature TEXT,
   photo TEXT,
   signaturePNG TEXT,
+  needCorrection INTEGER,
   CONSTRAINT Key4 PRIMARY KEY (id_invoice),
   CONSTRAINT invoice_custumer FOREIGN KEY (ListID) REFERENCES customer (ListID),
   CONSTRAINT invoice_terms FOREIGN KEY (id_term) REFERENCES term (id_term),
@@ -310,6 +312,8 @@ CREATE INDEX IX_Relationship18 ON creditMemo (ListID)@
 CREATE INDEX IX_Relationship21 ON creditMemo (id_term)@
 
 CREATE INDEX IX_Relationship23 ON creditMemo (customerMsg_ListID)@
+
+CREATE INDEX IX_creditmemo_date ON creditMemo (txnDate)@
 
 -- Table invoice_item
 

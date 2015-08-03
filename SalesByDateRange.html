@@ -61,7 +61,9 @@
 			}
 			// END functions on error case
 
+
 			function receiveSalesByCustomerDateRange(sales){
+				console.log("receiveSalesByCustomerDateRange sales=" + JSON.stringify(sales));
 				var totalAmount = 0.00;
 				var totalOpenBalance = 0.00;				
 				$("#tableBodySales").html("");
@@ -73,20 +75,42 @@
 					  +'<td><div class="TinyFont">Invoice #</div></td>'
 					  +'<td><div class="TinyFont">Amount</div></td>'
 					  +'<td><div class="TinyFont">Open Balance</div></td>'
+					  +'<td><div class="TinyFont">Sync</div></td>'
 					+'</tr>';
 				if (sales && sales.length>0){
+					var ico = "";
 					for (var i=0; i < sales.length; i++) {
+						if (sales[i].origin=="local"){
+							if (sales[i].needCorrection=="1"){
+								ico = "warning.png";
+							}else if (sales[i].needSync=="1"){
+								ico = "nosync.png";
+							}else{
+								ico = "sync.png";
+							}
+						}else if (sales[i].origin=="synch"){
+								ico = "sync.png";
+						}
+						console.log("ico=" + ico);
 						salesByCustomer +=
 						'<tr>'
 						  +'<td><div class="TinyFont">'+sales[i].billAddress1+'</div></td>'
 						  +'<td><div class="TinyFont">'+sales[i].refNumber+'</div></td>'
+
 						  +'<td><div class="TinyFont" align="right">'+NumberCast(sales[i].Amount,2,0)+'</div></td>'
 						  +'<td><div class="TinyFont" align="right">'+NumberCast(sales[i].OpenBalance,2,0)+'</div></td>';
+						  if (ico!=""){
+						  	salesByCustomer +='<td><div class="TinyFont" align="right"><img src="css/themes/images/' + ico + '" height="10" width="10"></div></td>';
+						  }else{
+						  	salesByCustomer +='<td><div class="TinyFont" align="right"></div></td>';
+						  }
 						salesByCustomer +='</tr>';
 						logZoe("sales[i].Amount:=========> "+sales[i].Amount);
+
 						totalAmount += NumberCast(sales[i].Amount,2,0)*1;
 						logZoe("totalAmount: =========>"+totalAmount);
 						logZoe("sales[i].OpenBalance: =========>"+sales[i].OpenBalance);
+						
 						totalOpenBalance += NumberCast(sales[i].OpenBalance,2,0)*1;
 						logZoe("totalOpenBalance: =========>"+totalOpenBalance);
 						}
@@ -94,12 +118,14 @@
 				else  {
 					salesByCustomer +=
 						'<tr>'
+
 							+'<td colspan="4"><div align="center" class="TinyFont">No sales in this dates range</div></td>'
 						+'</tr>';
 				}
 				salesByCustomer +=
 					'<tr>'
 						+'<td colspan="2"><div align="right" class="SmallFontN">Totals Amount & Open Balance</div></td>'
+
 						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalAmount,2,0, '')+'</div></td>'
 						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalOpenBalance,2,0, '')+'</div></td>'
 					+'</tr>';
@@ -173,6 +199,7 @@
 				/*Step 3: Text Styles*/
 				color: rgba(0, 0, 0, 0.55);
 				text-align: center;
+
 				vertical-align:text-bottom;
 
 				font-family: Arial; color:black; font-weight:bolder; font-size:10px;

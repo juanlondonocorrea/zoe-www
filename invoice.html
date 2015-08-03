@@ -83,7 +83,6 @@ $(document).ready(function() {
 			function renderInvoice(){
 				console.log("renderInvoice");
 				$("#selCustomer").val(currentInvoice.ListID).selectmenu('refresh');
-				selCustomerChange();
 				$("#selTerm").val(currentInvoice.id_term).selectmenu('refresh');
 				$("#Date").val(currentInvoice.txnDate);
 				$("#Due").val(currentInvoice.dueDate);
@@ -95,7 +94,11 @@ $(document).ready(function() {
 				$("#memo").val(currentInvoice.memo);
 				$("#selCustomerMsg").val(currentInvoice.customerMsg_ListID).selectmenu('refresh');
 				console.log("currentInvoice.signature=" + currentInvoice.signature);
-				$("#signature").jSignature("setData", currentInvoice.signature);
+				try{
+					$("#signature").jSignature("setData", currentInvoice.signature);
+				}catch(err){
+					console.log(err);
+				}
 				
 				//fill currentItems
 				currentItems = new Array();
@@ -105,6 +108,7 @@ $(document).ready(function() {
 					currentItems[i] = aItem;
 				}
 				renderItems();
+				selCustomerChange();
 			}
 			
 			var allLoaded = false;
@@ -285,6 +289,7 @@ $(document).ready(function() {
 			var totalQuantity=0;
 			var totalAmount=0;
 			function renderItems(){
+				console.log("renderItems currentItems=" + JSON.stringify(currentItems));
 				$("#tableBodyItems").html("");
 				var html="";
 				totalQuantity=0;
