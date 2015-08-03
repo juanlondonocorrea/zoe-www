@@ -80,9 +80,9 @@
 						'<tr>'
 						  +'<td><div class="TinyFont">'+itemsSold[i].FullName+'</div></td>'
 						  +'<td><div class="TinyFont">'+itemsSold[i].salesDesc+'</div></td>'
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(itemsSold[i].Quantity,0)+'</div></td>';
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(itemsSold[i].Quantity,0,0)+'</div></td>';
 						itemsSoldByDay +='</tr>';
-						totalItems += itemsSold[i].Quantity;
+						totalItems += (NumberCast(itemsSold[i].Quantity,0,0)*1);
 						}
 				}
 				else  {

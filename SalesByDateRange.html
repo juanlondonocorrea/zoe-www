@@ -61,7 +61,7 @@
 			}
 			// END functions on error case
 
-			function receiveSalesByCustomerDateRange(sales, InitialDate, FinalDate){
+			function receiveSalesByCustomerDateRange(sales){
 				var totalAmount = 0.00;
 				var totalOpenBalance = 0.00;				
 				$("#tableBodySales").html("");
@@ -80,28 +80,28 @@
 						'<tr>'
 						  +'<td><div class="TinyFont">'+sales[i].billAddress1+'</div></td>'
 						  +'<td><div class="TinyFont">'+sales[i].refNumber+'</div></td>'
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(sales[i].Amount,0)+'</div></td>'
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(sales[i].OpenBalance,0)+'</div></td>';
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(sales[i].Amount,2,0)+'</div></td>'
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(sales[i].OpenBalance,2,0)+'</div></td>';
 						salesByCustomer +='</tr>';
 						logZoe("sales[i].Amount:=========> "+sales[i].Amount);
-						totalAmount += NumberCast(sales[i].Amount,0)*1;
+						totalAmount += NumberCast(sales[i].Amount,2,0)*1;
 						logZoe("totalAmount: =========>"+totalAmount);
 						logZoe("sales[i].OpenBalance: =========>"+sales[i].OpenBalance);
-						totalOpenBalance += NumberCast(sales[i].OpenBalance,0)*1;
+						totalOpenBalance += NumberCast(sales[i].OpenBalance,2,0)*1;
 						logZoe("totalOpenBalance: =========>"+totalOpenBalance);
 						}
 				}
 				else  {
 					salesByCustomer +=
 						'<tr>'
-							+'<td colspan="3"><div align="center" class="TinyFont">No sales in this dates range</div></td>'
+							+'<td colspan="4"><div align="center" class="TinyFont">No sales in this dates range</div></td>'
 						+'</tr>';
 				}
 				salesByCustomer +=
 					'<tr>'
 						+'<td colspan="2"><div align="right" class="SmallFontN">Totals Amount & Open Balance</div></td>'
-						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalAmount,0, '')+'</div></td>'
-						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalOpenBalance,0, '')+'</div></td>'
+						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalAmount,2,0, '')+'</div></td>'
+						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalOpenBalance,2,0, '')+'</div></td>'
 					+'</tr>';
 				salesByCustomer += '</tbody></table>';
 				$("#tableBodySales").html(salesByCustomer); 
@@ -173,7 +173,8 @@
 				/*Step 3: Text Styles*/
 				color: rgba(0, 0, 0, 0.55);
 				text-align: center;
-				vertical-align: middle;
+				vertical-align:text-bottom;
+
 				font-family: Arial; color:black; font-weight:bolder; font-size:10px;
 				background: #FFFFFF;			 
 				-webkit-border-radius: 5px;

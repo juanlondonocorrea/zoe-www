@@ -3,6 +3,7 @@
 var creditMemoDAO = {listBySalesrep:listCreditMemosBySalesrep, 
 				listByCustomer:listCreditMemosByCustomer,
 				listToUpload:listCreditMemosToUpload,
+				creditMemosByCustomerDateRange:listCreditMemosByCustomerDateRange,
 				getById:getCreditMemoById, 
 				store:storeCreditMemo, 
 				deleteAll:deleteAllCreditMemos, 
@@ -62,6 +63,16 @@ function listCreditMemosByCustomer(customer_ListID, aReceiveFunction,aErrFunc){
 	creditMemoErrFunc = aErrFunc;
 	filterDataCreditMemo = customer_ListID;
 	db.transaction(doCustomerCreditMemos, creditMemoErrFunc);
+}
+
+function listCreditMemosByCustomerDateRange(initDate, finalDate, aReceiveFunction,aErrFunc){
+	db = openDatabaseZoe();
+	logZoe("listCreditMemosByCustomerDateRange db=" + db);
+	creditMemoReceiveFunction = aReceiveFunction;
+	creditMemoErrFunc = aErrFunc;
+	filterDataInvoice = new Array();
+	filterDataInvoice = [initDate,finalDate];	
+	db.transaction(doCreditMemosByCustomerDateRange, creditMemoErrFunc);
 }
 
 function listCreditMemosToUpload(aReceiveFunction,aErrFunc){
@@ -149,6 +160,17 @@ function doCustomerCreditMemos(tx){
 	tx.executeSql("SELECT id_creditMemo, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, origin FROM creditMemo WHERE ListID = ?", [filterDataCreditMemo],creditMemoLocalListReceiveFunction, creditMemoErrFunc);
 }
 
+function doCreditMemosByCustomerDateRange(tx){
+	logZoe("doCreditMemosByCustomerDateRange");
+	var sql = "SELECT customer.billAddress1, refNumber, txnDate, appliedAmount AS Amount, balanceRemaining AS OpenBalance " +
+	"FROM creditMemo, customer "+
+	"WHERE creditMemo.ListID = customer.ListID AND txnDate BETWEEN ? AND ? " +
+	"ORDER BY customer.billAddress1, creditMemo.txnDate ASC";
+	logZoe("sql: "+sql);
+	logZoe("filterDataInvoice: "+JSON.stringify(filterDataInvoice));
+	tx.executeSql(sql, filterDataInvoice, creditMemoLocalReceiveFunction, creditMemoErrFunc);
+}
+
 function creditMemoLocalReceiveFunction(tx,results){
 	console.log("creditMemoLocalReceiveFunction includeCreditMemoDetails=" + includeCreditMemoDetails);
 	console.log("creditMemoLocalReceiveFunction results.rows=" + results.rows);
@@ -159,9 +181,10 @@ function creditMemoLocalReceiveFunction(tx,results){
 					tx.executeSql("SELECT LineID, id_creditMemo, Inventory_ListID, creditMemo_item.Desc, " +
 					" Quantity, Rate, Amount, creditMemo_item.SalesTax_ListID, salesTax.Name as salesTax_Name, class.Name as class_Name, inventory.FullName as Inventory_FullName"+
 					" FROM creditMemo_item " +
-					" LEFT JOIN salesTax ON salesTax.ListID = creditMemo_item.SalesTax_ListID LEFT JOIN class ON class.ListID = creditMemo_item.class_ListID " +
+					" LEFT JOIN salesTax ON salesTax.ListID = creditMemo_item.SalesTax_ListID  " +
+					" LEFT JOIN class ON class.ListID = creditMemo_item.class_ListID " +
 					" LEFT JOIN inventory ON inventory.ListID = creditMemo_item.inventory_ListID "+
-					" Where id_creditMemo = ?", [filterDataCreditMemo],creditMemoItemsLocalReceiveFunction, creditMemoLocalErrFunc);
+					" Where id_creditMemo = ?", [filterDataCreditMemo], creditMemoItemsLocalReceiveFunction, creditMemoLocalErrFunc);
 			}else{
 				creditMemoReceiveFunction(creditMemoVO);
 			}
