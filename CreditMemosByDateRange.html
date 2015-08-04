@@ -13,7 +13,7 @@
 		<script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
 		<script type="text/javascript" src="cordova.js"></script>
 		<script src="js/zoe/zoe.js"></script>
-        <script src="js/zoe/invoiceDAO.js"></script>
+        <script src="js/zoe/creditMemoDAO.js"></script>
         <style>
 			.ui-icon-edit{
 				height:16px !important;
@@ -24,7 +24,7 @@
 				width:16px !important;
 			}
 		</style>
-
+        
 		<script>
 			$(document).bind("pagebeforecreate", function(event) {
 				initAnyPage(event.target);
@@ -34,7 +34,7 @@
 			var Date1;
 			var Date2;
  			function initThisPage(event){
-				selectSalesDateRange();
+				selectCreditMemosDateRange();
 			}
 
 			// Cordova Device Ready.
@@ -44,7 +44,7 @@
 					//Check whether the printer is available or not.
 					function (isAvailable) {
 						 //Enter the page location.
-						 var page = $('#SalesByCustomer_1').html(); //location.href;
+						 var page = $('#CreditMemosByCustomer_1').html(); //location.href;
 						 cordova.plugins.printer.print(page, 'Document.html', function () {
 						 alert('printing finished or canceled')
 							});
@@ -55,92 +55,87 @@
 				}
 			}			
 
-			function selectSalesDateRange(){
+			function selectCreditMemosDateRange(){
 				Date1 = $("#InitialDate").val();
 				Date2 = $("#FinalDate").val();
 				logZoe("Date1: ===>"+Date1+"Date2:===> "+Date2);
 				if ((Date1) && (Date2)){
-					logZoe("SalesByCustomerDateRange: =========>SI");
-					invoiceDAO.SalesByCustomerDateRange(Date1, Date2, receiveSalesByCustomerDateRange,errReceiveSalesByCustomerDateRange);
+					logZoe("CreditMemosByCustomerDateRange: =========>SI");
+					creditMemoDAO.creditMemosByCustomerDateRange(Date1, Date2, receiveCreditMemosByCustomerDateRange,errReceiveCreditMemosByCustomerDateRange);
 				}
 			}
 			
 			// BEGIN Functions on error case
-			function errReceiveSalesByCustomerDateRange(err){
-				alert("DB Error Sales By Customer & Date Range: "+JSON.stringify(err));
+			function errReceiveCreditMemosByCustomerDateRange(err){
+				alert("DB Error Credit Memos By Customer & Date Range: "+JSON.stringify(err));
 			}
 			// END functions on error case
 
 
-			function receiveSalesByCustomerDateRange(sales){
-				console.log("receiveSalesByCustomerDateRange sales=" + JSON.stringify(sales));
+			function receiveCreditMemosByCustomerDateRange(creditMemos){
+				console.log("receiveCreditMemosByCustomerDateRange creditMemos=" + JSON.stringify(creditMemos));				
 				var totalAmount = 0.00;
 				var totalOpenBalance = 0.00;				
-				$("#tableBodySales").html("");
-				var salesByCustomer = '<div class="MediumFont" align="center">Sales by Customer since '+Date1+' to '+Date2+'</div>'
-				+'<table class="tblSales">'
+				$("#tableBodyCreditMemos").html("");
+				var creditMemosByCustomer = '<div class="MediumFont" align="center">Credit Memos by Customer since '+Date1+' to '+Date2+'</div>'
+				+'<table class="tblCreditmemos">'
 				  +'<tbody>'
 					+'<tr>' 
 					  +'<td><div class="TinyFont">Customer</div></td>'
-					  +'<td><div class="TinyFont">Invoice #</div></td>'
+					  +'<td><div class="TinyFont">Credit Memo #</div></td>'
 					  +'<td><div class="TinyFont">Amount</div></td>'
 					  +'<td><div class="TinyFont">Open Balance</div></td>'
 					  +'<td><div class="TinyFont">Sync</div></td>'
 					+'</tr>';
-				if (sales && sales.length>0){
+				if (creditMemos && creditMemos.length>0){
 					var ico = "";
-					for (var i=0; i < sales.length; i++) {
-						if (sales[i].origin=="local"){
-							if (sales[i].needCorrection=="1"){
+					for (var i=0; i < creditMemos.length; i++) {
+						if (creditMemos[i].origin=="local"){
+							if (creditMemos[i].needCorrection=="1"){
 								ico = "warning.png";
-							}else if (sales[i].needSync=="1"){
+							}else if (creditMemos[i].needSync=="1"){
 								ico = "nosync.png";
 							}else{
 								ico = "sync.png";
 							}
-						}else if (sales[i].origin=="synch"){
+						}else if (creditMemos[i].origin=="synch"){
 								ico = "sync.png";
 						}
-						console.log("ico=" + ico);
-						salesByCustomer +=
+						console.log("ico=" + ico);						
+						creditMemosByCustomer +=
 						'<tr>'
-						  +'<td><div class="TinyFont">'+sales[i].billAddress1+'</div></td>'
-						  +'<td><div class="TinyFont">'+sales[i].refNumber+'</div></td>'
-
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(sales[i].Amount,2,0)+'</div></td>'
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(sales[i].OpenBalance,2,0)+'</div></td>'
+						  +'<td><div class="TinyFont">'+creditMemos[i].billAddress1+'</div></td>'
+						  +'<td><div class="TinyFont">'+creditMemos[i].refNumber+'</div></td>'
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(creditMemos[i].Amount,2,0)+'</div></td>'
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(creditMemos[i].OpenBalance,2,0)+'</div></td>';
 						  +'<td><table ><tr>';
 						  if (ico!=""){
-						  	salesByCustomer +='<td style="border: none;"><img src="css/themes/images/' + ico + '" height="10" width="10"></td>';
+						  	creditMemosByCustomer +='<td style="border: none;"><img src="css/themes/images/' + ico + '" height="10" width="10"></td>';
 						  }
-						  if (sales[i].origin=="local"){
-							  salesByCustomer +=  '<td style="border: none;"><a href="invoice.html?id_invoice=' + sales[i].id_invoice + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-edit"  data-ajax="false"></a></td>';
+						  if (creditMemos[i].origin=="local"){
+							  creditMemosByCustomer +=  '<td style="border: none;"><a href="invoice.html?id_invoice=' + creditMemos[i].id_creditMemo + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-edit"  data-ajax="false"></a></td>';
 						  }
-					  	salesByCustomer +=  '<td style="border: none;"><a href="InvoicePreview.html?id_invoice=' + sales[i].id_invoice + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-print"  data-ajax="false"></a></td>';
-						salesByCustomer +='</tr></table></td></tr>';
-						console.log("salesByCustomer=" + salesByCustomer);
+					  	creditMemosByCustomer +=  '<td style="border: none;"><a href="InvoicePreview.html?id_invoice=' + creditMemos[i].id_creditMemo + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-print"  data-ajax="false"></a></td>';
+						creditMemosByCustomer +='</tr></table></td></tr>';						
 
-						totalAmount += NumberCast(sales[i].Amount,2,0)*1;
-						
-						totalOpenBalance += NumberCast(sales[i].OpenBalance,2,0)*1;
+						totalAmount += NumberCast(creditMemos[i].Amount,2,0)*1;
+						totalOpenBalance += NumberCast(creditMemos[i].OpenBalance,2,0)*1;
 						}
 				}
 				else  {
-					salesByCustomer +=
+					creditMemosByCustomer +=
 						'<tr>'
-
-							+'<td colspan="4"><div align="center" class="TinyFont">No sales in this dates range</div></td>'
+							+'<td colspan="4"><div align="center" class="TinyFont">No Credit Memos in this dates range</div></td>'
 						+'</tr>';
 				}
-				salesByCustomer +=
+				creditMemosByCustomer +=
 					'<tr>'
 						+'<td colspan="2"><div align="right" class="SmallFontN">Totals Amount & Open Balance</div></td>'
-
 						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalAmount,2,0, '')+'</div></td>'
 						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalOpenBalance,2,0, '')+'</div></td>'
 					+'</tr>';
-				salesByCustomer += '</tbody></table>';
-				$("#tableBodySales").html(salesByCustomer); 
+				creditMemosByCustomer += '</tbody></table>';
+				$("#tableBodyCreditMemos").html(creditMemosByCustomer); 
 				print();
 			} 
 		</script>
@@ -165,11 +160,11 @@
 			.tblHeader { 
 				border: 1px solid black;
 			}
-			.tblSales { 
+			.tblCreditmemos { 
 				width: 100%; border-spacing: 0px;cellspacing: 0px;cellpadding: 0px;padding: 0px;
 			}
 
-			table.tblSales td{
+			table.tblCreditmemos td{
 				border:1px solid black;
 			}
 
@@ -183,7 +178,7 @@
 	</head>
 
 	<body>
-        <div data-role="page" id="SalesByCustomer_1" data-title="Sales by Customer" data-theme="a">
+        <div data-role="page" id="CreditMemosByCustomer_1" data-title="Credit Memos by Customer" data-theme="a">
             <div data-role="content">
             	<div id="dateRange">
                 <table>
@@ -202,14 +197,14 @@
                           </td>
                           <td valign="bottom">
                               <div  class="SmallFontN">
-                                <a onClick="selectSalesDateRange();" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-carat-r" data-ajax="false">Go</a>
+                                <a onClick="selectCreditMemosDateRange();" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-carat-r" data-ajax="false">Go</a>
                               </div>
                            </td>
                        </tr>
                  </table>
-              	<div id="tableBodySales"></div>
+                </div>
+              	<div id="tableBodyCreditMemos"></div>
             </div>
-		  </div>	
-        </div>
+		</div>				
 	</body>
 </html>
