@@ -4,6 +4,7 @@ var creditMemoDAO = {listBySalesrep:listCreditMemosBySalesrep,
 				listByCustomer:listCreditMemosByCustomer,
 				listToUpload:listCreditMemosToUpload,
 				creditMemosByCustomerDateRange:listCreditMemosByCustomerDateRange,
+				itemsReturnedByDateRange: listItemsReturnedByDateRange,
 				getById:getCreditMemoById, 
 				store:storeCreditMemo, 
 				deleteAll:deleteAllCreditMemos, 
@@ -73,6 +74,16 @@ function listCreditMemosByCustomerDateRange(initDate, finalDate, aReceiveFunctio
 	filterDataCreditMemo = new Array();
 	filterDataCreditMemo = [initDate,finalDate];	
 	db.transaction(doCreditMemosByCustomerDateRange, creditMemoErrFunc);
+}
+
+function listItemsReturnedByDateRange(initDate, finalDate, aReceiveFunction,aErrFunc){
+	db = openDatabaseZoe();
+	logZoe("listItemsReturnedByDateRange db=" + db);
+	creditMemoReceiveListFunction = aReceiveFunction;
+	creditMemoErrFunc = aErrFunc;
+	filterDataCreditMemo = new Array();
+	filterDataCreditMemo = [initDate,finalDate];	
+	db.transaction(doItemsReturnedByDateRange, creditMemoErrFunc);
 }
 
 function listCreditMemosToUpload(aReceiveFunction,aErrFunc){
@@ -169,6 +180,21 @@ function doCreditMemosByCustomerDateRange(tx){
 	logZoe("sql: "+sql);
 	logZoe("filterDataCreditMemo: "+JSON.stringify(filterDataCreditMemo));
 	tx.executeSql(sql, filterDataCreditMemo, creditMemoLocalListReceiveFunction, creditMemoErrFunc);
+}
+
+function doItemsReturnedByDateRange(tx){
+	logZoe("doCreditMemosByCustomerDateRange");
+	var sqlItemsRetCM = "SELECT inventory.ListID, inventory.FullName, inventory.salesDesc, creditMemo_item.Quantity AS Quantity, creditMemo_item.class_ListID, class.Name" +
+	"FROM creditMemo" +
+ 	"LEFT JOIN creditMemo_item ON creditMemo_item.id_creditMemo = creditMemo.id_creditMemo" +
+ 	"LEFT JOIN inventory ON inventory.ListID = creditMemo_item.Inventory_ListID" +
+	"LEFT JOIN class ON creditMemo_item.class_ListID = class.ListID" +
+ 	"WHERE txnDate BETWEEN ? AND ? " +
+ 	"GROUP BY inventory.ListID" +
+ 	"ORDER BY Quantity DESC" ;
+	logZoe("sqlItemsRetCM: "+sqlItemsRetCM);
+	logZoe("filterDataCreditMemo: "+JSON.stringify(filterDataCreditMemo));
+	tx.executeSql(sqlItemsRetCM, filterDataCreditMemo, creditMemoLocalListReceiveFunction, creditMemoErrFunc);
 }
 
 function creditMemoLocalReceiveFunction(tx,results){

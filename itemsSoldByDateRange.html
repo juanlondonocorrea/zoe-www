@@ -14,7 +14,7 @@
 		<script type="text/javascript" src="cordova.js"></script>
 		<script src="js/zoe/zoe.js"></script>
         <script src="js/zoe/invoiceDAO.js"></script>
-
+        
 		<script>
 			$(document).bind("pagebeforecreate", function(event) {
 				initAnyPage(event.target);
@@ -63,7 +63,7 @@
 			}
 			// END functions on error case
 
-			function receiveItemsSoldByDateRange(itemsSold, InitialDate, FinalDate){
+			function receiveItemsSoldByDateRange(itemsSold){
 				var totalItems = 0.00;
 				$("#tableBodyItemsSold").html("");
 				var itemsSoldByDay = '<div class="MediumFont" align="center">Items Sold since '+Date1+' to '+Date2+'</div>'
@@ -135,35 +135,7 @@
 			}
 			span { vertical-align:top; }
 			#Footer { float:right; width: 50%;}
-			
-			/***FIRST STYLE THE BUTTON***/
-			input#Go{
-				height: 10%;
-				cursor:pointer; /*forces the cursor to change to a hand when the button is hovered*/
-				padding:5px 5px; /*add some padding to the inside of the button*/
-				background:#35b128; /*the colour of the button*/
-				border:1px solid #33842a; /*required or the default border for the browser will appear*/
-				/*give the button curved corners, alter the size as required*/
-				-moz-border-radius: 10px;
-				-webkit-border-radius: 10px;
-				border-radius: 10px;
-				/*give the button a drop shadow*/
-				-webkit-box-shadow: 0 0 4px rgba(0,0,0, .75);
-				-moz-box-shadow: 0 0 4px rgba(0,0,0, .75);
-				box-shadow: 0 0 4px rgba(0,0,0, .75);
-				/*style the text*/
-				color:#f3f3f3;
-				font-size:1.1em;
-			}
-			/***NOW STYLE THE BUTTON'S HOVER AND FOCUS STATES***/
-			input#gobutton:hover, input#Go:focus{
-				height: 10%;
-				background-color :#399630; /*make the background a little darker*/
-				/*reduce the drop shadow size to give a pushed button effect*/
-				-webkit-box-shadow: 0 0 1px rgba(0,0,0, .75);
-				-moz-box-shadow: 0 0 1px rgba(0,0,0, .75);
-				box-shadow: 0 0 1px rgba(0,0,0, .75);
-			}			
+
 		</style> 
 	</head>
 
@@ -171,27 +143,27 @@
         <div data-role="page" id="itemsSoldByDay_1" data-title="Items sold by day" data-theme="a">
             <div data-role="content">
             	<div id="dateRange">
-
-                    <div class="ui-grid-b" style="height:95px">
-                    	<div class="ui-block-a" style="height:100%">            
+                <table>
+                	<tr>
+                    	<td valign="bottom">            
                             <div data-role="fieldcontain" class="SmallFont">
                                 <div class="SmallFontN">Initial Date:</div>
                              	<input type="date" name="InitialDate" id="InitialDate" placeholder="Initial Date" value=""/>
                             </div>
-                    	</div>
-                        <div class="ui-block-b" style="height:100%">
+                         </td>
+                         <td valign="bottom">
                             <div data-role="fieldcontain" class="SmallFont">
                                 <div class="SmallFontN">Final Date:</div>
                                 <input type="date" name="FinalDate" id="FinalDate" placeholder="Final Date" value=""/>
                             </div>
-                        </div>
-                        <div class="ui-block-c" style="height:100%">
-                          <div  class="SmallFontN">
-                          	<input type="button" name="Go" id="Go" value="Go" onClick="selectItemsByDateRange();"/>
-                          </div>
-                        </div>                        
-                   </div>
-                
+                          </td>
+                          <td valign="bottom">
+                              <div  class="SmallFontN">
+                                <a onClick="selectItemsByDateRange();" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-carat-r" data-ajax="false">Go</a>
+                              </div>
+                           </td>
+                       </tr>
+                 </table>
                 </div>
               	<div id="tableBodyItemsSold"></div>
             </div>

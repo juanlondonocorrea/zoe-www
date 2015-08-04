@@ -113,9 +113,9 @@
 						  	creditMemosByCustomer +='<td style="border: none;"><img src="css/themes/images/' + ico + '" height="10" width="10"></td>';
 						  }
 						  if (creditMemos[i].origin=="local"){
-							  creditMemosByCustomer +=  '<td style="border: none;"><a href="invoice.html?id_invoice=' + creditMemos[i].id_creditMemo + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-edit"  data-ajax="false"></a></td>';
+							  creditMemosByCustomer +=  '<td style="border: none;"><a href="CreditMemo.html?id_invoice=' + creditMemos[i].id_creditMemo + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-edit"  data-ajax="false"></a></td>';
 						  }
-					  	creditMemosByCustomer +=  '<td style="border: none;"><a href="InvoicePreview.html?id_invoice=' + creditMemos[i].id_creditMemo + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-print"  data-ajax="false"></a></td>';
+					  	creditMemosByCustomer +=  '<td style="border: none;"><a href="CreditMemoPreview.html?id_invoice=' + creditMemos[i].id_creditMemo + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-print"  data-ajax="false"></a></td>';
 						creditMemosByCustomer +='</tr></table></td></tr>';						
 
 						totalAmount += NumberCast(creditMemos[i].Amount,2,0)*1;
