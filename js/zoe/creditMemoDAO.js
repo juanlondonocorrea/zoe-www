@@ -183,19 +183,24 @@ function doCreditMemosByCustomerDateRange(tx){
 }
 
 function doItemsReturnedByDateRange(tx){
-	logZoe("doCreditMemosByCustomerDateRange");
-	var sqlItemsRetCM = "SELECT inventory.ListID, inventory.FullName, inventory.salesDesc, creditMemo_item.Quantity AS Quantity, creditMemo_item.class_ListID, class.Name" +
-	"FROM creditMemo" +
- 	"LEFT JOIN creditMemo_item ON creditMemo_item.id_creditMemo = creditMemo.id_creditMemo" +
- 	"LEFT JOIN inventory ON inventory.ListID = creditMemo_item.Inventory_ListID" +
-	"LEFT JOIN class ON creditMemo_item.class_ListID = class.ListID" +
+	logZoe("doItemsReturnedByDateRange");
+	var sqlItemsRetCM = "SELECT inventory.ListID, inventory.FullName, inventory.salesDesc, " +
+	"creditMemo_item.Quantity AS GoodsQuantity, creditMemo_item.Quantity AS DamagedQuantity, " +
+	"creditMemo_item.class_ListID, class.Name " +
+	"FROM creditMemo " +
+ 	"LEFT JOIN creditMemo_item ON creditMemo_item.id_creditMemo = creditMemo.id_creditMemo " +
+ 	"LEFT JOIN inventory ON inventory.ListID = creditMemo_item.Inventory_ListID " +
+	"LEFT JOIN class ON creditMemo_item.class_ListID = class.ListID " +
  	"WHERE txnDate BETWEEN ? AND ? " +
- 	"GROUP BY inventory.ListID" +
- 	"ORDER BY Quantity DESC" ;
+ 	"GROUP BY inventory.ListID " +
+ 	"ORDER BY Quantity DESC";
 	logZoe("sqlItemsRetCM: "+sqlItemsRetCM);
 	logZoe("filterDataCreditMemo: "+JSON.stringify(filterDataCreditMemo));
 	tx.executeSql(sqlItemsRetCM, filterDataCreditMemo, creditMemoLocalListReceiveFunction, creditMemoErrFunc);
 }
+
+
+
 
 function creditMemoLocalReceiveFunction(tx,results){
 	console.log("creditMemoLocalReceiveFunction includeCreditMemoDetails=" + includeCreditMemoDetails);

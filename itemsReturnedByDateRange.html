@@ -1,0 +1,186 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Customers</title>
+
+		<link rel="stylesheet" href="css/themes/zoe.min.css" />
+		<link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+		<link rel="stylesheet" href="js/jquery-mobile/jquery.mobile.structure-1.4.5.min.css" />
+
+		<!--  <link rel="stylesheet" href="js/jquery-mobile/jquery.mobile-1.4.5.min.css" />  -->
+		<script src="js/jquery-mobile/jquery-2.1.4.js"></script>
+		<script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+		<script type="text/javascript" src="cordova.js"></script>
+		<script src="js/zoe/zoe.js"></script>
+        <script src="js/zoe/creditMemoDAO.js"></script>
+        
+		<script>
+			$(document).bind("pagebeforecreate", function(event) {
+				initAnyPage(event.target);
+				initThisPage(event);
+			});
+			
+			var currentDate = new Date();
+			var Date1;
+			var Date2;
+ 			function initThisPage(event){
+				currentDate = dateFormat(currentDate,"yyyy-mm-dd");
+				selectItemsReturnedByDateRange();
+			}
+
+			// Cordova Device Ready.
+			function print() {
+				try{
+					cordova.plugins.printer.isAvailable(
+					//Check whether the printer is available or not.
+					function (isAvailable) {
+						 //Enter the page location.
+						 var page = $('#itemsReturnedByDay_1').html(); //location.href;
+						 cordova.plugins.printer.print(page, 'Document.html', function () {
+						 alert('printing finished or canceled')
+							});
+					}
+				);
+				}catch(e){
+					console.log("could not print:" + e);
+				}
+			}			
+
+			function selectItemsReturnedByDateRange(){
+				Date1 = $("#InitialDate").val();
+				Date2 = $("#FinalDate").val();
+				logZoe("Date1: ===>"+Date1+"Date2:===> "+Date2);
+				if ((Date1) && (Date2)){
+					logZoe("itemsReturnedByDateRange: =========>SI");
+					creditMemoDAO.itemsReturnedByDateRange(Date1, Date2, receiveItemsReturnedByDateRange,errReceiveItemsReturnedByDateRange);
+				}
+			}
+			
+			// BEGIN Functions on error case
+			function errReceiveItemsReturnedByDateRange(err){
+				alert("DB Error Items Returned By Date Range: "+JSON.stringify(err));
+			}
+			// END functions on error case
+
+			function receiveItemsReturnedByDateRange(itemsReturned){
+				var totalItemsRetGood = 0.00;
+				var totalItemsRetDamaged = 0.00;
+				$("#tableBodyItemsReturned").html("");
+				var itemsReturnedByDay = '<div class="MediumFont" align="center">Items Sold since '+Date1+' to '+Date2+'</div>'
+				+'<table class="tblItemsSold">'
+				  +'<tbody>'
+					+'<tr>' 
+					  +'<td><div class="TinyFont">Fullname</div></td>'
+					  +'<td><div class="TinyFont">Description</div></td>'
+					  +'<td><div class="TinyFont">Items Returned Goood</div></td>'
+					  +'<td><div class="TinyFont">Items Returned Damaged</div></td>'
+					+'</tr>';
+				if (itemsReturned && itemsReturned.length>0){
+					for (var i=0; i < itemsReturned.length; i++) {
+						
+						itemsReturned[i].Quantity
+						
+						itemsReturnedByDay +=
+						'<tr>'
+						  +'<td><div class="TinyFont">'+itemsReturned[i].FullName+'</div></td>'
+						  +'<td><div class="TinyFont">'+itemsReturned[i].salesDesc+'</div></td>'
+						  if (itemsReturned[i].class_ListID == '80000004-1420150604'){
+							totalItemsRetDamaged += (NumberCast(itemsReturned[i].DamagedQuantity,0,0)*1);
+						  }
+						  else {
+						  	totalItemsRetGood += (NumberCast(itemsReturned[i].GoodsQuantity,0,0)*1);
+						  }
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(itemsReturned[i].GoodsQuantity,0,0)+'</div></td>';
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(itemsReturned[i].DamagedQuantity,0,0)+'</div></td>';
+						itemsReturnedByDay +='</tr>';
+					//	totalItemsRetGood += (NumberCast(itemsReturned[i].GoodsQuantity,0,0)*1);
+					//	totalItemsRetDamaged += (NumberCast(itemsReturned[i].DamagedQuantity,0,0)*1);
+						}
+				}
+				else  {
+					itemsReturnedByDay +=
+						'<tr>'
+							+'<td colspan="4"><div align="center" class="TinyFont">No items returned</div></td>'
+						+'</tr>';
+				}
+				itemsReturnedByDay +=
+					'<tr>'
+						+'<td colspan="2"><div align="right" class="SmallFontN">Total Items Returned Good & Damaged</div></td>'
+						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalItemsRetGood,0, '')+'</div></td>'
+						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalItemsRetDamaged,0, '')+'</div></td>'
+					+'</tr>';
+				itemsReturnedByDay += '</tbody></table>';
+				$("#tableBodyItemsReturned").html(itemsReturnedByDay); 
+				print();
+			} 
+		</script>
+		<style type="text/css">
+			.BigFont { font-family: Arial; color:black; font-weight:bolder; font-size:14px; vertical-align:top;}
+			.MediumFont {font-family: Arial; color:black; font-weight:bolder; font-size:12px; vertical-align:top;}
+			.SmallFontN {font-family: Arial; color:black; font-weight:bolder; font-size:10px; vertical-align:top;}
+			.SmallFont {font-family: Arial; color:black; font-weight:normal; font-size:10px; vertical-align:top;}
+			.TinyFont {font-family: Arial; color:black; font-weight:bolder; font-size:8px; vertical-align:bottom;}
+
+			.table {
+				margin: 0 auto;
+				border-collapse: collapse;
+				border-spacing: 0px;
+				cellspacing: 0px;
+				cellpadding: 0px;
+				padding: 5px;
+				width: 100%;
+				vertical-align: top;
+			}
+			
+			.tblHeader { 
+				border: 1px solid black;
+			}
+			.tblItemsSold { 
+				width: 100%; border-spacing: 0px;cellspacing: 0px;cellpadding: 0px;padding: 0px;
+			}
+
+			table.tblItemsSold td{
+				border:1px solid black;
+			}
+
+			.tblFooter { 
+				border: 1px solid black;
+			}
+			span { vertical-align:top; }
+			#Footer { float:right; width: 50%;}
+
+		</style> 
+	</head>
+
+	<body>
+        <div data-role="page" id="itemsReturnedByDay_1" data-title="Items sold by day" data-theme="a">
+            <div data-role="content">
+            	<div id="dateRange">
+                <table>
+                	<tr>
+                    	<td valign="bottom">            
+                            <div data-role="fieldcontain" class="SmallFont">
+                                <div class="SmallFontN">Initial Date:</div>
+                             	<input type="date" name="InitialDate" id="InitialDate" placeholder="Initial Date" value=""/>
+                            </div>
+                         </td>
+                         <td valign="bottom">
+                            <div data-role="fieldcontain" class="SmallFont">
+                                <div class="SmallFontN">Final Date:</div>
+                                <input type="date" name="FinalDate" id="FinalDate" placeholder="Final Date" value=""/>
+                            </div>
+                          </td>
+                          <td valign="bottom">
+                              <div  class="SmallFontN">
+                                <a onClick="selectItemsReturnedByDateRange();" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-carat-r" data-ajax="false">Go</a>
+                              </div>
+                           </td>
+                       </tr>
+                 </table>
+                </div>
+              	<div id="tableBodyItemsReturned"></div>
+            </div>
+		</div>				
+	</body>
+</html>
