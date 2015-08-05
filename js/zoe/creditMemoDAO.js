@@ -185,7 +185,12 @@ function doCreditMemosByCustomerDateRange(tx){
 function doItemsReturnedByDateRange(tx){
 	logZoe("doItemsReturnedByDateRange");
 	var sqlItemsRetCM = "SELECT inventory.ListID, inventory.FullName, inventory.salesDesc, " +
-	"creditMemo_item.Quantity AS GoodsQuantity, creditMemo_item.Quantity AS DamagedQuantity, " +
+
+	"(CASE WHEN class_ListID!='80000004-1420150604' "+
+	"THEN creditMemo_item.Quantity ELSE '' END) AS GoodsQuantity, "+
+	"(CASE WHEN class_ListID='80000004-1420150604' "+
+	"THEN creditMemo_item.Quantity ELSE '' END) AS DamagedQuantity, "+
+
 	"creditMemo_item.class_ListID, class.Name " +
 	"FROM creditMemo " +
  	"LEFT JOIN creditMemo_item ON creditMemo_item.id_creditMemo = creditMemo.id_creditMemo " +

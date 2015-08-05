@@ -78,24 +78,19 @@
 					+'</tr>';
 				if (itemsReturned && itemsReturned.length>0){
 					for (var i=0; i < itemsReturned.length; i++) {
-						
-						itemsReturned[i].Quantity
-						
 						itemsReturnedByDay +=
 						'<tr>'
 						  +'<td><div class="TinyFont">'+itemsReturned[i].FullName+'</div></td>'
 						  +'<td><div class="TinyFont">'+itemsReturned[i].salesDesc+'</div></td>'
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(itemsReturned[i].GoodsQuantity,0,0)+'</div></td>';
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(itemsReturned[i].DamagedQuantity,0,0)+'</div></td>';
+						itemsReturnedByDay +='</tr>';
 						  if (itemsReturned[i].class_ListID == '80000004-1420150604'){
 							totalItemsRetDamaged += (NumberCast(itemsReturned[i].DamagedQuantity,0,0)*1);
 						  }
 						  else {
 						  	totalItemsRetGood += (NumberCast(itemsReturned[i].GoodsQuantity,0,0)*1);
 						  }
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(itemsReturned[i].GoodsQuantity,0,0)+'</div></td>';
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(itemsReturned[i].DamagedQuantity,0,0)+'</div></td>';
-						itemsReturnedByDay +='</tr>';
-					//	totalItemsRetGood += (NumberCast(itemsReturned[i].GoodsQuantity,0,0)*1);
-					//	totalItemsRetDamaged += (NumberCast(itemsReturned[i].DamagedQuantity,0,0)*1);
 						}
 				}
 				else  {
