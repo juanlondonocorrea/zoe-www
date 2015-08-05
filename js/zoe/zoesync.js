@@ -21,6 +21,8 @@ function consumeWS(mensaje, format, receiveFunction, acache, axpathExp, aExtraDa
     var webServiceURL = window.localStorage.getItem("syncURL");
 
 	log("consumeWS2 webServiceURL=" + webServiceURL); 
+	
+	console.log("mensaje length=" + mensaje.length);
 
 	$.support.cors = true;
 	
@@ -39,7 +41,7 @@ function consumeWS(mensaje, format, receiveFunction, acache, axpathExp, aExtraDa
 	
 	dataToSend += "}}";
 	
-	log("consumeWS3 data USING JSON:" + dataToSend); 
+	log("consumeWS3 data USING JSON:" + dataToSend + "--- dataToSend.length=" + dataToSend.length); 
 	
 $.ajax({
         url: webServiceURL,

@@ -499,6 +499,7 @@
 		invoiceDAO.listToUpload(function(results){
 			for (var i in results){
 				var rec = results[i];
+				console.log("syncUpInvoices invoice["+ i + "]=" + JSON.stringify(rec));
 				mensaje += '<InvoiceAddRq requestID="' + rec.refNumber+ '"><InvoiceAdd>'+
 					'<CustomerRef><ListID>' + rec.ListID + '</ListID></CustomerRef>'+
 					'<TxnDate>'+rec.shipDate+'</TxnDate>'+
