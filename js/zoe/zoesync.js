@@ -41,7 +41,8 @@ function consumeWS(mensaje, format, receiveFunction, acache, axpathExp, aExtraDa
 	
 	dataToSend += "}}";
 	
-	log("consumeWS3 data USING JSON:" + dataToSend + "--- dataToSend.length=" + dataToSend.length); 
+	console.log("dataToSend.length=" +  dataToSend.length);
+	log("consumeWS3 data USING JSON:" + dataToSend); 
 	
 $.ajax({
         url: webServiceURL,
