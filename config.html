@@ -533,6 +533,7 @@
 					",\"date\":\"" + rec.txnDate + "\"" +
 					",\"data\":\"" +rec.photo + "\"}";
 				}
+/*
 				if (rec.signaturePNG!=null && rec.signaturePNG!=''){
 					if (rec.photo!=null && rec.photo!=''){
 						extraDatas[rec.refNumber] += ",";
@@ -544,6 +545,7 @@
 					",\"date\":\"" + rec.txnDate + "\"" +
 					",\"data\":\"" +rec.signaturePNG + "\"},";
 				}
+				*/
 			}
 			
 			console.log("syncUpInvoices mensaje=" +  mensaje)
@@ -587,7 +589,9 @@
 		var statusMessage =InvoiceAddRs.statusMessage;
 		if (statusMessage == "Status OK"	){
 			currentInvoice = convertInvoiceFromQB(InvoiceAddRs.InvoiceRet);
-			consumeWS("", "JSON", function(message){console.log(JSON.stringify(message));}, null, null, "[" +extraDatas[currentInvoice.refNumber]+"]");
+			if (extraDatas[currentInvoice.refNumber] && extraDatas[currentInvoice.refNumber]!=""){
+				consumeWS("", "JSON", function(message){console.log(JSON.stringify(message));}, null, null, "[" +extraDatas[currentInvoice.refNumber]+"]");
+			}
 			currentInvoice.origin = "synch";
 			
 			invoiceDAO.store([currentInvoice],errorInvoiceDB,function(){
