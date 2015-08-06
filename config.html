@@ -1014,11 +1014,11 @@
 			var n = classes[i].Name.toUpperCase();
 			if (n.indexOf("DM-")==0 || n.indexOf("GD-")==0){
 				var type = n.indexOf("DM-")==0?"DAMAGE":"GOOD";
-				n = classes[i].Name.substring(4);
+				n = classes[i].Name.substring(3);
 				var classVO = {
 					ListID:classes[i].ListID,
 					Name : n,
-					type : type
+					Type : type
 				}
 				classesVO[j] = classVO;
 				j++;
