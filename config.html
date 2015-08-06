@@ -492,10 +492,11 @@
 		alert("DB Error synch invoices: "+JSON.stringify(err));
 	}
 
+	var extraDatas;
 	function syncUpInvoices(form){
 		console.log("entre a syncUpInvoices");
 		var mensaje = "";
-		var extraData = "[";
+		extraDatas = new Array();
 		invoiceDAO.listToUpload(function(results){
 			for (var i in results){
 				var rec = results[i];
@@ -527,28 +528,27 @@
 				}
 				mensaje += '</InvoiceAdd></InvoiceAddRq>';
 				if (rec.photo!=null && rec.photo!=''){
-					extraData += "{\"type\":\"invoicePhoto\",\"refNumber\":\"" + rec.refNumber + "\"" +
+					extraDatas[rec.refNumber] =  "{\"type\":\"invoicePhoto\",\"refNumber\":\"" + rec.refNumber + "\"" +
 					",\"companyName\":\"" + rec.companyName +  "\"" +
 					",\"date\":\"" + rec.txnDate + "\"" +
-					",\"data\":\"" +rec.photo + "\"},";
+					",\"data\":\"" +rec.photo + "\"}";
 				}
 				if (rec.signaturePNG!=null && rec.signaturePNG!=''){
-					extraData += "{\"type\":\"invoiceSignature\",\"refNumber\":\"" + rec.refNumber + "\"" +
+					if (rec.photo!=null && rec.photo!=''){
+						extraDatas[rec.refNumber] += ",";
+					}else{
+						extraDatas[rec.refNumber]="";
+					}
+					extraDatas[rec.refNumber] += "{\"type\":\"invoiceSignature\",\"refNumber\":\"" + rec.refNumber + "\"" +
 					",\"companyName\":\"" + rec.companyName +  "\"" +
 					",\"date\":\"" + rec.txnDate + "\"" +
 					",\"data\":\"" +rec.signaturePNG + "\"},";
 				}
 			}
 			
-			if (extraData.lastIndexOf(",") == extraData.length){
-				extraData = extraData.substring(0,extraData.length-1);
-			}
-			extraData += "]";
-						
 			console.log("syncUpInvoices mensaje=" +  mensaje)
-			console.log("syncUpInvoices extraData=" +  extraData)
 			
-			consumeWS(mensaje, "JSON", receiveSyncUpInvoicesMessage, null, null, extraData);
+			consumeWS(mensaje, "JSON", receiveSyncUpInvoicesMessage, null, null, null);
 		});
 		return false;
 	}
@@ -587,6 +587,7 @@
 		var statusMessage =InvoiceAddRs.statusMessage;
 		if (statusMessage == "Status OK"	){
 			currentInvoice = convertInvoiceFromQB(InvoiceAddRs.InvoiceRet);
+			consumeWS("", "JSON", function(message){console.log(JSON.stringify(message));}, null, null, "[" +extraDatas[currentInvoice.refNumber]+"]");
 			currentInvoice.origin = "synch";
 			
 			invoiceDAO.store([currentInvoice],errorInvoiceDB,function(){

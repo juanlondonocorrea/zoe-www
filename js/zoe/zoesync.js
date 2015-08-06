@@ -42,7 +42,7 @@ function consumeWS(mensaje, format, receiveFunction, acache, axpathExp, aExtraDa
 	dataToSend += "}}";
 	
 	console.log("dataToSend.length=" +  dataToSend.length);
-	log("consumeWS3 data USING JSON:" + dataToSend); 
+	console.log("consumeWS3 data USING JSON:" + dataToSend); 
 	
 $.ajax({
         url: webServiceURL,
@@ -97,22 +97,26 @@ function recibeSyncResponse(data, textStatus, jqXHR )
 		console.log("synchronizing EN 1c");
 		jsonStr = jsonStr.substring(1,jsonStr.length-1);
 		console.log("jsonStr="+jsonStr);
-		console.log("synchronizing EN 1d");
-		var obj = JSON.parse(jsonStr);
-		console.log("synchronizing EN 1e");
-		if (obj && obj.QBXML){
-		console.log("synchronizing EN 1f");
-			var msgObj = obj.QBXML.QBXMLMsgsRs;
-		console.log("synchronizing EN 1f-1 msgObj=" + msgObj);
-			receiveSyncCallback(msgObj);
-		}else{
-		console.log("synchronizing EN 1g");
-			if (obj){
-				receiveSyncCallback(obj);
+		if (jsonStr!=""){
+			console.log("synchronizing EN 1d");
+			var obj = JSON.parse(jsonStr);
+			console.log("synchronizing EN 1e");
+			if (obj && obj.QBXML){
+			console.log("synchronizing EN 1f");
+				var msgObj = obj.QBXML.QBXMLMsgsRs;
+			console.log("synchronizing EN 1f-1 msgObj=" + msgObj);
+				receiveSyncCallback(msgObj);
 			}else{
-				console.log("Synch error: empty response");
-				alert("Synch error: empty response");
+			console.log("synchronizing EN 1g");
+				if (obj){
+					receiveSyncCallback(obj);
+				}else{
+					console.log("Synch error: empty response");
+					alert("Synch error: empty response");
+				}
 			}
+		}else{
+			receiveSyncCallback(textStatus);
 		}
 	}else{
 		console.log("synchronizing EN 2");
