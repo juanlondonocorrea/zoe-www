@@ -53,12 +53,12 @@ function deleteAllClasses(aErrFunc,successCB){
 
 function doSelectClass(tx){
 	logZoe("doSelectClass filterData=" + filterDataClass);
-	tx.executeSql("SELECT ListID, Name FROM class Where LISTID = ?", [filterDataClass],classLocalReceiveFunction, classErrFunc);
+	tx.executeSql("SELECT * FROM class Where LISTID = ?", [filterDataClass],classLocalReceiveFunction, classErrFunc);
 }
 
 function doClasses(tx){
 	logZoe("doClasses");
-	tx.executeSql("SELECT ListID, Name FROM class", [],classLocalListReceiveFunction, classErrFunc);
+	tx.executeSql("SELECT * FROM class", [],classLocalListReceiveFunction, classErrFunc);
 }
 
 function classLocalReceiveFunction(tx,results){
@@ -98,7 +98,7 @@ function doStoreClass(tx){
 }
 
 function doStoreOneClass(tx, rec){
-	tx.executeSql('INSERT OR REPLACE INTO class(ListID, Name) values (?,?)',[rec.ListID, rec.Name]);
+	tx.executeSql('INSERT OR REPLACE INTO class(ListID, Name, Type) values (?,?,?)',[rec.ListID, rec.Name]);
 }
 
 function doDeleteAllClasses(tx){
