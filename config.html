@@ -1010,12 +1010,17 @@
 		var classesVO = [];
 		for (i=0;i<classes.length;i++){
 			logZoe("classes[i]=" + JSON.stringify(classes[i]));
-			var classVO = {
-				ListID:classes[i].ListID,
-				Name : classes[i].Name
+			var n = classes[i].Name.toUpperCase();
+			if (n.indexOf("DM-")==0 || n.indexOf("GD-")==0){
+				var type = n.indexOf("DM-")==0?"DAMAGE":"GOOD";
+				n = classes[i].Name.substring(4);
+				var classVO = {
+					ListID:classes[i].ListID,
+					Name : n,
+					type : type
+				}
+				classesVO[i] = classVO;
 			}
-			classesVO[i] = classVO;
-			
 		}
 			
 		classDAO.deleteAll(errClassInsert);

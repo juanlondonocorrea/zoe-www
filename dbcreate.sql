@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 03/08/2015
+Modified: 06/08/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -496,6 +496,7 @@ CREATE TABLE class
 (
   ListID TEXT NOT NULL,
   Name TEXT,
+  type TEXT,
   CONSTRAINT Key14 PRIMARY KEY (ListID)
 )@
 
