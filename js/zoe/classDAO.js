@@ -98,7 +98,7 @@ function doStoreClass(tx){
 }
 
 function doStoreOneClass(tx, rec){
-	tx.executeSql('INSERT OR REPLACE INTO class(ListID, Name, Type) values (?,?,?)',[rec.ListID, rec.Name]);
+	tx.executeSql('INSERT OR REPLACE INTO class(ListID, Name, Type) values (?,?,?)',[rec.ListID, rec.Name, rec.Type]);
 }
 
 function doDeleteAllClasses(tx){
