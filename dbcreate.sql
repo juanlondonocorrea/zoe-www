@@ -496,7 +496,7 @@ CREATE TABLE class
 (
   ListID TEXT NOT NULL,
   Name TEXT,
-  type TEXT,
+  Type TEXT,
   CONSTRAINT Key14 PRIMARY KEY (ListID)
 )@
 
