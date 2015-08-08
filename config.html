@@ -50,6 +50,7 @@
 			$('#syncURL').val(window.localStorage.getItem("syncURL"));	
 			$('#submitConfig').click(submitFormConfig);	
 			$('#createDB').click(checkDatabase);	
+			fillNeedToSync();
 			logZoe("config.html listo pagebeforecreate");
 		}		
 
@@ -58,6 +59,15 @@
 		window.localStorage.setItem("syncURL",$('#syncURL').val());
 		logZoe("config localStorage salesRepName=" + window.localStorage.getItem("salesRepName"));
 		return false;
+	}
+	
+	function fillNeedToSync(){
+				$('#syncUpSelect').empty();
+				$('#syncUpSelect').append('<option value="choose-one" data-placeholder="true">Choose what to upload</option>');
+				for (var i in needToSync) {
+					$('#syncUpSelect').append('<option value="syncUp' + i +'">'+i + ' [' + needToSync[i] +']</option>');
+				}
+				$('#syncUpSelect').trigger("chosen:updated");
 	}
 	
 	var wasSelectedAllSyncDown=false;
@@ -108,6 +118,9 @@
 			$("#currentTask").html(whatToUpload[currentUp] + "...");
 			if (whatToUpload[currentUp] == "syncUpInvoices" ){
 				syncUpInvoices();
+			}
+			if (whatToUpload[currentUp] == "syncUpCreditMemos" ){
+				syncUpCreditMemos();
 			}
 		}else{
 			console.log("Synch upload finish!");
@@ -625,6 +638,128 @@
 		processNextInvoiceResponse();
 	}
 
+//Synchronizaction UP creditMemos
+
+	function syncUpCreditMemos(form){
+		console.log("entre a syncUpCreditMemos");
+		var mensaje = "";
+		extraDatas = new Array();
+		creditMemoDAO.listToUpload(function(results){
+			for (var i in results){
+				var rec = results[i];
+				console.log("syncUpCreditMemos creditMemo["+ i + "]=" + JSON.stringify(rec));
+				mensaje += '<CreditMemoAddRq requestID="' + rec.refNumber+ '"><CreditMemoAdd>'+
+					'<CustomerRef><ListID>' + rec.ListID + '</ListID></CustomerRef>'+
+					'<TxnDate>'+rec.shipDate+'</TxnDate>'+
+					'<RefNumber>'+rec.refNumber+'</RefNumber>'+
+					'<TermsRef><ListID>'+rec.id_term+ '</ListID></TermsRef>'+
+					'<DueDate>'+rec.dueDate+'</DueDate>'+
+					'<SalesRepRef><ListID>' +rec.id_salesrep+'</ListID></SalesRepRef>'+
+					'<Memo>' +rec.memo+'</Memo>';
+					if (rec.customerMsg_ListID){
+						mensaje+='<CustomerMsgRef><ListID>' +rec.customerMsg_ListID + '</ListID></CustomerMsgRef>';
+					}
+					if (rec.SalesTax_ListID){
+						mensaje+='<CustomerSalesTaxCodeRef><ListID>' + rec.SalesTax_ListID + '</ListID></CustomerSalesTaxCodeRef>';
+					}
+				for (var j in rec.items){
+					var item=rec.items[j];
+					mensaje += '<CreditMemoLineAdd><ItemRef><ListID>' + item.Inventory_ListID +'</ListID></ItemRef>';
+					mensaje += '<Quantity>' + item.Quantity + '</Quantity>';
+					mensaje += '<Rate>' + item.Rate + '</Rate>';
+					mensaje += '<ClassRef><ListID>' + item.class_ListID + '</ListID></ClassRef>';
+					if (item.InventorySite_ListID){
+						mensaje += '<InventorySiteRef><ListID>' + item.InventorySite_ListID+ '</ListID></InventorySiteRef>';
+					}
+					mensaje += '</CreditMemoLineAdd>';
+				}
+				mensaje += '</CreditMemoAdd></CreditMemoAddRq>';
+				if (rec.photo!=null && rec.photo!=''){
+					extraDatas[rec.refNumber] =  "{\"type\":\"creditMemoPhoto\",\"refNumber\":\"" + rec.refNumber + "\"" +
+					",\"companyName\":\"" + rec.companyName +  "\"" +
+					",\"date\":\"" + rec.txnDate + "\"" +
+					",\"data\":\"" +rec.photo + "\"}";
+				}
+			}
+			
+			console.log("syncUpCreditMemos mensaje=" +  mensaje)
+			
+			consumeWS(mensaje, "JSON", receiveSyncUpCreditMemosMessage, null, null, null);
+		});
+		return false;
+	}
+	
+	var CreditMemoAddRs;
+	var ListCreditMemoAddRs;
+	var currentCreditMemoIndex;
+	var message = "";
+	var currentCreditMemo;
+	function receiveSyncUpCreditMemosMessage(message){
+		console.log('receiveSyncUpCreditMemosMessage message=' + message);
+		ListCreditMemoAddRs = message.CreditMemoAddRs;
+		console.log("ListCreditMemoAddRs=" + ListCreditMemoAddRs);
+		currentCreditMemoIndex = 0;
+		processNextCreditMemoResponse();
+	}
+	
+	function processNextCreditMemoResponse(){
+		console.log("currentCreditMemoIndex=" +currentCreditMemoIndex);
+		if (message!=null&& message!=""){
+			$("#currentTask").html(message);
+		}
+			if (!ListCreditMemoAddRs.length && currentCreditMemoIndex==1){
+				$("#btnSynchDialog").html("Accept");
+				return;
+			}else if (currentCreditMemoIndex == ListCreditMemoAddRs.length){
+				$("#btnSynchDialog").html("Accept");
+				return;
+			}
+		if (ListCreditMemoAddRs.length){
+			CreditMemoAddRs =ListCreditMemoAddRs[currentCreditMemoIndex]
+		}else{
+			CreditMemoAddRs = ListCreditMemoAddRs;
+		}
+		console.log("CreditMemoAddRs=" + JSON.stringify(CreditMemoAddRs));
+		var statusMessage =CreditMemoAddRs.statusMessage;
+		if (statusMessage == "Status OK"	){
+			currentCreditMemo = convertCreditMemoFromQB(CreditMemoAddRs.CreditMemoRet);
+			if (extraDatas[currentCreditMemo.refNumber] && extraDatas[currentCreditMemo.refNumber]!=""){
+				consumeWS("", "JSON", function(message){console.log(JSON.stringify(message));}, null, null, "[" +extraDatas[currentCreditMemo.refNumber]+"]");
+			}
+			currentCreditMemo.origin = "synch";
+			
+			creditMemoDAO.store([currentCreditMemo],errorCreditMemoDB,function(){
+				creditMemoDAO.delete(currentCreditMemo.refNumber,errorCreditMemoDB, processedCreditMemo);
+			});
+		}else{
+			if ( CreditMemoAddRs.statusCode=="3231" ){
+					message += "CreditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
+					processNextCreditMemoResponse();
+			}else {
+				creditMemoDAO.markSynchronizedError(CreditMemoAddRs.requestID, errorCreditMemoDB,function(){
+					currentCreditMemoIndex++;
+					message += "Fail to upload creditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
+					message += "This creditMemo must be corrected and send it again<br>";
+					processNextCreditMemoResponse();
+				});
+			}
+		}
+	}
+	
+	function processedCreditMemo(){
+		currentCreditMemoIndex++;
+		message += "Success upload CreditMemo " + CreditMemoAddRs.requestID + "<br>";
+		processNextCreditMemoResponse();
+	}
+	
+
+	function	errorCreditMemoDB(err) {
+		message += "Fail to store creditMemo " + CreditMemoAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
+		currentCreditMemoIndex++;
+		processNextCreditMemoResponse();
+	}
+
+
 //SYNCHRONIZATION CreditMemos	
 	function syncCreditMemos(form){
 		console.log("entre a syncCreditMemos");
@@ -676,7 +811,7 @@
 				dueDate : creditMemo.DueDate,
 				appliedAmount : creditMemo.AppliedAmount,
 				txnDate: creditMemo.TxnDate,
-				balanceRemaining : creditMemo.BalanceRemaining,
+				balanceRemaining : creditMemo.CreditRemaining,
 				billAddress_addr1 : creditMemo.BillAddress?creditMemo.BillAddress.Addr1:null,
 				billAddress_addr2 :creditMemo.BillAddress?creditMemo.BillAddress.Addr2:null,
 				billAddress_addr3 : creditMemo.BillAddress?creditMemo.BillAddress.Addr3:null,

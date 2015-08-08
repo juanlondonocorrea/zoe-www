@@ -267,6 +267,15 @@ $(document).ready(function() {
 			
 			var currentItems= new Array();
 			function addItem(){
+				console.log("add item ItemClassSelectedIndex=" + ItemClassSelectedIndex);
+				if (typeof ItemClassSelectedIndex == 'undefined'  || ItemClassSelectedIndex<0){
+					alert("Please select a class");
+					return false;
+				}
+				if (isNaN($("#RatePrice").val()) || $("#RatePrice").val()==""){
+					alert("Rate price must be a number");
+					return false;
+				}
 				console.log("addItem listCustomers[customerSelectedIndex]=" + JSON.stringify(listCustomers[customerSelectedIndex]));
 				console.log("addItem listItems[productSelectedIndex]=" + JSON.stringify(listItems[productSelectedIndex]));
 				var aItem = {"LineID":generateKey(), 

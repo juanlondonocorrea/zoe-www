@@ -151,6 +151,7 @@
 					  +'<td><div class="TinyFont">Quantity</div></td>'
 					  +'<td><div class="TinyFont">Amount</div></td>'
 					  +'<td><div class="TinyFont">Tax</div></td>'
+					  +'<td><div class="TinyFont">Class</div></td>'
 					+'</tr>';
 				var TotItems = 0;
 				$("#tableBodyItems").html("");
@@ -163,6 +164,7 @@
 						  +'<td><div align="right" class="TinyFont">'+NumberCast(CreditMemoVO.items[i].Quantity,0, 0)+'</div></td>'
 						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(CreditMemoVO.items[i].Amount,2, 0.00)+'</div></td>';
 					  	creditMemoItems += '<td><div class="TinyFont">'+NumberCast(CreditMemoVO.items[i].salesTax_Name,0, '')+'</div></td>';
+					  	creditMemoItems += '<td><div class="TinyFont">'+CreditMemoVO.items[i].class_name+'</div></td>';
 						creditMemoItems +='</tr>';
 						TotItems += CreditMemoVO.items[i].Quantity;
 						logZoe("creditMemoItems: ============> "+creditMemoItems);

@@ -480,7 +480,7 @@
 				for(var i=0; i< arrayListCreditMemosByCust.length; i++) {
 						htmlString3 += '<li data-filtertext="' + arrayListCreditMemosByCust[i].refNumber + '">'+
 						'<table width="100%" border="0" style="border:none !important;"><tr><td width="80%" valign="top" style="border:none;">Credit Memo #' + arrayListCreditMemosByCust[i].refNumber +
-						'<div>Amount: <span id="overdueBal">'+ifNull(arrayListCreditMemosByCust[i].appliedAmount,'')+'</span><br/>Balance Remaining:<span> '+ifNull(arrayListCreditMemosByCust[i].balanceRemaining,'')+'</span><br/>';
+						'<div>Amount: <span id="overdueBal">'+ifNull(arrayListCreditMemosByCust[i].subtotal,'')+'</span><br/>Balance Remaining:<span> '+ifNull(arrayListCreditMemosByCust[i].balanceRemaining,'')+'</span><br/>';
 						htmlString3 +='</div></td><td width="20%" style:"border:none !important;" valign="top">';
 						if (arrayListCreditMemosByCust[i].origin == 'local'){
 							htmlString3 += '<a href="CreditMemo.html?id_creditMemo=' + arrayListCreditMemosByCust[i].id_creditMemo + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
@@ -489,7 +489,7 @@
 						'" class="ui-btn ui-btn-icon-notext ui-icon-print ui-corner-all" data-ajax="false" onClick="onClickInvoicePreview(\''+ arrayListCreditMemosByCust[i].id_creditMemo + '\'); return true;"></a>' + 
 						'</td></tr></table></li>';
 						TotBalanceRemCM += NumberCast(arrayListCreditMemosByCust[i].balanceRemaining,2, 0.00)*1;
-						TotAmountCM += NumberCast(arrayListCreditMemosByCust[i].appliedAmount,2, 0.00)*1;
+						TotAmountCM += NumberCast(arrayListCreditMemosByCust[i].subtotal,2, 0.00)*1+NumberCast(arrayListCreditMemosByCust[i].salesTaxTotal,2, 0.00);
 					}
 					htmlString3 += '</ul>';
 					htmlString3 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Balance Remaining</td><td>Total Applied Amount</td></tr><tr><td>'+NumberCast(TotBalanceRemCM,2, 0.00)+'</td><td>'+NumberCast(TotAmountCM,2, 0.00)+'</td></tr></table>';

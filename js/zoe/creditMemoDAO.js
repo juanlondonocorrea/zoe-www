@@ -7,6 +7,7 @@ var creditMemoDAO = {listBySalesrep:listCreditMemosBySalesrep,
 				itemsReturnedByDateRange: listItemsReturnedByDateRange,
 				getById:getCreditMemoById, 
 				store:storeCreditMemo, 
+				storePhoto:storeCreditMemoPhoto, 
 				deleteAll:deleteAllCreditMemos, 
 				delete:deleteCreditMemo, 
 				markToSync:markToSyncCreditMemo, 
@@ -28,11 +29,11 @@ var includeCreditMemoDetails;
 
 function doGenerateRefNum(prefix){
 	var date = new Date();
-	var toReturn = prefix + (date.getFullYear()+"").substring(2) + "" + (date.getMonth()+1) + "" + date.getDate();
+	var toReturn = prefix + (date.getFullYear()+"").substring(3) + "" + (date.getMonth()+1) + "" + date.getDate();
 	var plantilla = 'xxxxxxxxxxx'.substring(toReturn.length);
 	toReturn += plantilla.replace(/[xy]/g, function(c) {
-        var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
-        return v.toString(16);
+        var r = Math.random()*10|0, v = c === 'x' ? r : (r&0x3|0x8);
+        return v.toString(10);
     });
     toReturn = toReturn.toUpperCase();
 	return toReturn;
@@ -102,6 +103,15 @@ function storeCreditMemo(records,aErrFunc,successCB){
 	db.transaction(doStoreCreditMemo, errorCB, successCB);
 }
 
+function storeCreditMemoPhoto(record,aErrFunc,successCB){
+	db = openDatabaseZoe();
+	logZoe("storeCreditMemoPhoto db=" + db);
+	recordCreditMemo = record;
+	creditMemoErrFunc = aErrFunc;
+	db.transaction(doStoreCreditMemoPhoto, errorCB, successCB);
+}
+
+
 function deleteAllCreditMemos(aErrFunc,successCB){
 	db = openDatabaseZoe();
 	logZoe("deleteAllCreditMemo db=" + db);
@@ -168,7 +178,7 @@ function doListCreditMemosToUpload(tx){
 
 function doCustomerCreditMemos(tx){
 	logZoe("doSelectSelesrepCreditMemos");
-	tx.executeSql("SELECT id_creditMemo, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, origin FROM creditMemo WHERE ListID = ?", [filterDataCreditMemo],creditMemoLocalListReceiveFunction, creditMemoErrFunc);
+	tx.executeSql("SELECT id_creditMemo, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, origin, signature, signaturePNG, photo FROM creditMemo WHERE ListID = ?", [filterDataCreditMemo],creditMemoLocalListReceiveFunction, creditMemoErrFunc);
 }
 
 function doCreditMemosByCustomerDateRange(tx){
@@ -210,7 +220,7 @@ function creditMemoLocalReceiveFunction(tx,results){
 		creditMemoVO=results.rows.item(0);
 			if (includeCreditMemoDetails){
 					tx.executeSql("SELECT LineID, id_creditMemo, Inventory_ListID, creditMemo_item.Desc, " +
-					" Quantity, Rate, Amount, creditMemo_item.SalesTax_ListID, salesTax.Name as salesTax_Name, class.Name as class_Name, inventory.FullName as Inventory_FullName"+
+					" Quantity, Rate, Amount, creditMemo_item.SalesTax_ListID, salesTax.Name as salesTax_Name, class.Name as class_name, inventory.FullName as Inventory_FullName"+
 					" FROM creditMemo_item " +
 					" LEFT JOIN salesTax ON salesTax.ListID = creditMemo_item.SalesTax_ListID  " +
 					" LEFT JOIN class ON class.ListID = creditMemo_item.class_ListID " +
@@ -309,6 +319,9 @@ function creditMemoLocalListToUploadReceiveFunction(tx,results){
 				id_salesrep: rec.id_salesrep,
 				customerMsg_ListID: rec.customerMsg_ListID,
 				memo: rec.memo,
+				photo: rec.photo,
+				signature: rec.signature,
+				signaturePNG: rec.signaturePNG,
 				items: new Array()
 			}
 			arrayCreditMemos[indexCreditMemo] = creditMemoVO;
@@ -365,7 +378,8 @@ function doStoreCreditMemo(tx){
 }
 
 function doStoreOneCreditMemo(tx, rec){
-		tx.executeSql('INSERT OR REPLACE INTO creditMemo(id_creditMemo, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, origin) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?, ?)',[rec.id_creditMemo, rec.ListID, ifUndefNull(rec.po_number), ifUndefNull(rec.txnDate), ifUndefNull(rec.dueDate), ifUndefNull(rec.appliedAmount), ifUndefNull(rec.balanceRemaining), ifUndefNull(rec.billAddress_addr1), ifUndefNull(rec.billAddress_addr2), ifUndefNull(rec.billAddress_addr3), ifUndefNull(rec.billAddress_city), ifUndefNull(rec.billAddress_state), ifUndefNull(rec.billAddress_postalcode), ifUndefNull(rec.shipAddress_addr1), ifUndefNull(rec.shipAddress_addr2), ifUndefNull(rec.shipAddress_addr3), ifUndefNull(rec.shipAddress_city), ifUndefNull(rec.shipAddress_state), ifUndefNull(rec.shipAddress_postalcode), ifUndefNull(rec.isPaid), ifUndefNull(rec.isPending), ifUndefNull(rec.refNumber), ifUndefNull(rec.TaxPercentage), ifUndefNull(rec.salesTaxTotal), ifUndefNull(rec.shipDate), ifUndefNull(rec.subtotal), ifUndefNull(rec.id_term), ifUndefNull(rec.id_salesrep), ifUndefNull(rec.customerMsg_ListID), ifUndefNull(rec.memo), ifUndefNull(rec.origin)] );
+		tx.executeSql('INSERT OR REPLACE INTO creditMemo(id_creditMemo, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, signature,signaturePNG,  photo, origin) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?, ?,?,?,?)',[rec.id_creditMemo, rec.ListID, ifUndefNull(rec.po_number), ifUndefNull(rec.txnDate), ifUndefNull(rec.dueDate), ifUndefNull(rec.appliedAmount), ifUndefNull(rec.balanceRemaining), ifUndefNull(rec.billAddress_addr1), ifUndefNull(rec.billAddress_addr2), ifUndefNull(rec.billAddress_addr3), ifUndefNull(rec.billAddress_city), ifUndefNull(rec.billAddress_state), ifUndefNull(rec.billAddress_postalcode), ifUndefNull(rec.shipAddress_addr1), ifUndefNull(rec.shipAddress_addr2), ifUndefNull(rec.shipAddress_addr3), ifUndefNull(rec.shipAddress_city), ifUndefNull(rec.shipAddress_state), ifUndefNull(rec.shipAddress_postalcode), ifUndefNull(rec.isPaid), ifUndefNull(rec.isPending), ifUndefNull(rec.refNumber), ifUndefNull(rec.TaxPercentage), ifUndefNull(rec.salesTaxTotal), ifUndefNull(rec.shipDate), ifUndefNull(rec.subtotal), ifUndefNull(rec.id_term), ifUndefNull(rec.id_salesrep), ifUndefNull(rec.customerMsg_ListID), ifUndefNull(rec.memo), ifUndefNull(rec.signature), 
+		ifUndefNull(rec.signaturePNG), ifUndefNull(rec.photo), ifUndefNull(rec.origin)] );
 		
 	
 	 if (rec.items){
@@ -398,3 +412,7 @@ function doMarkSynchorinizedCreditMemo(tx){
 	tx.executeSql("UPDATE creditMemo SET needSync=0, zoeSyncDate=datetime('now', 'localtime') where id_creditMemo = ?",[filterDataCreditMemo]);
 }
 
+function doStoreCreditMemoPhoto(tx){
+	logZoe ("doStoreCreditMemoPhoto record=" + JSON.stringify(recordCreditMemo));
+	tx.executeSql("UPDATE creditMemo SET photo=? where id_invoice = ?",[recordCreditMemo.photo, recordCreditMemo.id_invoice+""]);
+}
