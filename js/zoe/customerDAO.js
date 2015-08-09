@@ -141,7 +141,6 @@ function doStoreCustomer(tx){
 		var i;
 		for (i=0;i<recordCustomer.length;i++){
 			var theRecord = recordCustomer[i];
-			logZoe("store customer:" + JSON.stringify(theRecord));
 			doStoreOneCustomer(tx, theRecord);
 		}
 	}else{
@@ -151,8 +150,26 @@ function doStoreCustomer(tx){
 }
 
 function doStoreOneCustomer(tx, theRecord){
-	tx.executeSql('INSERT OR REPLACE INTO customer(ListID, FullName, IsActive, billAddress1, billAddress2, shipAddress1, shipAddress2, openBalance, overdueBalance, workPhone, cellPhone, email, shipAddressZipcode, billAddresZipcode, billAddresCity, billAddressState, billAddressCountry, shipAddressCity, shipAddressState, shipAddressCountry, id_salesrep, routeDay1, routeDay2, routeDay3, routeDay4, routeDay5, routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails, id_term, pricelevel_ListID, vendor_ListID) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',[theRecord.ListID, ifUndefNull(theRecord.FullName), theRecord.IsActive, ifUndefNull(theRecord.billAddress1), ifUndefNull(theRecord.billAddress2), ifUndefNull(theRecord.shipAddress1), ifUndefNull(theRecord.shipAddress2), ifUndefNull(theRecord.openBalance), ifUndefNull(theRecord.overdueBalance), ifUndefNull(theRecord.workPhone), ifUndefNull(theRecord.cellPhone), ifUndefNull(theRecord.email), ifUndefNull(theRecord.shipAddressZipcode), ifUndefNull(theRecord.billAddresZipcode), ifUndefNull(theRecord.billAddresCity), ifUndefNull(theRecord.billAddressState), ifUndefNull(theRecord.billAddressCountry), ifUndefNull(theRecord.shipAddressCity), ifUndefNull(theRecord.shipAddressState), ifUndefNull(theRecord.shipAddressCountry), ifUndefNull(theRecord.id_salesrep), ifUndefNull(theRecord.routeDay1), ifUndefNull(theRecord.routeDay2), ifUndefNull(theRecord.routeDay3), ifUndefNull(theRecord.routeDay4), ifUndefNull(theRecord.routeDay5), ifUndefNull(theRecord.routeDay6), ifUndefNull(theRecord.routeDay7), ifUndefNull(theRecord.Fax), ifUndefNull(theRecord.billAddress3), ifUndefNull(theRecord.shipAddress3), ifUndefNull(theRecord.name), ifUndefNull(theRecord.companyName), ifUndefNull(theRecord.otherDetails), ifUndefNull(theRecord.id_term), 
-	theRecord.pricelevel_ListID, ifUndefNull(theRecord.vendor_ListID)]);
+	console.log("store customer:" + JSON.stringify(theRecord));
+	tx.executeSql('INSERT OR REPLACE INTO customer(ListID, FullName, IsActive, billAddress1, '
+	+' billAddress2, shipAddress1, shipAddress2, openBalance, overdueBalance, workPhone, cellPhone, '
+	+' email, shipAddressZipcode, billAddresZipcode, billAddresCity, billAddressState, billAddressCountry,'
+	+' shipAddressCity, shipAddressState, shipAddressCountry, id_salesrep, routeDay1, routeDay2, routeDay3,'
+	+' routeDay4, routeDay5, routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails,'
+	+' id_term, pricelevel_ListID, vendor_ListID) '
+	+' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+	[theRecord.ListID, ifUndefNull(theRecord.FullName), theRecord.IsActive, ifUndefNull(theRecord.billAddress1), 
+	ifUndefNull(theRecord.billAddress2), ifUndefNull(theRecord.shipAddress1), ifUndefNull(theRecord.shipAddress2), 
+	ifUndefNull(theRecord.openBalance), ifUndefNull(theRecord.overdueBalance), ifUndefNull(theRecord.workPhone), 
+	ifUndefNull(theRecord.cellPhone), ifUndefNull(theRecord.email), ifUndefNull(theRecord.shipAddressZipcode), 
+	ifUndefNull(theRecord.billAddresZipcode), ifUndefNull(theRecord.billAddresCity), ifUndefNull(theRecord.billAddressState), 
+	ifUndefNull(theRecord.billAddressCountry), ifUndefNull(theRecord.shipAddressCity), ifUndefNull(theRecord.shipAddressState), 
+	ifUndefNull(theRecord.shipAddressCountry), ifUndefNull(theRecord.id_salesrep), ifUndefNull(theRecord.routeDay1), 
+	ifUndefNull(theRecord.routeDay2), ifUndefNull(theRecord.routeDay3), ifUndefNull(theRecord.routeDay4), 
+	ifUndefNull(theRecord.routeDay5), ifUndefNull(theRecord.routeDay6), ifUndefNull(theRecord.routeDay7), 
+	ifUndefNull(theRecord.Fax), ifUndefNull(theRecord.billAddress3), ifUndefNull(theRecord.shipAddress3), 
+	ifUndefNull(theRecord.name), ifUndefNull(theRecord.companyName), ifUndefNull(theRecord.otherDetails), 
+	ifUndefNull(theRecord.id_term), theRecord.pricelevel_ListID, ifUndefNull(theRecord.vendor_ListID)]);
 	if (customerOrigin){
 		tx.executeSql('UPDATE customer set origin = ? WHERE ListID = ?',[customerOrigin, theRecord.ListID]);
 	}

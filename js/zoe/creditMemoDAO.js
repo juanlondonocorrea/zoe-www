@@ -13,7 +13,8 @@ var creditMemoDAO = {listBySalesrep:listCreditMemosBySalesrep,
 				markToSync:markToSyncCreditMemo, 
 				markSynchronizedError:markSynchronizedErrorCreditMemo,
 				markSynchronized:doMarkSynchorinizedCreditMemo,
-				generateRefNum:doGenerateRefNum
+				generateRefNum:doGenerateCreditMemoRefNum,
+				confirmGeneratedRefNum:doConfirmGeneratedCreditMemoRefNum
 			};
 var filterDataCreditMemo;
 var creditMemoReceiveFunction;
@@ -28,16 +29,30 @@ var includeCreditMemoDetails;
 //metodos hacia afuera
 //----------------------
 
-function doGenerateRefNum(prefix){
+var lastGeneratedCreditMemoToConfirm;
+function doGenerateCreditMemoRefNum(prefix){
+	var milsByDay = 1000*60*60*24;
+	var dateBase = new Date('2015-06-01');
 	var date = new Date();
-	var toReturn = prefix + (date.getFullYear()+"").substring(3) + "" + (date.getMonth()+1) + "" + date.getDate();
-	var plantilla = 'xxxxxxxxxxx'.substring(toReturn.length);
-	toReturn += plantilla.replace(/[xy]/g, function(c) {
-        var r = Math.random()*10|0, v = c === 'x' ? r : (r&0x3|0x8);
-        return v.toString(10);
-    });
-    toReturn = toReturn.toUpperCase();
+	var daysSince = Math.floor((date.getTime() - dateBase.getTime()) / milsByDay);
+	console.log("doGenerateCreditMemoRefNum daysSince="+daysSince);
+	var currentMinuteDay = date.getHours()*60+date.getMinutes();
+	var generatedNumber = Math.floor(currentMinuteDay/15);
+	console.log("doGenerateCreditMemoRefNum generatedNumber="+generatedNumber);
+	var lastGeneratedCreditMemo  = window.localStorage.getItem("lastGeneratedCreditMemo")*1;
+	console.log("doGenerateCreditMemoRefNum lastGeneratedCreditMemo="+lastGeneratedCreditMemo);
+	if (lastGeneratedCreditMemo+1<generatedNumber){
+		generatedNumber = lastGeneratedCreditMemo+1;
+	}
+	lastGeneratedCreditMemoToConfirm = generatedNumber;
+	console.log("doGenerateRefNum lastGeneratedCreditMemoToConfirm="+lastGeneratedCreditMemoToConfirm);
+	var toReturn = prefix + daysSince+""+generatedNumber+"";
 	return toReturn;
+}
+
+function doConfirmGeneratedCreditMemoRefNum(){
+		window.localStorage.setItem("lastGeneratedCreditMemo", lastGeneratedCreditMemoToConfirm);
+	console.log("doConfirmGeneratedCreditMemoRefNum lastGeneratedCreditMemo="+lastGeneratedCreditMemoToConfirm);
 }
 
 function getCreditMemoById(aId,includeDetail,aReceiveFunction,aErrFunc){
@@ -422,7 +437,7 @@ function doMarkSynchorinizedCreditMemo(tx){
 
 function doStoreCreditMemoPhoto(tx){
 	logZoe ("doStoreCreditMemoPhoto record=" + JSON.stringify(recordCreditMemo));
-	tx.executeSql("UPDATE creditMemo SET photo=? where id_invoice = ?",[recordCreditMemo.photo, recordCreditMemo.id_invoice+""]);
+	tx.executeSql("UPDATE creditMemo SET photo=? where id_creditmemo = ?",[recordCreditMemo.photo, recordCreditMemo.id_creditMemo+""]);
 }
 
 function doMarkSyncErrorCreditMemo(tx){
