@@ -62,12 +62,20 @@
 	}
 	
 	function fillNeedToSync(){
-				$('#syncUpSelect').empty();
-				$('#syncUpSelect').append('<option value="choose-one" data-placeholder="true">Choose what to upload</option>');
-				for (var i in needToSync) {
-					$('#syncUpSelect').append('<option value="syncUp' + i +'">'+i + ' [' + needToSync[i] +']</option>');
-				}
-				$('#syncUpSelect').trigger("chosen:updated");
+		console.log("fillNeedToSync");
+		if (!needToSync) {
+			setTimeout("fillNeedToSync()",100);
+			return;
+		}
+		$('#syncUpSelect').empty();
+		$('#syncUpSelect').append('<option value="choose-one" data-placeholder="true">Choose what to upload</option>');
+		for (var i in needToSync) {	
+			var option= '<option value="syncUp' + needToSync[i].entity +'">'+ needToSync[i].entity + ' [' + needToSync[i].total +']</option>';
+			console.log(option);
+			$('#syncUpSelect').append(option);
+		}
+		$('#syncUpSelect').trigger("chosen:updated");
+		$('#syncUpSelect').selectmenu('refresh');
 	}
 	
 	var wasSelectedAllSyncDown=false;
@@ -664,6 +672,7 @@
 					}
 				for (var j in rec.items){
 					var item=rec.items[j];
+					console.log("item=" + JSON.stringify(item));
 					mensaje += '<CreditMemoLineAdd><ItemRef><ListID>' + item.Inventory_ListID +'</ListID></ItemRef>';
 					mensaje += '<Quantity>' + item.Quantity + '</Quantity>';
 					mensaje += '<Rate>' + item.Rate + '</Rate>';

@@ -126,10 +126,11 @@ function openDatabaseZoe(){
 	}
 
 	function doNeedToSync(tx) {
-	var	sql = "select 'invoices' as entity, sum(1) as total FROM invoice WHERE needSync=1"
-		+" UNION ALL select 'creditMemos' as entity, sum(1) as total FROM creditMemo WHERE needSync=1"
-		+" UNION ALL select 'customers' as entity, sum(1) as total FROM customer WHERE needSync=1"
-		+" UNION ALL select 'payments' as entity, sum(1) as total FROM payment WHERE needSync=1'"
+	var	sql = "select 'Invoices' as entity, sum(1) as total FROM invoice WHERE needSync=1"
+		+" UNION ALL select 'CreditMemos' as entity, sum(1) as total FROM creditMemo WHERE needSync=1"
+		+" UNION ALL select 'Customers' as entity, sum(1) as total FROM customer WHERE needSync=1"
+		+" UNION ALL select 'Payments' as entity, sum(1) as total FROM payment WHERE needSync=1";
+		console.log("doNeedToSync sql=" + sql);
 		tx.executeSql(sql,[],receiveCheckNeedToSync);
 	}
 	
@@ -139,10 +140,14 @@ function openDatabaseZoe(){
 		needToSync = new Array();
 		console.log("receiveCheckNeedToSync results=" + results);
 		for (i = 0; i<results.rows.length; i++){
-			needToSync[results.rows.item(i).entity] = results.rows.item(i).total;
-			itemsToSync += results.rows.item(i).total;
+			var total = results.rows.item(i).total;
+			if (total == null || !total) total = 0;
+			console.log("results.rows.item(i)=" + JSON.stringify(results.rows.item(i)));
+			needToSync[i] = {"entity":results.rows.item(i).entity,"total":total};
+			console.log("total=" + total);
+			itemsToSync += total;
 		}
-		console.log("needToSyncc=" + JSON.stringify(needToSync));
+		console.log("needToSync=" + JSON.stringify(needToSync));
 		console.log("needToSync itemsToSync=" + itemsToSync);
 		if (itemsToSync>0){
 			$("#iconSync").html('<a class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-icon-nosync"></a>');

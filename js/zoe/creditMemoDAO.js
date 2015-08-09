@@ -11,6 +11,7 @@ var creditMemoDAO = {listBySalesrep:listCreditMemosBySalesrep,
 				deleteAll:deleteAllCreditMemos, 
 				delete:deleteCreditMemo, 
 				markToSync:markToSyncCreditMemo, 
+				markSynchronizedError:markSynchronizedErrorCreditMemo,
 				markSynchronized:doMarkSynchorinizedCreditMemo,
 				generateRefNum:doGenerateRefNum
 			};
@@ -143,6 +144,13 @@ function markSynchronizedCustomer(id_creditMemo,aErrFunc,successCB){
 	db.transaction(doMarkToSynchronizedCreditMemo, errorCB, successCB);
 }
 
+function markSynchronizedErrorCreditMemo(id_creditMemo,aErrFunc,successCB){
+	db = openDatabaseZoe();
+	logZoe("markSynchronizedErrorCreditMemo db=" + db);
+	customerErrFunc = aErrFunc;
+	filterDataCreditMemo	 = id_creditMemo;
+	db.transaction(doMarkSyncErrorCreditMemo, errorCB, successCB);
+}
 
 //----------------------
 //metodos privados
@@ -330,7 +338,7 @@ function creditMemoLocalListToUploadReceiveFunction(tx,results){
 		var creditMemoItemVO = {
 			  	LineID:rec.LineID,
   				id_creditMemo:rec.id_creditMemo,
-				Inventory_ListID:rec.Inventory_ListID,
+				Inventory_ListID:rec.inventory_ListID,
 				InventorySite_ListID:rec.InventorySite_ListID,
 				Desc:rec.Desc,
 				Quantity:rec.Quantity,
@@ -415,4 +423,8 @@ function doMarkSynchorinizedCreditMemo(tx){
 function doStoreCreditMemoPhoto(tx){
 	logZoe ("doStoreCreditMemoPhoto record=" + JSON.stringify(recordCreditMemo));
 	tx.executeSql("UPDATE creditMemo SET photo=? where id_invoice = ?",[recordCreditMemo.photo, recordCreditMemo.id_invoice+""]);
+}
+
+function doMarkSyncErrorCreditMemo(tx){
+	tx.executeSql("UPDATE creditMemo SET needSync=0, zoeSycDate=datetime('now', 'localtime'), needCorrection=1 where id_creditMemo = ?",[filterDataCreditMemo+""]);
 }
