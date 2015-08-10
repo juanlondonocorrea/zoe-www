@@ -206,7 +206,7 @@ function doCustomerCreditMemos(tx){
 
 function doCreditMemosByCustomerDateRange(tx){
 	logZoe("doCreditMemosByCustomerDateRange");
-	var sql = "SELECT customer.billAddress1, refNumber, txnDate, appliedAmount AS Amount, balanceRemaining AS OpenBalance " +
+	var sql = "SELECT creditMemo.id_creditMemo, customer.billAddress1, refNumber, txnDate, appliedAmount AS Amount, balanceRemaining AS OpenBalance " +
 	"FROM creditMemo, customer "+
 	"WHERE creditMemo.ListID = customer.ListID AND txnDate BETWEEN ? AND ? " +
 	"ORDER BY customer.billAddress1, creditMemo.txnDate ASC";
