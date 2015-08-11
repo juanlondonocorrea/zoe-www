@@ -176,7 +176,7 @@ function doStoreOneCustomer(tx, theRecord){
 	+' routeDay4, routeDay5, routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails,'
 	+' id_term, pricelevel_ListID, vendor_ListID) '
 	+' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-	[theRecord.ListID, ifUndefNull(theRecord.editSequence),ifUndefNull(theRecord.FullName), theRecord.IsActive, ifUndefNull(theRecord.billAddress1), 
+	[theRecord.ListID, ifUndefNull(theRecord.editSequence+""),ifUndefNull(theRecord.FullName), theRecord.IsActive, ifUndefNull(theRecord.billAddress1), 
 	ifUndefNull(theRecord.billAddress2), ifUndefNull(theRecord.shipAddress1), ifUndefNull(theRecord.shipAddress2), 
 	ifUndefNull(theRecord.openBalance), ifUndefNull(theRecord.overdueBalance), ifUndefNull(theRecord.workPhone), 
 	ifUndefNull(theRecord.cellPhone), ifUndefNull(theRecord.email), ifUndefNull(theRecord.shipAddressZipcode), 

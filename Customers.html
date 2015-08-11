@@ -458,7 +458,7 @@
 				logZoe("Phone ========> " +$('#Phone').val());				
 				logZoe("customerVO ========> " + JSON.stringify(customerVO));
 				customersVO[0] = customerVO;
-				customerDAO.store(customersVO, errCustomerUpdate, successCustomerUpdate, "local");
+				customerDAO.store(customersVO, errCustomerUpdate, successCustomerUpdate);
 			}
 
 			function successCustomerUpdate(){
