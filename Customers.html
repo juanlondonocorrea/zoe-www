@@ -360,6 +360,14 @@
 				$('#Terms').val(listCustomers[index].id_term);
 				$('#OtherDetails').val(listCustomers[index].otherDetails);
 			
+				(listCustomers[index].routeDay1)?$('#routeDay1').prop("checked", true):$('#routeDay1').prop("checked", false);
+				(listCustomers[index].routeDay2)?$('#routeDay2').prop("checked", true):$('#routeDay2').prop("checked", false);
+				(listCustomers[index].routeDay3)?$('#routeDay3').prop("checked", true):$('#routeDay3').prop("checked", false);
+				(listCustomers[index].routeDay4)?$('#routeDay4').prop("checked", true):$('#routeDay4').prop("checked", false);
+				(listCustomers[index].routeDay5)?$('#routeDay5').prop("checked", true):$('#routeDay5').prop("checked", false);
+				(listCustomers[index].routeDay6)?$('#routeDay6').prop("checked", true):$('#routeDay6').prop("checked", false);
+				(listCustomers[index].routeDay7)?$('#routeDay7').prop("checked", true):$('#routeDay7').prop("checked", false);
+
 				$('#routeDay1').val(listCustomers[index].routeDay1);
 				$('#routeDay2').val(listCustomers[index].routeDay2);	
 				$('#routeDay3').val(listCustomers[index].routeDay3);
@@ -368,7 +376,8 @@
 				$('#routeDay6').val(listCustomers[index].routeDay6);
 				$('#routeDay7').val(listCustomers[index].routeDay7);
 				$('#pricelevel_ListID').val(listCustomers[index].pricelevel_ListID);
-
+				console.log("listCustomers[index].pricelevel_ListID =======> "+listCustomers[index].pricelevel_ListID);
+								
 				// Address for LocateAddress function
 				CustomerAddress = listCustomers[index].billAddress2+', '+listCustomers[index].billAddresCity+', '+listCustomers[index].billAddressState;
 				CustomerEmail = listCustomers[index].email;
@@ -447,12 +456,11 @@
 					routeDay6:$('#routeDay6').is(':checked')?1:0,
 					routeDay7:$('#routeDay7').is(':checked')?1:0,
 
-					
 					pricelevel_ListID:$('#pricelevel_ListID').val(), 
 					needSync:1,
 					zoeUpdateDate:new Date()
-					
 				};
+				console.log("$('#pricelevel_ListID').val() =======> "+$('#pricelevel_ListID').val());
 				logZoe("ListID ========> " +$('#ListID').val());
 				logZoe("FullName ========> " +$('#FullName').val());
 				logZoe("Phone ========> " +$('#Phone').val());				

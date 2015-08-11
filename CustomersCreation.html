@@ -34,12 +34,12 @@
 			function errReceiveTerms(err){
 				alert("DB Error terms: "+JSON.stringify(err));
 			}
-			
+
 			function errPriceLevel(err){
 				alert("DB Error Price Level: "+JSON.stringify(err));
 			}
 			// END functions on error case
-			
+
 			$(document).bind('pagechange', function() {
 				$('.ui-page-active .ui-listview').listview('refresh');
 				$('.ui-page-active :jqmData(role=content)').trigger('create');
@@ -70,17 +70,17 @@
 			}
 			 
 			function routeDayChecked(rDay){
-				logZoe("rDay: ===1====> "+rDay);
+			/*	logZoe("rDay: ===1====> "+rDay);
 				rDay = "'#"+rDay+"'";
 				logZoe("rDay: ===2====> "+rDay);
 				if ($(rDay).is(':checked')){
-					$(rDay).val('1');
+					$(rDay).prop("checked", false)
 				}
 				else {
-					$(rDay).val('0');
+					$(rDay).prop("checked", true);
 				}
-				logZoe("rDay: ===3====> "+$(rDay).val());
-			}
+				logZoe("rDay: ===3====> "+$(rDay).is(':checked'));
+		*/	}
 
 			var selectedIndex;
 			function receiveTerms(arrayTerms){
@@ -162,6 +162,14 @@
 					id_term:$('#Terms').val(),
 					otherDetails:$('#OtherDetails').val(),
 
+					routeDay1:$('#routeDay1').is(':checked')?1:0,
+					routeDay2:$('#routeDay2').is(':checked')?1:0,
+					routeDay3:$('#routeDay3').is(':checked')?1:0,
+					routeDay4:$('#routeDay4').is(':checked')?1:0,
+					routeDay5:$('#routeDay5').is(':checked')?1:0,
+					routeDay6:$('#routeDay6').is(':checked')?1:0,
+					routeDay7:$('#routeDay7').is(':checked')?1:0,
+/*
 					routeDay1:$('#routeDay1').val(),
 					routeDay2:$('#routeDay2').val(),
 					routeDay3:$('#routeDay3').val(),
@@ -169,7 +177,7 @@
 					routeDay5:$('#routeDay5').val(),
 					routeDay6:$('#routeDay6').val(),
 					routeDay7:$('#routeDay7').val(),
-
+*/
 					pricelevel_ListID:$('#priceLevel').val()
 				};
 				logZoe("ListID ========> " +$('#ListID').val());
@@ -193,7 +201,7 @@
 
 			function successCustomerCreation(){
 					customerDAO.markToSync(CodCustomer, errCustomermarkToSync);
-					alert("Customer was successful updated");
+					alert("Customer was successful added");
 					window.location = "Customers.html?ListID=" +CodCustomer;
 			}
 			
