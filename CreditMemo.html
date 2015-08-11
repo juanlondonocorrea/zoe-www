@@ -462,6 +462,9 @@ $(document).ready(function() {
 			}
 		
 		function successCreditMemoInsert(){
+			if ($("#isPersisted").val() == "false"){
+				creditMemoDAO.confirmGeneratedRefNum();
+			}
 			$("#isPersisted").val("true");
 			creditMemoDAO.markToSync($('#refNumber').val(), errCreditMemoInsert, successCreditMemoInsertMark);
 			isPersistedChange();

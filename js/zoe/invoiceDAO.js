@@ -13,7 +13,8 @@ var invoiceDAO = {listBySalesrep:listInvoicesBySalesrep,
 				delete:deleteInvoice, 
 				markToSync:markToSyncInvoice, 
 				markSynchronizedError:markSynchronizedErrorInvoice,
-				generateRefNum:doGenerateRefNum,
+				generateRefNum:doGenerateInvoiceRefNum,
+				confirmGeneratedRefNum:doConfirmGeneratedInvoiceRefNum,
 				itemsSoldByDateRange:listItemsSoldByDateRange
 			};
 var filterDataInvoice;
@@ -27,17 +28,30 @@ var includeInvoiceDetails;
 //----------------------
 //metodos hacia afuera
 //----------------------
-
-function doGenerateRefNum(prefix){
+var lastGeneratedInvoiceToConfirm;
+function doGenerateInvoiceRefNum(prefix){
+	var milsByDay = 1000*60*60*24;
+	var dateBase = new Date('2015-06-01');
 	var date = new Date();
-	var toReturn = prefix + (date.getFullYear()+"").substring(3) + "" + (date.getMonth()+1) + "" + date.getDate()+""+date.getHours() + "" + date.getMinutes();
-	var plantilla = 'xxxxxxxxxxx'.substring(toReturn.length);
-	toReturn += plantilla.replace(/[xy]/g, function(c) {
-        var r = Math.random()*10|0, v = c === 'x' ? r : (r&0x3|0x8);
-        return v.toString(10);
-    });
-    toReturn = toReturn.toUpperCase();
+	var daysSince = Math.floor((date.getTime() - dateBase.getTime()) / milsByDay);
+	console.log("doGenerateRefNum daysSince="+daysSince);
+	var currentMinuteDay = date.getHours()*60+date.getMinutes();
+	var generatedNumber = Math.floor(currentMinuteDay/15);
+	console.log("doGenerateRefNum generatedNumber="+generatedNumber);
+	var lastGeneratedInvoice  = window.localStorage.getItem("lastGeneratedInvoice")*1;
+	console.log("doGenerateRefNum lastGeneratedInvoice="+lastGeneratedInvoice);
+	if (lastGeneratedInvoice+1<generatedNumber){
+		generatedNumber = lastGeneratedInvoice+1;
+	}
+	lastGeneratedInvoiceToConfirm = generatedNumber;
+	console.log("doGenerateRefNum lastGeneratedInvoiceToConfirm="+lastGeneratedInvoiceToConfirm);
+	var toReturn = prefix + daysSince+""+generatedNumber+"";
 	return toReturn;
+}
+
+function doConfirmGeneratedInvoiceRefNum(){
+		window.localStorage.setItem("lastGeneratedInvoice", lastGeneratedInvoiceToConfirm);
+	console.log("doConfirmGeneratedInvoiceRefNum lastGeneratedInvoice="+lastGeneratedInvoiceToConfirm);
 }
 
 function getInvoiceById(aId,includeDetail,aReceiveFunction,aErrFunc){

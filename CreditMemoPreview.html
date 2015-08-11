@@ -164,7 +164,7 @@
 						  +'<td><div align="right" class="TinyFont">'+NumberCast(CreditMemoVO.items[i].Quantity,0, 0)+'</div></td>'
 						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(CreditMemoVO.items[i].Amount,2, 0.00)+'</div></td>';
 					  	creditMemoItems += '<td><div class="TinyFont">'+NumberCast(CreditMemoVO.items[i].salesTax_Name,0, '')+'</div></td>';
-					  	creditMemoItems += '<td><div class="TinyFont">'+CreditMemoVO.items[i].class_name+'</div></td>';
+					  	creditMemoItems += '<td><div class="TinyFont">'+(CreditMemoVO.items[i].class_name==null?'':CreditMemoVO.items[i].class_name)+'</div></td>';
 						creditMemoItems +='</tr>';
 						TotItems += CreditMemoVO.items[i].Quantity;
 						logZoe("creditMemoItems: ============> "+creditMemoItems);

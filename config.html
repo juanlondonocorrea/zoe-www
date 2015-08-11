@@ -126,9 +126,10 @@
 			$("#currentTask").html(whatToUpload[currentUp] + "...");
 			if (whatToUpload[currentUp] == "syncUpInvoices" ){
 				syncUpInvoices();
-			}
-			if (whatToUpload[currentUp] == "syncUpCreditMemos" ){
+			}else if (whatToUpload[currentUp] == "syncUpCreditMemos" ){
 				syncUpCreditMemos();
+			}else if (whatToUpload[currentUp] == "syncUpCustomers" ){
+				syncUpCustomers();
 			}
 		}else{
 			console.log("Synch upload finish!");
@@ -647,7 +648,6 @@
 	}
 
 //Synchronizaction UP creditMemos
-
 	function syncUpCreditMemos(form){
 		console.log("entre a syncUpCreditMemos");
 		var mensaje = "";
@@ -768,6 +768,102 @@
 		processNextCreditMemoResponse();
 	}
 
+//Synchronizaction UP customers
+	function syncUpCustomers(form){
+		console.log("entre a syncUpCustomers");
+		var mensaje = "";
+		customerDAO.listModifiedToUpload(function(results){
+			for (var i in results){
+				var rec = results[i];
+				console.log("syncUpCustomers customer["+ i + "]=" + JSON.stringify(rec));
+				mensaje += '<CustomerModRq requestID="' + rec.refNumber+ '"><CustomerMod>'+
+					'<ListID>' + rec.ListID + '</ListID>';
+					
+				mensaje += '</CustomerMod></CustomerModRq>';
+				if (rec.photo!=null && rec.photo!=''){
+					extraDatas[rec.refNumber] =  "{\"type\":\"customerPhoto\",\"refNumber\":\"" + rec.refNumber + "\"" +
+					",\"companyName\":\"" + rec.companyName +  "\"" +
+					",\"date\":\"" + rec.txnDate + "\"" +
+					",\"data\":\"" +rec.photo + "\"}";
+				}
+			}
+			
+			console.log("syncUpCustomers mensaje=" +  mensaje)
+			
+			consumeWS(mensaje, "JSON", receiveSyncUpCustomersMessage, null, null, null);
+		});
+		return false;
+	}
+	
+	var CustomerAddRs;
+	var ListCustomerAddRs;
+	var currentCustomerIndex;
+	var message = "";
+	var currentCustomer;
+	function receiveSyncUpCustomersMessage(message){
+		console.log('receiveSyncUpCustomersMessage message=' + message);
+		ListCustomerAddRs = message.CustomerAddRs;
+		console.log("ListCustomerAddRs=" + ListCustomerAddRs);
+		currentCustomerIndex = 0;
+		processNextCustomerResponse();
+	}
+	
+	function processNextCustomerResponse(){
+		console.log("currentCustomerIndex=" +currentCustomerIndex);
+		if (message!=null&& message!=""){
+			$("#currentTask").html(message);
+		}
+			if (!ListCustomerAddRs.length && currentCustomerIndex==1){
+				$("#btnSynchDialog").html("Accept");
+				return;
+			}else if (currentCustomerIndex == ListCustomerAddRs.length){
+				$("#btnSynchDialog").html("Accept");
+				return;
+			}
+		if (ListCustomerAddRs.length){
+			CustomerAddRs =ListCustomerAddRs[currentCustomerIndex]
+		}else{
+			CustomerAddRs = ListCustomerAddRs;
+		}
+		console.log("CustomerAddRs=" + JSON.stringify(CustomerAddRs));
+		var statusMessage =CustomerAddRs.statusMessage;
+		if (statusMessage == "Status OK"	){
+			currentCustomer = convertCustomerFromQB(CustomerAddRs.CustomerRet);
+			if (extraDatas[currentCustomer.refNumber] && extraDatas[currentCustomer.refNumber]!=""){
+				consumeWS("", "JSON", function(message){console.log(JSON.stringify(message));}, null, null, "[" +extraDatas[currentCustomer.refNumber]+"]");
+			}
+			currentCustomer.origin = "synch";
+			
+			customerDAO.store([currentCustomer],errorCustomerDB,function(){
+				customerDAO.delete(currentCustomer.refNumber,errorCustomerDB, processedCustomer);
+			});
+		}else{
+			if ( CustomerAddRs.statusCode=="3231" ){
+					message += "Customer " + CustomerAddRs.requestID + ":" + statusMessage + "<br>";
+					processNextCustomerResponse();
+			}else {
+				customerDAO.markSynchronizedError(CustomerAddRs.requestID, errorCustomerDB,function(){
+					currentCustomerIndex++;
+					message += "Fail to upload customer " + CustomerAddRs.requestID + ":" + statusMessage + "<br>";
+					message += "This customer must be corrected and send it again<br>";
+					processNextCustomerResponse();
+				});
+			}
+		}
+	}
+	
+	function processedCustomer(){
+		currentCustomerIndex++;
+		message += "Success upload Customer " + CustomerAddRs.requestID + "<br>";
+		processNextCustomerResponse();
+	}
+	
+
+	function	errorCustomerDB(err) {
+		message += "Fail to store customer " + CustomerAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
+		currentCustomerIndex++;
+		processNextCustomerResponse();
+	}
 
 //SYNCHRONIZATION CreditMemos	
 	function syncCreditMemos(form){

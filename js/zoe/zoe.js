@@ -12,8 +12,6 @@
 				$(this).trigger('create');
 			});
 
-			
-
 		  var toPage = target.id;
 		  console.log("target=" + target);
 		  console.log("toPage=" + toPage);
