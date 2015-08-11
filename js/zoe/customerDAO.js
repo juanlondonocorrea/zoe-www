@@ -110,7 +110,7 @@ function markSynchronizedCustomer(ListID,aErrFunc,successCB){
 
 function doSelectCustomer(tx){
 	logZoe("doSelectCustomer filterData=" + filterDataCustomer);
-	tx.executeSql("SELECT ListID, FullName, IsActive, billAddress1, billAddress2, shipAddress1, shipAddress2, openBalance, overdueBalance, workPhone, cellPhone, email, shipAddressZipcode, billAddresZipcode, billAddresCity, billAddressState, billAddressCountry, shipAddressCity, shipAddressState, shipAddressCountry, id_salesrep, routeDay1, routeDay2, routeDay3, routeDay4, routeDay5, routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails, id_term, pricelevel_ListID, vendor_ListID FROM customer Where ListId=?", [filterDataCustomer],customerLocalReceiveFunction, customerErrFunc);
+	tx.executeSql("SELECT ListID, editSequence, FullName, IsActive, billAddress1, billAddress2, shipAddress1, shipAddress2, openBalance, overdueBalance, workPhone, cellPhone, email, shipAddressZipcode, billAddresZipcode, billAddresCity, billAddressState, billAddressCountry, shipAddressCity, shipAddressState, shipAddressCountry, id_salesrep, routeDay1, routeDay2, routeDay3, routeDay4, routeDay5, routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails, id_term, pricelevel_ListID, vendor_ListID FROM customer Where ListId=?", [filterDataCustomer],customerLocalReceiveFunction, customerErrFunc);
 }
 
 function doSelectAllCustomer(tx){
@@ -169,14 +169,14 @@ function doStoreCustomer(tx){
 
 function doStoreOneCustomer(tx, theRecord){
 	console.log("store customer:" + JSON.stringify(theRecord));
-	tx.executeSql('INSERT OR REPLACE INTO customer(ListID, FullName, IsActive, billAddress1, '
+	tx.executeSql('INSERT OR REPLACE INTO customer(ListID, editSequence, FullName, IsActive, billAddress1, '
 	+' billAddress2, shipAddress1, shipAddress2, openBalance, overdueBalance, workPhone, cellPhone, '
 	+' email, shipAddressZipcode, billAddresZipcode, billAddresCity, billAddressState, billAddressCountry,'
 	+' shipAddressCity, shipAddressState, shipAddressCountry, id_salesrep, routeDay1, routeDay2, routeDay3,'
 	+' routeDay4, routeDay5, routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails,'
 	+' id_term, pricelevel_ListID, vendor_ListID) '
-	+' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-	[theRecord.ListID, ifUndefNull(theRecord.FullName), theRecord.IsActive, ifUndefNull(theRecord.billAddress1), 
+	+' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+	[theRecord.ListID, ifUndefNull(theRecord.editSequence),ifUndefNull(theRecord.FullName), theRecord.IsActive, ifUndefNull(theRecord.billAddress1), 
 	ifUndefNull(theRecord.billAddress2), ifUndefNull(theRecord.shipAddress1), ifUndefNull(theRecord.shipAddress2), 
 	ifUndefNull(theRecord.openBalance), ifUndefNull(theRecord.overdueBalance), ifUndefNull(theRecord.workPhone), 
 	ifUndefNull(theRecord.cellPhone), ifUndefNull(theRecord.email), ifUndefNull(theRecord.shipAddressZipcode), 

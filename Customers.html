@@ -326,6 +326,7 @@
 				$('#SalesRep').val(listCustomers[index].id_salesrep);
 				$('#SalesRepName').val(window.localStorage.getItem("salesRepName"));
 				$('#ListID').val(listCustomers[index].ListID);
+				$('#editSequence').val(listCustomers[index].editSequence);
 				$('#IsActive').val(listCustomers[index].IsActive);
 				$('#FullName').val(listCustomers[index].FullName);
 				$('#openBalance').val(listCustomers[index].openBalance);
@@ -407,13 +408,12 @@
 			}	
 			
 			function UpdateCustomer(){
-				console.log("$('#routeDay1').val()=" + $('#routeDay1').is(':checked'));
 				
 				var customersVO = [];
 								
 				var customerVO = {
 					id_salesrep:salesRepVO.id_salesrep,
-
+					editSequence:$('#editSequence').val(),
 					ListID:$('#ListID').val(),
 					IsActive:$('#IsActive').val(),
 					FullName:$('#FullName').val(),
@@ -686,6 +686,7 @@
 							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<div data-role="fieldcontain">
 									<div>
+									<input type="hidden" data-theme="b" name="editSequence" id="editSequence" value=""/>
 									<input type="hidden" data-theme="b" name="ListID" id="ListID" value=""/>
 									<input type="hidden" data-theme="b" name="IsActive" id="IsActive" value=""/>
 										<label for="FullName">Full Name:</label>
