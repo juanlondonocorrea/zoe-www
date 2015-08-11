@@ -777,7 +777,7 @@
 				var rec = results[i];
 				console.log("syncUpCustomers customer["+ i + "]=" + JSON.stringify(rec));
 				mensaje += '<CustomerModRq requestID="' + rec.refNumber+ '"><CustomerMod>'+
-					'<ListID>' + rec.ListID + '</ListID>'+
+					'<ListID>' + rec.ListID + '</ListID>';
 					
 				mensaje += '</CustomerMod></CustomerModRq>';
 				if (rec.photo!=null && rec.photo!=''){
