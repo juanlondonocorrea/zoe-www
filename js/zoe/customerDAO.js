@@ -2,6 +2,8 @@
 
 var customerDAO = {list:listCustomers, 
 		listByRouteDay:listCustomersByRouteDay,
+		listModifiedToUpload:listModifiedCustomersToUpload,
+		listAddedToUpload:listAddedCustomersToUpload,
 		getById:getCustomerById, 
 		store:storeCustomer, 
 		updateVendor:updateCustomerVendor, 
@@ -33,6 +35,22 @@ function listCustomers(aReceiveFunction,aErrFunc){
 	customerReceiveListFunction = aReceiveFunction;
 	customerErrFunc = aErrFunc;
 	db.transaction(doSelectAllCustomer, customerErrFunc);
+}
+
+function listModifiedCustomersToUpload(aReceiveFunction,aErrFunc){
+	db = openDatabaseZoe();
+	logZoe("listModifiedCustomersToUpload db=" + db);
+	customerReceiveListFunction = aReceiveFunction;
+	customerErrFunc = aErrFunc;
+	db.transaction(doListModifiedCustomersToUpload, customerErrFunc);
+}
+
+function listAddedCustomersToUpload(aReceiveFunction,aErrFunc){
+	db = openDatabaseZoe();
+	logZoe("listAddedCustomersToUpload db=" + db);
+	customerReceiveListFunction = aReceiveFunction;
+	customerErrFunc = aErrFunc;
+	db.transaction(doListAddedCustomersToUpload, customerErrFunc);
 }
 
 function listCustomersByRouteDay(aDay, aReceiveFunction,aErrFunc){
@@ -174,6 +192,19 @@ function doStoreOneCustomer(tx, theRecord){
 		tx.executeSql('UPDATE customer set origin = ? WHERE ListID = ?',[customerOrigin, theRecord.ListID]);
 	}
 }
+
+function doListModifiedCustomersToUpload(tx){
+	var selectStr = "SELECT * FROM customer WHERE needSync = 1 AND origin = 'remote'";
+	logZoe("doListModifiedCustomersToUpload select= " + selectStr);
+	tx.executeSql(selectStr,[], customerLocalListReceiveFunction, invoiceErrFunc);
+ }
+
+function doListAddedCustomersToUpload(tx){
+	var selectStr = "SELECT * FROM customer WHERE needSync = 1 AND origin = 'local'";
+	logZoe("doListAddedCustomersToUpload select= " + selectStr);
+	tx.executeSql(selectStr,[], customerLocalListReceiveFunction, invoiceErrFunc);
+ }
+
 
 function doMarkToSyncCustomer(tx){
 	tx.executeSql("UPDATE customer SET needSync=1, zoeUpdateDate=datetime('now', 'localtime') where ListID = ?",[filterDataCustomer]);

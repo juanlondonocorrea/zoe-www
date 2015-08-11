@@ -398,6 +398,8 @@
 			}	
 			
 			function UpdateCustomer(){
+				console.log("$('#routeDay1').val()=" + $('#routeDay1').is(':checked'));
+				
 				var customersVO = [];
 								
 				var customerVO = {
@@ -436,15 +438,18 @@
 					id_term:$('#Terms').val(),
 					otherDetails:$('#OtherDetails').val(),
 
-					routeDay1:$('#routeDay1').val(),
-					routeDay2:$('#routeDay2').val(),
-					routeDay3:$('#routeDay3').val(),
-					routeDay4:$('#routeDay4').val(),
-					routeDay5:$('#routeDay5').val(),
-					routeDay6:$('#routeDay6').val(),
-					routeDay7:$('#routeDay7').val(),
+					routeDay1:$('#routeDay1').is(':checked')?1:0,
+					routeDay2:$('#routeDay2').is(':checked')?1:0,
+					routeDay3:$('#routeDay3').is(':checked')?1:0,
+					routeDay4:$('#routeDay4').is(':checked')?1:0,
+					routeDay5:$('#routeDay5').is(':checked')?1:0,
+					routeDay6:$('#routeDay6').is(':checked')?1:0,
+					routeDay7:$('#routeDay7').is(':checked')?1:0,
 
-					pricelevel_ListID:$('#pricelevel_ListID').val()
+					pricelevel_ListID:$('#pricelevel_ListID').val(), 
+					needSync:1,
+					zoeUpdateDate:new Date()
+					
 				};
 				logZoe("ListID ========> " +$('#ListID').val());
 				logZoe("FullName ========> " +$('#FullName').val());
