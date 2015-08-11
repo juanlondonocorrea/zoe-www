@@ -25,7 +25,7 @@
 				initAnyPage(event.target);
 				initThisPage(event);
 			});
-			
+
 			var type="";
 			function initThisPage(event){ 
 				//receiveCustomers();
@@ -438,6 +438,7 @@
 					id_term:$('#Terms').val(),
 					otherDetails:$('#OtherDetails').val(),
 
+
 					routeDay1:$('#routeDay1').is(':checked')?1:0,
 					routeDay2:$('#routeDay2').is(':checked')?1:0,
 					routeDay3:$('#routeDay3').is(':checked')?1:0,
@@ -446,6 +447,7 @@
 					routeDay6:$('#routeDay6').is(':checked')?1:0,
 					routeDay7:$('#routeDay7').is(':checked')?1:0,
 
+					
 					pricelevel_ListID:$('#pricelevel_ListID').val(), 
 					needSync:1,
 					zoeUpdateDate:new Date()
@@ -529,36 +531,37 @@
 		</script>
 		<style type="text/css">
 		
-.inlinetabs .ui-navbar {
-    margin: 0px 2px;
-	height: 54px;
-	padding-left: 6px !important;
-}
 
-.inlinetabs .ui-tabs-nav > li {
-    margin: 0 2px;
-    width: auto;
-    clear: none;
-	height:15px;
-}
-
-.inlinetabs .ui-tabs-nav .ui-btn {
-    border-bottom: none;
-    border-top-left-radius: .6em;
-    border-top-right-radius: .6em;
-	width:55px;
-}
-
-.inlinetabs .ui-tabs-panel {
-    background: #fff;
-    border-radius: .6em;
-    border: 1px solid #ddd;
-}
-
-.inlinetabs div {
-   margin:2px 2px 2px 2px;
-    outline:none;
-}
+			.inlinetabs .ui-navbar {
+				margin: 0px 2px;
+				height: 54px;
+				padding-left: 6px !important;
+			}
+			
+			.inlinetabs .ui-tabs-nav > li {
+				margin: 0 2px;
+				width: auto;
+				clear: none;
+				height:15px;
+			}
+			
+			.inlinetabs .ui-tabs-nav .ui-btn {
+				border-bottom: none;
+				border-top-left-radius: .6em;
+				border-top-right-radius: .6em;
+				width:55px;
+			}
+			
+			.inlinetabs .ui-tabs-panel {
+				background: #fff;
+				border-radius: .6em;
+				border: 1px solid #ddd;
+			}
+			
+			.inlinetabs div {
+			   margin:2px 2px 2px 2px;
+				outline:none;
+			}
 			thead {color:black;}
 			tbody {color:gray;}
 			tfoot {

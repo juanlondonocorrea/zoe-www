@@ -3,6 +3,7 @@
 var paymentDAO = {
 				getById: getPaymentById, 
 				listByCustomer:listPaymentsByCustomer,
+				PaymentsByCustomerDateRange:listPaymentsByCustomerDateRange,
 				listToUpload:listPaymentsToUpload,
 				getById:getPaymentById, 
 				store:storePayment, 
@@ -53,6 +54,16 @@ function listPaymentsByCustomer(customer_ListID, aReceiveFunction,aErrFunc){
 	paymentErrFunc = aErrFunc;
 	filterDataPayment = customer_ListID;
 	db.transaction(doCustomerPayments, paymentErrFunc);
+}
+
+function listPaymentsByCustomerDateRange(initDate, finalDate, aReceiveFunction,aErrFunc){
+	db = openDatabaseZoe();
+	logZoe("listPaymentsByCustomerDateRange db=" + db);
+	paymentReceiveListFunction = aReceiveFunction;
+	paymentErrFunc = aErrFunc;
+	filterDataPayment = new Array();
+	filterDataPayment = [initDate,finalDate];
+	db.transaction(doCustomerPaymentsByDateRange, paymentErrFunc);
 }
 
 function listPaymentsToUpload(aReceiveFunction,aErrFunc){
@@ -116,6 +127,16 @@ function doListPaymentsToUpload(tx){
 function doCustomerPayments(tx){
 	logZoe("doSelectSelesrepPayments");
 	tx.executeSql("SELECT * FROM payment WHERE ListID = ?", [filterDataPayment],paymentLocalListReceiveFunction, paymentErrFunc);
+}
+
+function doCustomerPaymentsByDateRange(tx){
+	logZoe("doCustomerPaymentsByDateRange");
+	tx.executeSql("SELECT TxnDate, customer.FullName AS Full_Name, refNumber, PaymentMethod.Name AS PaymentMethod_Name, TotalAmount "+
+	" FROM Payment " +
+	" LEFT JOIN PaymentMethod ON PaymentMethod.ListID = Payment.paymentsMethod_ListID " +
+	" LEFT JOIN customer ON customer.ListID = payment.ListID " +
+	" WHERE TxnDate BETWEEN ? AND ? " +
+	" ORDER BY TxnDate ASC", filterDataPayment,paymentLocalListReceiveFunction, paymentErrFunc);
 }
 
 function paymentLocalReceiveFunction(tx,results){
