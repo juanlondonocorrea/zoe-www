@@ -15,6 +15,7 @@
 		<script type="text/javascript" src="cordova.js"></script>
 		<script src="js/jqm-inlinetabs/jqm-inlinetabs.min.js"></script>        
 		<script src="js/zoe/zoe.js"></script>
+        <script src="js/zoe/salesRepDAO.js"></script>
 		<script src="js/zoe/customerDAO.js"></script>
         <script src="js/zoe/termDAO.js"></script>
         <script src="js/zoe/pricelevelDAO.js"></script>
@@ -110,16 +111,26 @@
 
 			function CreateCustomer(){
 				termDAO.list(receiveTerms,errReceiveTerms);
-				pricelevelDAO.list(receivePriceLevel,errPriceLevel);				
+				pricelevelDAO.list(receivePriceLevel,errPriceLevel);
+				salesRepDAO.getByName(window.localStorage.getItem("salesRepName"),receiveSalesrep);
+				
 			}
+
+			var salesrepVO;
+			function receiveSalesrep(obj){
+				salesrepVO = obj;
+				console.log("salesRep=" + JSON.stringify(salesrepVO));
+				$("#SalesRep").val(window.localStorage.getItem("salesRepName"));
+			}
+						
+			var CodCustomer = '';
 			function AddCustomer(){
 				var customersVO = [];
 								
 				var customerVO = {
-					id_salesrep:$('#SalesRep').val(),
-
-					ListID:$('#ListID').val(generateKey()),
-					IsActive:$('#IsActive').val(),
+					id_salesrep:salesrepVO.id_salesrep,
+					ListID:generateKey(),
+					IsActive:'1',
 					FullName:$('#FullName').val(),
 					name:$('#Name').val(),
 					companyName:$('#CompanyName').val(),
@@ -174,13 +185,16 @@
 				logZoe("routeDay7 ========> " +$('#routeDay7').val());
 				logZoe("PriceLevel ========> " +$('#priceLevel').val());			
 				logZoe("customerVO ========> " + JSON.stringify(customerVO));
+				CodCustomer = customerVO.ListID;
 				customersVO[0] = customerVO;
-				//customerDAO.store(customersVO, errCustomerCreation, successCustomerCreation, "local");
+				customerDAO.store(customersVO, errCustomerCreation, successCustomerCreation, "local");
+				return false;
 			}
 
 			function successCustomerCreation(){
-					customerDAO.markToSync($('#ListID').val(), errCustomermarkToSync);
+					customerDAO.markToSync(CodCustomer, errCustomermarkToSync);
 					alert("Customer was successful updated");
+					window.location = "Customers.html?ListID=" +CodCustomer;
 			}
 			
 			function errCustomerCreation(err){
@@ -251,21 +265,14 @@
 						<legend><h4>Sales Representant Info</h4></legend>
 						<div data-role="fieldcontain">
 							<div>
-								<label for="ListID">Sales Representant:</label>
+								<label for="SalesRep">Sales Representant:</label>
 							</div>
-							<input class="myFormsControl" type="text" data-theme="b" name="SalesRep" id="SalesRep" value=""/>
+							<input class="myFormsControl" type="text" data-theme="b" name="SalesRep" id="SalesRep" value="" readonly/>
 						</div>
 					</fieldset>    
 					<!-- Identification Info -->
 					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
 						<legend><h4>Identification Info</h4></legend>
-						<div data-role="fieldcontain">
-							<div>
-								<label for="ListID">ListID:</label>
-							</div>
-							<input type="text" data-theme="b" name="ListID" id="ListID" value=""/>
-							<input type="text" data-theme="b" name="IsActive" id="IsActive" value=""/>
-						</div>
 						<div data-role="fieldcontain">
 							<div>
 								<label for="FullName">Full Name:</label>
