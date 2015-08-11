@@ -345,6 +345,7 @@
 			routeDay = routeDay.toUpperCase();
 			logZoe("routeday=" + routeDay);
 			var customerVO = {ListID:customers[i].ListID,
+			editSequence:customers[i].EditSequence,
 			FullName:customers[i].FullName,
 			IsActive:customers[i].IsActive==true?1:0,
 			billAddress1:customers[i].BillAddress?customers[i].BillAddress.Addr1:null,
