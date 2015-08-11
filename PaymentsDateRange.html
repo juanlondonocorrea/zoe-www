@@ -1,0 +1,216 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Customers</title>
+
+		<link rel="stylesheet" href="css/themes/zoe.min.css" />
+		<link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+		<link rel="stylesheet" href="js/jquery-mobile/jquery.mobile.structure-1.4.5.min.css" />
+
+		<!--  <link rel="stylesheet" href="js/jquery-mobile/jquery.mobile-1.4.5.min.css" />  -->
+		<script src="js/jquery-mobile/jquery-2.1.4.js"></script>
+		<script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+		<script type="text/javascript" src="cordova.js"></script>
+		<script src="js/zoe/zoe.js"></script>
+        <script src="js/zoe/paymentDAO.js"></script>
+
+        <style>
+			.ui-icon-edit{
+				height:16px !important;
+				width:16px !important;
+			}
+			.ui-icon-print{
+				height:16px !important;
+				width:16px !important;
+			}
+		</style>
+
+		<script>
+			$(document).bind("pagebeforecreate", function(event) {
+				initAnyPage(event.target);
+				initThisPage(event);
+			});
+			
+			var Date1;
+			var Date2;
+ 			function initThisPage(event){
+				selectPaymentsDateRange();
+			}
+
+			// Cordova Device Ready.
+			function print() {
+				try{
+					cordova.plugins.printer.isAvailable(
+					//Check whether the printer is available or not.
+					function (isAvailable) {
+						 //Enter the page location.
+						 var page = $('#PaymentsByCustomer_1').html(); //location.href;
+						 cordova.plugins.printer.print(page, 'Document.html', function () {
+						 alert('printing finished or canceled')
+							});
+					}
+				);
+				}catch(e){
+					console.log("could not print:" + e);
+				}
+			}			
+
+			function selectPaymentsDateRange(){
+				Date1 = $("#InitialDate").val();
+				Date2 = $("#FinalDate").val();
+				logZoe("Date1: ===>"+Date1+"Date2:===> "+Date2);
+				if ((Date1) && (Date2)){
+					logZoe("selectPaymentsDateRange: =========>SI");
+					paymentDAO.PaymentsByCustomerDateRange(Date1, Date2, receivePaymentsByCustomerDateRange,errReceivePaymentsByCustomerDateRange);
+				}
+			}
+			
+			// BEGIN Functions on error case
+			function errReceivePaymentsByCustomerDateRange(err){
+				alert("DB Error Payments By Customer & Date Range: "+JSON.stringify(err));
+			}
+			// END functions on error case
+
+
+			function receivePaymentsByCustomerDateRange(payments){
+				console.log("receivePaymentsByCustomerDateRange payments=" + JSON.stringify(payments));
+				var totalAmount = 0.00;
+				var totalOpenBalance = 0.00;				
+				$("#tableBodyPayments").html("");
+				var paymentsByCustomer = '<div class="MediumFont" align="center">Payments by Customer since '+Date1+' to '+Date2+'</div>'
+				+'<table class="tblPayments">'
+				  +'<tbody>'
+					+'<tr>' 
+					  +'<td><div class="TinyFont">Customer</div></td>'
+					  +'<td><div class="TinyFont">Reference</div></td>'
+					  +'<td><div class="TinyFont">Payment Method</div></td>'
+					  +'<td><div class="TinyFont">Amount</div></td>'
+					  +'<td><div class="TinyFont">Sync</div></td>'
+					+'</tr>';
+				if (payments && payments.length>0){
+					var ico = "";
+					for (var i=0; i < payments.length; i++) {
+						if (payments[i].origin=="local"){
+							if (payments[i].needCorrection=="1"){
+								ico = "warning.png";
+							}else if (payments[i].needSync=="1"){
+								ico = "nosync.png";
+							}else{
+								ico = "sync.png";
+							}
+						}else if (payments[i].origin=="synch"){
+								ico = "sync.png";
+						}
+						console.log("ico=" + ico);
+						paymentsByCustomer +=
+						'<tr>'
+						  +'<td><div class="TinyFont">'+payments[i].FullName+'</div></td>'
+						  +'<td><div class="TinyFont">'+payments[i].refNumber+'</div></td>'
+
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(payments[i].PaymentMethod_Name,2,0)+'</div></td>'
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(payments[i].Amount,2,0)+'</div></td>'
+						  +'<td><table ><tr>';
+						  if (ico!=""){
+						  	paymentsByCustomer +='<td style="border: none;"><img src="css/themes/images/' + ico + '" height="10" width="10"></td>';
+						  }
+						  if (payments[i].origin=="local"){
+							  paymentsByCustomer +=  '<td style="border: none;"><a href="payment.html?id_payment=' + payments[i].id_payment + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-edit"  data-ajax="false"></a></td>';
+						  }
+					  	paymentsByCustomer +=  '<td style="border: none;"><a href="payment.html?id_payment=' + payments[i].id_payment + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-print"  data-ajax="false"></a></td>';
+						paymentsByCustomer +='</tr></table></td></tr>';
+						console.log("paymentsByCustomer=" + paymentsByCustomer);
+
+						totalAmount += NumberCast(payments[i].Amount,2,0)*1;
+						
+						totalOpenBalance += NumberCast(payments[i].OpenBalance,2,0)*1;
+						}
+				}
+				else  {
+					paymentsByCustomer +=
+						'<tr>'
+
+							+'<td colspan="4"><div align="center" class="TinyFont">No payments in this dates range</div></td>'
+						+'</tr>';
+				}
+				paymentsByCustomer +=
+					'<tr>'
+						+'<td colspan="2"><div align="right" class="SmallFontN">Totals Amount & Open Balance</div></td>'
+
+						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalAmount,2,0, '')+'</div></td>'
+						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalOpenBalance,2,0, '')+'</div></td>'
+					+'</tr>';
+				paymentsByCustomer += '</tbody></table>';
+				$("#tableBodyPayments").html(paymentsByCustomer); 
+				print();
+			} 
+		</script>
+		<style type="text/css">
+			.BigFont { font-family: Arial; color:black; font-weight:bolder; font-size:14px; vertical-align:top;}
+			.MediumFont {font-family: Arial; color:black; font-weight:bolder; font-size:12px; vertical-align:top;}
+			.SmallFontN {font-family: Arial; color:black; font-weight:bolder; font-size:10px; vertical-align:top;}
+			.SmallFont {font-family: Arial; color:black; font-weight:normal; font-size:10px; vertical-align:top;}
+			.TinyFont {font-family: Arial; color:black; font-weight:bolder; font-size:8px; vertical-align:bottom;}
+
+			.table {
+				margin: 0 auto;
+				border-collapse: collapse;
+				border-spacing: 0px;
+				cellspacing: 0px;
+				cellpadding: 0px;
+				padding: 5px;
+				width: 100%;
+				vertical-align: top;
+			}
+			
+			.tblHeader { 
+				border: 1px solid black;
+			}
+			.tblPayments { 
+				width: 100%; border-spacing: 0px;cellspacing: 0px;cellpadding: 0px;padding: 0px;
+			}
+
+			table.tblPayments td{
+				border:1px solid black;
+			}
+
+			.tblFooter { 
+				border: 1px solid black;
+			}
+			span { vertical-align:top; }
+			#Footer { float:right; width: 50%;}
+			
+		</style> 
+	</head>
+
+	<body>
+        <div data-role="page" id="PaymentsByCustomer_1" data-title="Payments by Customer" data-theme="a">
+            <div data-role="content">
+            	<div id="dateRange">
+                <table>
+                	<tr>
+                    	<td valign="bottom">            
+                            <div data-role="fieldcontain" class="SmallFont">
+                                <div class="SmallFontN">Initial Date:</div>
+                             	<input type="date" name="InitialDate" id="InitialDate" placeholder="Initial Date" value=""/>
+                            </div>
+                         </td>
+                         <td valign="bottom">
+                            <div data-role="fieldcontain" class="SmallFont">
+                                <div class="SmallFontN">Final Date:</div>
+                                <input type="date" name="FinalDate" id="FinalDate" placeholder="Final Date" value=""/>
+                            </div>
+                          </td>
+                          <td valign="bottom">
+                              <div  class="SmallFontN">
+                                <a onClick="selectPaymentsDateRange();" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-carat-r" data-ajax="false">Go</a>
+                              </div>
+                           </td>
+                       </tr>
+                 </table>
+              	<div id="tableBodyPayments"></div>
+            </div>
+		  </div>	
+        </div>
+	</body>
+</html>
