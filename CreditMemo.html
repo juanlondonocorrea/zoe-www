@@ -131,7 +131,7 @@ $(document).ready(function() {
 				salesrepVO = obj;
 				console.log("salesRep=" + JSON.stringify(salesrepVO));
 				
-				$('#refNumber').val( creditMemoDAO.generateRefNum(salesrepVO.initial+ "") );
+				$('#refNumber').val( invoiceDAO.generateRefNum(salesrepVO.initial+ "") );
 				$('#PONumber').val($('#refNumber').val());
 				$("#SalesRep").val(window.localStorage.getItem("salesRepName"));
 

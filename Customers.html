@@ -199,7 +199,6 @@
 					var li =  '<li data-filtertext="' + arrayCustomers[i].FullName + '"><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '" ><h3>'+arrayCustomers[i].FullName+'</h3><p>' + ((type=='route')?'Total sales':'Balance') + '</p><span id="openB" class="ui-li-count">'+((type=='route')?arrayCustomers[i].salesofday:arrayCustomers[i].openBalance)+'</span></a><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
 					
 					htmlString1 += li;
-					console.log("li=" + li);					
 					}
 					console.log("========= FIN LISTA =========");
 					try{$('#custList').html(htmlString1).listview('refresh');}catch(e){}
@@ -230,11 +229,13 @@
 			function receivePriceLevel(arrayPriceList){
 				$('#priceLevel').empty();
 				var toSelectIndex = 0;
+				var option='<option value="">Chose a pricelevel</option>'
+				$('#priceLevel').append(option);
 				for (var i in arrayPriceList) {
 					if (arrayPriceList[i].ListID == listCustomers[selectedIndex].pricelevel_ListID){
 						toSelectIndex=i;
 					}
-					var option='<option value="'+arrayPriceList[i].ListID+'">'+arrayPriceList[i].name+'</option>'
+					option='<option value="'+arrayPriceList[i].ListID+'">'+arrayPriceList[i].name+'</option>'
 					$('#priceLevel').append(option);
 				}
 				$('#priceLevel')[0].selectedIndex = toSelectIndex;
@@ -367,14 +368,8 @@
 				(listCustomers[index].routeDay5)?$('#routeDay5').prop("checked", true):$('#routeDay5').prop("checked", false);
 				(listCustomers[index].routeDay6)?$('#routeDay6').prop("checked", true):$('#routeDay6').prop("checked", false);
 				(listCustomers[index].routeDay7)?$('#routeDay7').prop("checked", true):$('#routeDay7').prop("checked", false);
-
-				$('#routeDay1').val(listCustomers[index].routeDay1);
-				$('#routeDay2').val(listCustomers[index].routeDay2);	
-				$('#routeDay3').val(listCustomers[index].routeDay3);
-				$('#routeDay4').val(listCustomers[index].routeDay4);
-				$('#routeDay5').val(listCustomers[index].routeDay5);
-				$('#routeDay6').val(listCustomers[index].routeDay6);
-				$('#routeDay7').val(listCustomers[index].routeDay7);
+				
+				console.log("pricelevel_ListID=" + listCustomers[index].pricelevel_ListID);
 				$('#pricelevel_ListID').val(listCustomers[index].pricelevel_ListID);
 				console.log("listCustomers[index].pricelevel_ListID =======> "+listCustomers[index].pricelevel_ListID);
 								
@@ -455,12 +450,11 @@
 					routeDay5:$('#routeDay5').is(':checked')?1:0,
 					routeDay6:$('#routeDay6').is(':checked')?1:0,
 					routeDay7:$('#routeDay7').is(':checked')?1:0,
-
-					pricelevel_ListID:$('#pricelevel_ListID').val(), 
+					pricelevel_ListID:$('#priceLevel').val(), 
 					needSync:1,
 					zoeUpdateDate:new Date()
 				};
-				console.log("$('#pricelevel_ListID').val() =======> "+$('#pricelevel_ListID').val());
+				console.log("$('#pricelevel_ListID').val() =======> "+$('#priceLevel').val());
 				logZoe("ListID ========> " +$('#ListID').val());
 				logZoe("FullName ========> " +$('#FullName').val());
 				logZoe("Phone ========> " +$('#Phone').val());				
