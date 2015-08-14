@@ -14,6 +14,7 @@
   <script src="js/zoe/zoe.js"></script>
   <script src="js/zoe/salesRepDAO.js"></script>
   <script src="js/zoe/creditMemoDAO.js"></script>
+  <script src="js/zoe/invoiceDAO.js"></script>
   <script src="js/zoe/inventoryDAO.js"></script>
   <script src="js/zoe/customerDAO.js"></script>
   <script src="js/zoe/termDAO.js"></script>
@@ -204,7 +205,7 @@ $(document).ready(function() {
 				console.log("selCustomerChange val=" + $( "#selCustomer" ).val());
 				customerSelectedIndex = $( "#selCustomer" )[0].selectedIndex-1;
 				console.log("selCustomerChange custseleccionado=" + JSON.stringify(listCustomers[customerSelectedIndex]));
-				inventoryDAO.listByCustomer($( "#selCustomer" ).val(),receiveItems,errReceive);
+				inventoryDAO.listByCustomerAndAll($( "#selCustomer" ).val(),receiveItems,errReceive);
 				if (!currentCreditMemo){
 					$("#selTerm").val(listCustomers[customerSelectedIndex].id_term).selectmenu("refresh");
 					selTermChange();

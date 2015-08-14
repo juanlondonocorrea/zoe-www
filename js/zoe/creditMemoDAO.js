@@ -194,8 +194,15 @@ function doSalesrepCreditMemos(tx){
 
 function doListCreditMemosToUpload(tx){
 	logZoe("doListCreditMemosToUpload");
-	tx.executeSql("SELECT creditMemo.*, creditMemo_item.*, inventorySite_ListID FROM creditMemo LEFT JOIN creditMemo_item ON creditMemo.id_creditMemo = creditMemo_item.id_creditMemo " +
-	"LEFT JOIN inventory ON creditMemo_item.inventory_ListID = inventory.ListID  WHERE needSync = 1",[], creditMemoLocalListToUploadReceiveFunction, creditMemoErrFunc);
+	var sql = "SELECT creditMemo.*, creditMemo_item.*, inventorySite_ListID, class.type, inventorySite.ListID as inventorySite_damagedListID"
+		+" FROM creditMemo "
+		+" LEFT JOIN creditMemo_item ON creditMemo.id_creditMemo = creditMemo_item.id_creditMemo "
+		+" LEFT JOIN class ON class.ListID = creditMemo_item.class_ListID"
+		+" LEFT JOIN inventory ON creditMemo_item.inventory_ListID = inventory.ListID "
+		+" LEFT JOIN inventorySite ON inventorySite.Name = 'Damaged'"
+		+"  WHERE needSync = 1"
+	
+	tx.executeSql(sql,[], creditMemoLocalListToUploadReceiveFunction, creditMemoErrFunc);
  }
 
 
@@ -354,7 +361,7 @@ function creditMemoLocalListToUploadReceiveFunction(tx,results){
 			  	LineID:rec.LineID,
   				id_creditMemo:rec.id_creditMemo,
 				Inventory_ListID:rec.inventory_ListID,
-				InventorySite_ListID:rec.InventorySite_ListID,
+				InventorySite_ListID:rec.Type=="GOOD"?rec.InventorySite_ListID:rec.inventorySite_damagedListID,
 				Desc:rec.Desc,
 				Quantity:rec.Quantity,
 				Rate:rec.Rate,
