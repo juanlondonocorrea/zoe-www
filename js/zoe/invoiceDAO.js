@@ -414,7 +414,7 @@ function doStoreInvoice(tx){
 function doStoreOneInvoice(tx, rec){
 		tx.executeSql('INSERT OR REPLACE INTO invoice(id_invoice, ListID, po_number, txnDate, dueDate, appliedAmount, balanceRemaining, billAddress_addr1, billAddress_addr2, billAddress_addr3, billAddress_city, billAddress_state, billAddress_postalcode, shipAddress_addr1, shipAddress_addr2, shipAddress_addr3, shipAddress_city, shipAddress_state, shipAddress_postalcode, isPaid, isPending, refNumber, salesTaxPercentage, salesTaxTotal, shipDate, subtotal, id_term, id_salesrep, customerMsg_ListID, memo, signature,signaturePNG,  photo, origin) ' +
 		' values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?,?,?, ?, ?)',
-		[rec.id_invoice, rec.ListID, ifUndefNull(rec.po_number)+"", ifUndefNull(rec.txnDate), 
+		[rec.id_invoice+"", rec.ListID, ifUndefNull(rec.po_number)+"", ifUndefNull(rec.txnDate), 
 		ifUndefNull(rec.dueDate), ifUndefNull(rec.appliedAmount), ifUndefNull(rec.balanceRemaining), 
 		ifUndefNull(rec.billAddress_addr1), ifUndefNull(rec.billAddress_addr2), 
 		ifUndefNull(rec.billAddress_addr3), ifUndefNull(rec.billAddress_city), 
@@ -436,7 +436,7 @@ function doStoreOneInvoice(tx, rec){
 			 console.log("elementos=" + JSON.stringify([item.LineID,rec.id_invoice,item.Inventory_ListID,item.Desc,item.Quantity,item.Rate,item.Amount,item.salesTax_ListID]));
 			 tx.executeSql('INSERT INTO invoice_item(LineID,id_invoice,Inventory_ListID,Desc,Quantity,Rate,Amount,SalesTax_ListID) '+
 			 ' VALUES(?,?,?,?,?,?,?,?)',
-			 [item.LineID,rec.id_invoice,ifUndefNull(item.Inventory_ListID),ifUndefNull(item.Desc),ifUndefNull(item.Quantity),
+			 [item.LineID,rec.id_invoice+"",ifUndefNull(item.Inventory_ListID),ifUndefNull(item.Desc),ifUndefNull(item.Quantity),
 			 ifUndefNull(item.Rate),ifUndefNull(item.Amount),ifUndefNull(item.salesTax_ListID)]);
 		 }
 	 }
