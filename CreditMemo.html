@@ -222,7 +222,7 @@ $(document).ready(function() {
 				$('#selProduct').empty();
 				$('#selProduct').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');				
 				for (var i in list) {
-					$('#selProduct').append('<option value="' + list[i].ListID +'">('+ list[i].QuantityOnHand + ') ' + list[i].FullName + '-'+list[i].salesDesc+ '</option>');
+					$('#selProduct').append('<option value="' + list[i].ListID +'">'+ list[i].FullName + '-'+list[i].salesDesc+ '</option>');
 				}
 				$('#selProduct').trigger("chosen:updated");
 			}
@@ -464,7 +464,7 @@ $(document).ready(function() {
 		
 		function successCreditMemoInsert(){
 			if ($("#isPersisted").val() == "false"){
-				creditMemoDAO.confirmGeneratedRefNum();
+				invoiceDAO.confirmGeneratedRefNum();
 			}
 			$("#isPersisted").val("true");
 			creditMemoDAO.markToSync($('#refNumber').val(), errCreditMemoInsert, successCreditMemoInsertMark);

@@ -657,6 +657,7 @@
 		var mensaje = "";
 		extraDatas = new Array();
 		creditMemoDAO.listToUpload(function(results){
+			console.log("syncUpCreditMemos results=" + results);
 			for (var i in results){
 				var rec = results[i];
 				console.log("syncUpCreditMemos creditMemo["+ i + "]=" + JSON.stringify(rec));
@@ -674,9 +675,13 @@
 					if (rec.SalesTax_ListID){
 						mensaje+='<CustomerSalesTaxCodeRef><ListID>' + rec.SalesTax_ListID + '</ListID></CustomerSalesTaxCodeRef>';
 					}
+					console.log("antes del for");
 				for (var j in rec.items){
+					console.log("dentro del for1");
 					var item=rec.items[j];
-					console.log("item=" + JSON.stringify(item));
+					console.log("dentro del for2");
+					console.log("item x=" + JSON.stringify(item));
+					console.log("item.class_ListID=" + item.class_ListID);
 					mensaje += '<CreditMemoLineAdd><ItemRef><ListID>' + item.Inventory_ListID +'</ListID></ItemRef>';
 					mensaje += '<Quantity>' + item.Quantity + '</Quantity>';
 					mensaje += '<Rate>' + item.Rate + '</Rate>';
@@ -712,6 +717,7 @@
 		ListCreditMemoAddRs = message.CreditMemoAddRs;
 		console.log("ListCreditMemoAddRs=" + ListCreditMemoAddRs);
 		currentCreditMemoIndex = 0;
+		message = "";
 		processNextCreditMemoResponse();
 	}
 	
@@ -1005,106 +1011,6 @@
 		alert("DB Error synch creditMemos: "+JSON.stringify(err));
 	}
 
-	function syncUpCreditMemos(form){
-		console.log("entre a syncUpCreditMemos");
-		var mensaje = "";
-		creditMemoDAO.listToUpload(function(results){
-			for (var i in results){
-				var rec = results[i];
-				mensaje += '<CreditMemoAddRq requestID="' + rec.refNumber+ '"><CreditMemoAdd>'+
-					'<CustomerRef><ListID>' + rec.ListID + '</ListID></CustomerRef>'+
-					'<TxnDate>'+rec.shipDate+'</TxnDate>'+
-					'<RefNumber>'+rec.refNumber+'</RefNumber>'+
-					'<PONumber>'+rec.po_number+'</PONumber>'+
-					'<TermsRef><ListID>'+rec.id_term+ '</ListID></TermsRef>'+
-					'<DueDate>'+rec.dueDate+'</DueDate>'+
-					'<SalesRepRef><ListID>' +rec.id_salesrep+'</ListID></SalesRepRef>'+
-					'<Memo>' +rec.memo+'</Memo>';
-					if (rec.customerMsg_ListID){
-						mensaje+='<CustomerMsgRef><ListID>' +rec.customerMsg_ListID + '</ListID></CustomerMsgRef>';
-					}
-					if (rec.SalesTax_ListID){
-						mensaje+='<CustomerSalesTaxCodeRef><ListID>' + rec.SalesTax_ListID + '</ListID></CustomerSalesTaxCodeRef>';
-					}
-				for (var j in rec.items){
-					var item=rec.items[j];
-					mensaje += '<CreditMemoLineAdd><ItemRef><ListID>' + item.Inventory_ListID +'</ListID></ItemRef>';
-					mensaje += '<Quantity>' + item.Quantity + '</Quantity>';
-					mensaje += '<Rate>' + item.Rate + '</Rate>';
-					if (item.InventorySite_ListID){
-						mensaje += '<InventorySiteRef><ListID>' + item.InventorySite_ListID+ '</ListID></InventorySiteRef>';
-					}
-					mensaje += '</CreditMemoLineAdd>';
-				}
-				mensaje += '</CreditMemoAdd></CreditMemoAddRq>';
-			}
-						
-			console.log("syncUpCreditMemos mensaje=" +  mensaje)
-			
-			consumeWS(mensaje, "JSON", receiveSyncUpCreditMemosMessage);
-		}, function(err){
-			alert("Fail sync upload CreditMemos " + JSON.stringify(err));
-		});
-		return false;
-	}
-	
-	var CreditMemoAddRs;
-	var ListCreditMemoAddRs;
-	var currentCreditMemoIndex;
-	var currentCreditMemo;
-	function receiveSyncUpCreditMemosMessage(message){
-		console.log('receiveSyncUpCreditMemosMessage message=' + message);
-		ListCreditMemoAddRs = message.CreditMemoAddRs;
-		console.log("ListCreditMemoAddRs=" + ListCreditMemoAddRs);
-		currentCreditMemoIndex = 0;
-		message = "";
-		processNextCreditMemoResponse();
-	}
-	
-	function processNextCreditMemoResponse(){
-		console.log("currentCreditMemoIndex=" +currentCreditMemoIndex);
-		if (message!=null&& message!=""){
-			$("#currentTask").html(message);
-		}
-			if (!ListCreditMemoAddRs.length && currentCreditMemoIndex==1){
-				$("#btnSynchDialog").html("Accept");
-				return;
-			}else if (currentCreditMemoIndex == ListCreditMemoAddRs.length){
-				$("#btnSynchDialog").html("Accept");
-				return;
-			}
-		if (ListCreditMemoAddRs.length){
-			CreditMemoAddRs =ListCreditMemoAddRs[currentCreditMemoIndex]
-		}else{
-			CreditMemoAddRs = ListCreditMemoAddRs;
-		}
-		console.log("CreditMemoAddRs=" +CreditMemoAddRs);
-		var statusMessage =CreditMemoAddRs.statusMessage;
-		if (statusMessage == "Status OK"	){
-			currentCreditMemo = convertCreditMemoFromQB(CreditMemoAddRs.CreditMemoRet);
-			currentCreditMemo.origin = "synch";
-			
-			creditMemoDAO.store([currentCreditMemo],errorCreditMemoDB,function(){
-				creditMemoDAO.delete(currentCreditMemo.refNumber,errorCreditMemoDB, processedCreditMemo);
-			});
-		}else{
-			message += "Fail to upload creditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
-		}
-	}
-	
-	function processedCreditMemo(){
-		currentCreditMemoIndex++;
-		message += "Success upload CreditMemo " + CreditMemoAddRs.requestID + "<br>";
-		processNextCreditMemoResponse();
-	}
-	
-
-	function	errorCreditMemoDB(err) {
-		message += "Fail to store creditMemo " + CreditMemoAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
-		currentCreditMemoIndex++;
-		processNextCreditMemoResponse();
-	}
-	
 
 
 //SYNCHRONIZATION inventory
