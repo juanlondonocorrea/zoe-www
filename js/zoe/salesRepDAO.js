@@ -27,7 +27,7 @@ function storeSalesRep(record,aErrFunc,successCB){
 
 function doSelectSalesRep(tx){
 	logZoe("doSelectSalesRep filterData=" + filterData);
-	tx.executeSql("SELECT id_salesrep,Name, Password, isActive, SyncTime, Initial FROM salesRep Where Name=?", [filterData],localReceiveFunction, salesRepErrFunc);
+	tx.executeSql("SELECT id_salesrep,Name, Password, isActive, SyncTime, Initial FROM salesRep Where upper(Name)=upper(?)", [filterData],localReceiveFunction, salesRepErrFunc);
 }
 
 function localReceiveFunction(tx,results){
