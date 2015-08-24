@@ -63,6 +63,7 @@ function listPaymentsByCustomerDateRange(initDate, finalDate, aReceiveFunction,a
 	paymentErrFunc = aErrFunc;
 	filterDataPayment = new Array();
 	filterDataPayment = [initDate,finalDate];
+	console.log("filterDataPayment: ========> "+filterDataPayment);
 	db.transaction(doCustomerPaymentsByDateRange, paymentErrFunc);
 }
 
@@ -130,7 +131,7 @@ function doCustomerPayments(tx){
 }
 
 function doCustomerPaymentsByDateRange(tx){
-	logZoe("doCustomerPaymentsByDateRange");
+	logZoe("doCustomerPaymentsByDateRange ========");
 	tx.executeSql("SELECT TxnDate, customer.FullName AS Full_Name, refNumber, PaymentMethod.Name AS PaymentMethod_Name, TotalAmount "+
 	" FROM Payment " +
 	" LEFT JOIN PaymentMethod ON PaymentMethod.ListID = Payment.paymentsMethod_ListID " +
