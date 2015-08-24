@@ -384,6 +384,7 @@
 			id_term:customers[i].TermsRef?customers[i].TermsRef.ListID:null,
 			pricelevel_ListID:customers[i].PriceLevelRef?customers[i].PriceLevelRef.ListID:null,
 			vendor_ListID:vendorName,
+			origin:"remote"
 			};
 			logZoe("customerVO=" + JSON.stringify(customerVO));
 			customersVO[i] = customerVO;
@@ -782,51 +783,71 @@
 	function syncUpCustomers(form){
 		console.log("entre a syncUpCustomers");
 		var mensaje = "";
-		customerDAO.listModifiedToUpload(function(results){
+		customerDAO.listAllToUpload(function(results){
+			console.log("syncUpCustomers results = " + JSON.stringify(results));
 			for (var i in results){
 				var rec = results[i];
 				console.log("syncUpCustomers customer["+ i + "]=" + JSON.stringify(rec));
-				mensaje += '<CustomerModRq requestID="' + rec.ListID + '"><CustomerMod>'+
-					'<ListID>' + rec.ListID + '</ListID>'
-					+'<EditSequence>'+ rec.editSequence + '</EditSequence>'
-					+'<Name>'+rec.FullName+'<Name>'
+				if (rec.origin=="remote"){
+					mensaje += '<CustomerModRq requestID="' + rec.ListID + '"><CustomerMod>';
+				}else{
+					mensaje += '<CustomerAddRq requestID="' + rec.ListID + '"><CustomerAdd>';
+				}
+				mensaje +='<ListID>' + rec.ListID + '</ListID>';
+				if (rec.origin=="remote"){
+					mensaje +='<EditSequence>'+ rec.editSequence + '</EditSequence>';
+				}
+				mensaje +='<Name>'+rec.FullName+'</Name>'
 					+'<CompanyName>'+rec.companyName+'</CompanyName>'
 					+'<BillAddress>'
-					+'<Addr1>'+rec.billAddress1+'</Addr1>'
-					+'<Addr2>'+rec.billAddress2+'</Addr2>'
-					+'<Addr3>'+rec.billAddress3+'</Addr3>' 
-					+'<Country>'+rec.billAddressCountry+'</Country>' 
-					+'<City>'+rec.billAddresscity+'</City>' 
-					+'<State>'+rec.billAddressState+'</State>' 
-					+'<PostalCode>'+rec.billAddressZipCode+'</PostalCode>'
+					+fillXMLTag('Addr1',rec.billAddress1,true,true)
+					+fillXMLTag('Addr2',rec.billAddress2,true,true)
+					+fillXMLTag('Addr3',rec.billAddress3,true,true)
+					+fillXMLTag('State',rec.billAddressState,true,true)
+					+fillXMLTag('City',rec.billAddresscity,true,true)
+					+fillXMLTag('PostalCode',rec.billAddressZipCode,true,true)
+					+fillXMLTag('Country',rec.billAddressCountry,true,true)
 					+'</BillAddress>'
 					+'<ShipAddress>'
-					+'<Addr1>'+rec.shipAddress1+'</Addr1>'
-					+'<Addr2>'+rec.shipAddress2+'</Addr2>'
-					+'<Addr3>'+rec.shipAddress3+'</Addr3>' 
-					+'<Country>'+rec.shipAddressCountry+'</Country>' 
-					+'<City>'+rec.shipAddressCity+'</City>' 
-					+'<State>'+rec.shipAddressState+'</State>' 
-					+'<PostalCode>'+rec.shipAddressZipcode+'</PostalCode>'
+					+fillXMLTag('Addr1',rec.shipAddress1,true,true)
+					+fillXMLTag('Addr2',rec.shipAddress2,true,true)
+					+fillXMLTag('Addr3',rec.shipAddress3,true,true)
+					+fillXMLTag('City',rec.shipAddressCity,true,true)
+					+fillXMLTag('State',rec.shipAddressState,true,true)
+					+fillXMLTag('PostalCode',rec.shipAddressZipcode,true,true)
+					+fillXMLTag('Country',rec.shipAddressCountry,true,true)
 					+'</ShipAddress>'
-					+'<Phone>'+rec.workPhone+'</Phone>'
-					+'<AltPhone>'+rec.cellPhone+'</AltPhone>'
-					+'<Email>'+rec.email+'</Email>'
-					+'<Fax>'+rec.Fax+'</Fax>'
+					+fillXMLTag('Phone',rec.workPhone,true,true)
+					+fillXMLTag('AltPhone',rec.cellPhone,true,true)
+					+fillXMLTag('Email',rec.email,true,true)
+					+fillXMLTag('Fax',rec.Fax,true,true)
 					+'<TermsRef><ListID>'+rec.id_term+'</ListID></TermsRef>'
 					+'<SalesRepRef><ListID>'+rec.id_salesrep+'</ListID></SalesRepRef>';
 					if (rec.pricelevel_ListID){
 						mensaje +='<PriceLevelRef><ListID>'+rec.pricelevel_ListID+'</ListID></PriceLevelRef>';
 					}
-					mensaje +='</CustomerMod></CustomerModRq>';
+					if (rec.origin=="remote"){
+						mensaje +='</CustomerMod></CustomerModRq>';
+					}else{
+						mensaje +='</CustomerAdd></CustomerAddRq>';
+					}
 					
 					if (rec.routeDay1 + rec.routeDay1 + rec.routeDay3 +rec.routeDay4 + rec.routeDay5 + rec.routeDay6 + rec.routeDay7 >0){
-						mensaje += '<DataExtModRq RequestID=dext-"' + rec.refNumber + '"><DataExtMod>'		
-								+'<OwnerID>0</OwnerID>'
+						if (rec.origin=="remote"){
+							mensaje += '<DataExtModRq><DataExtMod>';
+						}else{
+							mensaje += '<DataExtAddRq><DataExtAdd>';
+						}
+						mensaje +='<OwnerID>0</OwnerID>'
 								+'<DataExtName>RouteDay</DataExtName>'
-								+'<DataExtType>STR255TYPE</DataExtType>'
-								+'<DataExtValue>'+(rec.routeDay1==1?'SUN,':'')+(rec.routeDay2==1?'MON,':'')+(rec.routeDay3==1?'TUE,':'')+(rec.routeDay4==1?'WED,':'')+(rec.routeDay5==1?'THU,':'')+(rec.routeDay6==1?'FRI,':'')+(rec.routeDay7==1?'SAT':'')+'</DataExtValue>'
-								+'</DataExtMod></DataExtModRq>';
+								+'<ListDataExtType>Customer</ListDataExtType>'
+								+'<ListObjRef><ListID>' + rec.ListID +  '</ListID></ListObjRef>'
+								+'<DataExtValue>'+(rec.routeDay1==1?'SUN,':'')+(rec.routeDay2==1?'MON,':'')+(rec.routeDay3==1?'TUE,':'')+(rec.routeDay4==1?'WED,':'')+(rec.routeDay5==1?'THU,':'')+(rec.routeDay6==1?'FRI,':'')+(rec.routeDay7==1?'SAT':'')+'</DataExtValue>';
+						if (rec.origin=="remote"){
+							mensaje+='</DataExtMod></DataExtModRq>';
+						}else{
+							mensaje+='</DataExtAdd></DataExtAddRq>';
+						}
 					}
 			}
 			
@@ -845,6 +866,11 @@
 	function receiveSyncUpCustomersMessage(message){
 		console.log('receiveSyncUpCustomersMessage message=' + message);
 		ListCustomerModRs = message.CustomerModRs;
+		if (ListCustomerModRs==null || typeof ListCustomerModRs == "undefined"){
+			$("#currentTask").html("No data returned by server.  An error ocurred");
+			$("#btnSynchDialog").html("Accept");
+			return;
+		}
 		console.log("ListCustomerModRs=" + ListCustomerModRs);
 		currentCustomerIndex = 0;
 		processNextCustomerResponse();
@@ -858,7 +884,7 @@
 			if (!ListCustomerModRs.length && currentCustomerIndex==1){
 				$("#btnSynchDialog").html("Accept");
 				return;
-			}else if (currentCustomerIndex == ListCustomerAddRs.length){
+			}else if (currentCustomerIndex == ListCustomerModRs.length){
 				$("#btnSynchDialog").html("Accept");
 				return;
 			}
@@ -888,13 +914,13 @@
 	
 	function processedCustomer(){
 		currentCustomerIndex++;
-		message += "Success upload Customer " + CustomerAddRs.requestID + "<br>";
+		message += "Success upload Customer " + CustomerModRs.FullName + "<br>";
 		processNextCustomerResponse();
 	}
 	
 
 	function	errorCustomerDB(err) {
-		message += "Fail to store customer " + CustomerAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
+		message += "Fail to store customer " + CustomerModRs.requestID + ":" + JSON.stringify(err) + "<br>";
 		currentCustomerIndex++;
 		processNextCustomerResponse();
 	}

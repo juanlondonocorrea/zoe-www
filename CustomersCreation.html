@@ -50,7 +50,6 @@
 				var copyState = $('#copyBillToShip').is(':checked');
 				logZoe("copyState: ========> "+copyState);
 				if (copyState == true) { // Copy Bill to Ship
-					$('#shipAddress1').val($('#billAddress1').val());
 					$('#shipAddress2').val($('#billAddress2').val());
 					$('#shipAddress3').val($('#billAddress3').val());
 					$('#shipCity').val($('#billCity').val());
@@ -59,7 +58,6 @@
 					$('#shipCountry').val($('#billCountry').val());
 				}
 				else if (copyState == false) {
-					$('#shipAddress1').val('');
 					$('#shipAddress2').val('');
 					$('#shipAddress3').val('');
 					$('#shipCity').val('');
@@ -84,11 +82,11 @@
 
 			var selectedIndex;
 			function receiveTerms(arrayTerms){
-				//$('#Terms').empty();
-				//var toSelectIndex = 0;
+				$('#Terms').empty();
 				for (var i in arrayTerms) {
 					//	toSelectIndex=i;
-					var option='<option value="'+arrayTerms[i].id_term+'">'+arrayTerms[i].name+'</option>'
+					var selected = arrayTerms[i].name.toLowerCase()=='due on reciept'?"selected":"";
+					var option='<option value="'+arrayTerms[i].id_term+'"' + selected + '>'+arrayTerms[i].name+'</option>'
 					$('#Terms').append(option);					
 				}
 				//$('#Terms')[0].selectedIndex = toSelectIndex;
@@ -132,7 +130,7 @@
 					ListID:generateKey(),
 					IsActive:'1',
 					FullName:$('#FullName').val(),
-					name:$('#Name').val(),
+					name:$('#FullName').val(),
 					companyName:$('#CompanyName').val(),
 
 					workPhone:$('#Phone').val(),
@@ -140,7 +138,7 @@
 					Fax:$('#Fax').val(),
 					email:$('#Email').val(),
 
-					billAddress1:$('#billAddress1').val(),
+					billAddress1:$('#FullName').val(),
 					billAddress2:$('#billAddress2').val(),
 					billAddress3:$('#billAddress3').val(),
 					billAddresCity:$('#billCity').val(),
@@ -148,7 +146,6 @@
 					billAddresZipcode:$('#billZipCode').val(),
 					billAddressCountry:$('#billCountry').val(),
 
-					shipAddress1:$('#shipAddress1').val(),
 					shipAddress2:$('#shipAddress2').val(),
 					shipAddress3:$('#shipAddress3').val(),
 					shipAddressCity:$('#shipCity').val(),
@@ -156,9 +153,6 @@
 					shipAddressZipcode:$('#shipZipCode').val(),
 					shipAddressCountry:$('#shipCountry').val(),
 			
-					openBalance:$('#openBalance').val(),
-					overdueBalance:$('#overdueBalance').val(),
-
 					id_term:$('#Terms').val(),
 					otherDetails:$('#OtherDetails').val(),
 
@@ -200,9 +194,10 @@
 			}
 
 			function successCustomerCreation(){
-					customerDAO.markToSync(CodCustomer, errCustomermarkToSync);
-					alert("Customer was successful added");
-					window.location = "Customers.html?ListID=" +CodCustomer;
+					customerDAO.markToSync(CodCustomer, errCustomermarkToSync, function(){
+						alert("Customer was successful added");
+						window.location = "Customers.html?ListID=" +CodCustomer;
+					});
 			}
 			
 			function errCustomerCreation(err){
@@ -289,12 +284,6 @@
 						</div>
 						<div data-role="fieldcontain">
 							<div>
-								<label for="Name">Name:</label>
-							</div>
-							<input type="text" data-theme="b" name="Name" id="Name" value=""  />
-						</div>
-						<div data-role="fieldcontain">
-							<div>
 								<label for="CompanyName">Company Name:</label>
 							</div>
 							<input type="text" data-theme="b" name="CompanyName" id="CompanyName" value=""  />
@@ -331,12 +320,6 @@
 					<!-- Billing Address -->
 					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
 						<legend><h4>Billing Address</h4></legend>
-						<div data-role="fieldcontain">
-							<div>
-								<label for="billAddress1">Bill Address Line 1:</label>
-							</div>
-							<input type="text" data-theme="b" name="billAddress1" id="billAddress1" value=""  />
-						</div>
 						<div data-role="fieldcontain">
 							<div>
 								<label for="billAddress2">Bill Address Line 2:</label>
@@ -392,12 +375,6 @@
 						<legend><h4>Shiping Address</h4></legend>
 						<div data-role="fieldcontain">
 							<div>
-								<label for="shipAddress1">Ship Address Line 1:</label>
-							</div>
-							<input type="text" data-theme="b" name="shipAddress1" id="shipAddress1" value=""  />
-						</div>
-						<div data-role="fieldcontain">
-							<div>
 								<label for="shipAddress2">Ship Address Line 2:</label>
 							</div>
 							<input type="text" data-theme="b" name="shipAddress2" id="shipAddress2" value=""  />
@@ -439,28 +416,6 @@
 							</div>  
 						</div>
 					</fieldset> 
-					<!-- Balance Info -->
-					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
-						<legend><h4>Balance Info</h4></legend>
-						<div class="ui-grid-a" style="height:95px">
-							<div class="ui-block-a" style="height:100%"> 
-								<div data-role="fieldcontain">
-									<div>
-										<label for="openBalance">Open:</label>
-									</div>
-									<input type="text" data-theme="b" name="openBalance" id="openBalance" value=""  onClick="overdueBalanceRed();"/>
-								</div>                    
-							</div>
-							<div class="ui-block-b" style="height:100%">            
-								<div data-role="fieldcontain">
-									<div>
-										<label for="overdueBalance">Overdue:</label>
-									</div>
-									<input type="text" data-theme="b" name="overdueBalance" id="overdueBalance" value=""  />
-								</div>                      
-							</div>  
-						</div>
-					</fieldset>           
 					<!-- Terms Info --> 
 					<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:15px">
 						<div data-role="fieldcontain" id="CustomerTerms">

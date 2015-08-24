@@ -4,12 +4,13 @@ var customerDAO = {list:listCustomers,
 		listByRouteDay:listCustomersByRouteDay,
 		listModifiedToUpload:listModifiedCustomersToUpload,
 		listAddedToUpload:listAddedCustomersToUpload,
+		listAllToUpload:listAllCustomersToUpload,
 		getById:getCustomerById, 
 		store:storeCustomer, 
 		updateVendor:updateCustomerVendor, 
 		deleteAll:deleteAllCustomer, 
 		markToSync:markToSyncCustomer, 
-		markSynchronized:doMarkSynchorinizedCustomer};
+		markSynchronized:markSynchronizedCustomer};
 var filterDataCustomer;
 var customerReceiveFunction;
 var customerReceiveListFunction;
@@ -51,6 +52,14 @@ function listAddedCustomersToUpload(aReceiveFunction,aErrFunc){
 	customerReceiveListFunction = aReceiveFunction;
 	customerErrFunc = aErrFunc;
 	db.transaction(doListAddedCustomersToUpload, customerErrFunc);
+}
+
+function listAllCustomersToUpload(aReceiveFunction,aErrFunc){
+	db = openDatabaseZoe();
+	logZoe("listAllCustomersToUpload db=" + db);
+	customerReceiveListFunction = aReceiveFunction;
+	customerErrFunc = aErrFunc;
+	db.transaction(doListAllCustomersToUpload, customerErrFunc);
 }
 
 function listCustomersByRouteDay(aDay, aReceiveFunction,aErrFunc){
@@ -100,7 +109,7 @@ function markSynchronizedCustomer(ListID,aErrFunc,successCB){
 	logZoe("markSynchronizedCustomer db=" + db);
 	customerErrFunc = aErrFunc;
 	filterDataCustomer = ListID;
-	db.transaction(doMarkToSynchronizedCustomer, errorCB, successCB);
+	db.transaction(doMarkSynchorinizedCustomer, errorCB, successCB);
 }
 
 
@@ -110,17 +119,17 @@ function markSynchronizedCustomer(ListID,aErrFunc,successCB){
 
 function doSelectCustomer(tx){
 	logZoe("doSelectCustomer filterData=" + filterDataCustomer);
-	tx.executeSql("SELECT ListID, editSequence, FullName, IsActive, billAddress1, billAddress2, shipAddress1, shipAddress2, openBalance, overdueBalance, workPhone, cellPhone, email, shipAddressZipcode, billAddresZipcode, billAddresCity, billAddressState, billAddressCountry, shipAddressCity, shipAddressState, shipAddressCountry, id_salesrep, routeDay1, routeDay2, routeDay3, routeDay4, routeDay5, routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails, id_term, pricelevel_ListID, vendor_ListID FROM customer Where ListId=?", [filterDataCustomer],customerLocalReceiveFunction, customerErrFunc);
+	tx.executeSql("SELECT ListID, editSequence, FullName, IsActive, billAddress1, billAddress2, shipAddress1, shipAddress2, openBalance, overdueBalance, workPhone, cellPhone, email, shipAddressZipcode, billAddresZipcode, billAddresCity, billAddressState, billAddressCountry, shipAddressCity, shipAddressState, shipAddressCountry, id_salesrep, routeDay1, routeDay2, routeDay3, routeDay4, routeDay5, routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails, id_term, pricelevel_ListID, vendor_ListID, origin FROM customer Where ListId=?", [filterDataCustomer],customerLocalReceiveFunction, customerErrFunc);
 }
 
 function doSelectAllCustomer(tx){
 	logZoe("doSelectAllCustomer")
-	tx.executeSql("SELECT ListID, editSequence, FullName, IsActive, billAddress1, billAddress2, shipAddress1, shipAddress2, openBalance, overdueBalance, workPhone, cellPhone, email, shipAddressZipcode, billAddresZipcode, billAddresCity, billAddressState, billAddressCountry, shipAddressCity, shipAddressState, shipAddressCountry, id_salesrep, routeDay1, routeDay2, routeDay3, routeDay4, routeDay5, routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails, id_term, pricelevel_ListID, vendor_ListID FROM customer ORDER BY FullName", [],customerLocalListReceiveFunction, customerErrFunc);
+	tx.executeSql("SELECT ListID, editSequence, FullName, IsActive, billAddress1, billAddress2, shipAddress1, shipAddress2, openBalance, overdueBalance, workPhone, cellPhone, email, shipAddressZipcode, billAddresZipcode, billAddresCity, billAddressState, billAddressCountry, shipAddressCity, shipAddressState, shipAddressCountry, id_salesrep, routeDay1, routeDay2, routeDay3, routeDay4, routeDay5, routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails, id_term, pricelevel_ListID, vendor_ListID, origin FROM customer ORDER BY FullName", [],customerLocalListReceiveFunction, customerErrFunc);
 }
 
 function doListCustomersByRouteDay(tx){
 	logZoe("doListCustomersByRouteDay")
-	var query = "SELECT customer.ListID, editSequence, FullName, IsActive, billAddress1, billAddress2, shipAddress1, shipAddress2, openBalance, overdueBalance, workPhone, cellPhone, email, shipAddressZipcode, billAddresZipcode, billAddresCity, billAddressState, billAddressCountry, shipAddressCity, shipAddressState, shipAddressCountry, id_salesrep, routeDay1, routeDay2, routeDay3, routeDay4, routeDay5, routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails, customer.id_term, pricelevel_ListID ,ifnull(inv.salesofday,0) as salesofday, vendor_ListID FROM customer left join (select listid, sum(subtotal+salestaxtotal) salesofday FROM invoice where shipdate=date('now','localtime') group by listid) as inv on inv.listid= customer.listid"
+	var query = "SELECT customer.ListID, editSequence, FullName, IsActive, billAddress1, billAddress2, shipAddress1, shipAddress2, openBalance, overdueBalance, workPhone, cellPhone, email, shipAddressZipcode, billAddresZipcode, billAddresCity, billAddressState, billAddressCountry, shipAddressCity, shipAddressState, shipAddressCountry, id_salesrep, routeDay1, routeDay2, routeDay3, routeDay4, routeDay5, routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails, customer.id_term, pricelevel_ListID ,ifnull(inv.salesofday,0) as salesofday, vendor_ListID, origin FROM customer left join (select listid, sum(subtotal+salestaxtotal) salesofday FROM invoice where shipdate=date('now','localtime') group by listid) as inv on inv.listid= customer.listid"
 	+" WHERE customer.routeday" + filterDataCustomer + "=1" ;
 	console.log("doListCustomersByRouteDay query=" + query);
 	tx.executeSql(query,[],customerLocalListReceiveFunction, customerErrFunc);
@@ -188,7 +197,7 @@ function doStoreOneCustomer(tx, theRecord){
 	ifUndefNull(theRecord.Fax), ifUndefNull(theRecord.billAddress3), ifUndefNull(theRecord.shipAddress3), 
 	ifUndefNull(theRecord.name), ifUndefNull(theRecord.companyName), ifUndefNull(theRecord.otherDetails), 
 	ifUndefNull(theRecord.id_term), theRecord.pricelevel_ListID, ifUndefNull(theRecord.vendor_ListID)]);
-	if (customerOrigin){
+	if (customerOrigin && customerOrigin!=""){
 		tx.executeSql('UPDATE customer set origin = ? WHERE ListID = ?',[customerOrigin, theRecord.ListID]);
 	}
 }
@@ -205,6 +214,11 @@ function doListAddedCustomersToUpload(tx){
 	tx.executeSql(selectStr,[], customerLocalListReceiveFunction, invoiceErrFunc);
  }
 
+function doListAllCustomersToUpload(tx){
+	var selectStr = "SELECT * FROM customer WHERE needSync = 1";
+	logZoe("doListAllCustomersToUpload select= " + selectStr);
+	tx.executeSql(selectStr,[], customerLocalListReceiveFunction, invoiceErrFunc);
+ }
 
 function doMarkToSyncCustomer(tx){
 	tx.executeSql("UPDATE customer SET needSync=1, zoeUpdateDate=datetime('now', 'localtime') where ListID = ?",[filterDataCustomer]);

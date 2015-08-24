@@ -214,6 +214,8 @@
 			function receiveTerms(arrayTerms){
 				$('#Terms').empty();
 				var toSelectIndex = 0;
+				console.log("selectedIndex=" + selectedIndex);
+				console.log("listCustomers[selectedIndex]=" + listCustomers[selectedIndex]);
 				for (var i in arrayTerms) {
 					if (arrayTerms[i].id_term == listCustomers[selectedIndex].id_term){
 						toSelectIndex=i;
@@ -328,6 +330,7 @@
 				$('#SalesRepName').val(window.localStorage.getItem("salesRepName"));
 				$('#ListID').val(listCustomers[index].ListID);
 				$('#editSequence').val(listCustomers[index].editSequence);
+				$('#origin').val(listCustomers[index].origin);
 				$('#IsActive').val(listCustomers[index].IsActive);
 				$('#FullName').val(listCustomers[index].FullName);
 				$('#openBalance').val(listCustomers[index].openBalance);
@@ -410,7 +413,7 @@
 					id_salesrep:salesRepVO.id_salesrep,
 					editSequence:$('#editSequence').val(),
 					ListID:$('#ListID').val(),
-					IsActive:$('#IsActive').val(),
+					IsActive:1,
 					FullName:$('#FullName').val(),
 					name:$('#Name').val(),
 					companyName:$('#CompanyName').val(),
@@ -460,7 +463,7 @@
 				logZoe("Phone ========> " +$('#Phone').val());				
 				logZoe("customerVO ========> " + JSON.stringify(customerVO));
 				customersVO[0] = customerVO;
-				customerDAO.store(customersVO, errCustomerUpdate, successCustomerUpdate);
+				customerDAO.store(customersVO, errCustomerUpdate, successCustomerUpdate, $("#origin").val());
 			}
 
 			function successCustomerUpdate(){
@@ -681,8 +684,9 @@
 								<div data-role="fieldcontain">
 									<div>
 									<input type="hidden" data-theme="b" name="editSequence" id="editSequence" value=""/>
+									<input type="hidden" data-theme="b" name="editSequence" id="editSequence" value=""/>
 									<input type="hidden" data-theme="b" name="ListID" id="ListID" value=""/>
-									<input type="hidden" data-theme="b" name="IsActive" id="IsActive" value=""/>
+									<input type="hidden" data-theme="b" name="origin" id="origin" value=""/>
 										<label for="FullName">Full Name:</label>
 									</div>
 									<input  class="myFormsControl" type="text" data-theme="b" name="FullName" id="FullName" value=""/>
