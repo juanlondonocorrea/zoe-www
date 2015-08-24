@@ -244,7 +244,7 @@ function logout(){
 }
 
 function ifUndefNull(variable){
-	if (typeof variable == 'undefined'){
+	if (typeof variable == 'undefined' || variable == 'undefined'){
 		return null;
 	}
 	return variable;
@@ -424,3 +424,22 @@ function replaceAll(str, find, replace) {
         ]
     };
     
+function fillXMLTag(tag, value, notGenerateIfNull, notGenerateIfEmpty){
+	if (notGenerateIfNull && (typeof value == "undefined" || value==null)){
+		return "";
+	}
+	if (notGenerateIfEmpty && value == ""){
+		return "";
+	}
+	var nValue = value ;
+	if (typeof value == "undefined" || nValue == null){
+		nValue = "";
+	}
+	nValue = nValue.replace(/&/g, '&amp;')
+               .replace(/</g, '&lt;')
+               .replace(/>/g, '&gt;')
+               .replace(/"/g, '&quot;')
+               .replace(/'/g, '&apos;');
+
+	return "<"+tag+">" + nValue + "</"+tag+">";
+}
