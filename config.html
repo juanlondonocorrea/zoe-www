@@ -1071,9 +1071,10 @@
 		console.log("CustomerAddRs.requestID=" + CustomerAddRs.requestID);
 		var msg = hashRoutedays[CustomerAddRs.requestID];
 		if (msg){
-			msg.replace(CustomerAddRs.requestID,CustomerAddRs.CustomerRet.ListID);
-			qbxmlRouteDays +=  msg.qbxml;
-			console.log("add a qbxmlRouteDays=" + msg.qbxml);
+			msg = msg.qbxml;
+			
+			qbxmlRouteDays +=  msg.replace(CustomerAddRs.requestID,CustomerAddRs.CustomerRet.ListID);
+			console.log("add a qbxmlRouteDays=" + msg);
 		}
 		processNextCustomerAddResponse();
 	}
