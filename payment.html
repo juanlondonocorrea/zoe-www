@@ -280,12 +280,28 @@
 		}
 
 		function onChangeCheckInvoice(event){
-			var selectedIndex = event.target.value;
+			console.log("event.target =======> "+event.target);
+			console.log("event.target.id =======> "+event.target.id);
+			console.log("event.target.value =======> "+event.target.value);
+
+			var selectedIndex;
+			if (event.target.value){
+				selectedIndex = event.target.value;
+			}else if (event.target.id){
+				selectedIndex = event.target.id.substring(event.target.id.indexOf("_")+1)*1;
+			} else {
+				return;	
+			}
+			
+			console.log("selectedIndex =======> "+selectedIndex);
+
 			var invoice = listPendingInvoices[selectedIndex];
 			var totalAmount = $("#totalAmount").val()*1;
 			var sumPaymentAmount =  $("#sumPaymentAmount").val()*1;
 			
-			if (event.target.checked) {
+			console.log("checksel=" + $('#checkSelInvoice_'+selectedIndex).prop('checked'));
+			
+			if ($('#checkSelInvoice_'+selectedIndex).prop('checked')) {
 				invoice.selected = true;
 				if ($("#paymentAmount_"+selectedIndex).val()=="" || $("#paymentAmount_"+selectedIndex).val()*1==0){
 					var balanceRemaining = invoice.balanceRemaining;
@@ -406,7 +422,7 @@ table, th, td {
 		   <!-- plantilla detalle de payment -->
            <div id="invoiceSelTemplate" style="display:none">
            		<li>
-	                <label for="checkSelInvoice_@i">@refNumber Due date: @dueDate</label><input type="checkbox" class="checkInvoices_class" name="checkSelInvoice_@i" id="checkSelInvoice_@i" onClick="onChangeCheckInvoice(event); return true;" value="@i"/>
+	                <label for="checkSelInvoice_@i"  id="L_@i">@refNumber Due date: @dueDate</label><input type="checkbox" class="checkInvoices_class" name="checkSelInvoice_@i" id="checkSelInvoice_@i" onClick="onChangeCheckInvoice(event); return true;" value="@i"/>
                 	<fieldset class="ui-grid-a">
                         <div class="ui-block-a"><label for="balanceRemaining_@i">Balance:</label><input type="number" name="balanceRemaining_@i" id="balanceRemaining_@i"  value="@balanceRemaining" readonly></div>
                         <div class="ui-block-b"><label for="paymentAmount_@i">Payment:</label><input type="number" name="paymentAmount_@i" id="paymentAmount_@i"  value="@paymentAmount" onChange="onChangePaymentAmount(event)"></div>

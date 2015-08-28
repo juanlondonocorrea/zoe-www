@@ -65,7 +65,7 @@
 					paymentDAO.PaymentsByCustomerDateRange(Date1, Date2, receivePaymentsByCustomerDateRange,errReceivePaymentsByCustomerDateRange);
 				}
 			}
-			
+
 			// BEGIN Functions on error case
 			function errReceivePaymentsByCustomerDateRange(err){
 				alert("DB Error Payments By Customer & Date Range: "+JSON.stringify(err));

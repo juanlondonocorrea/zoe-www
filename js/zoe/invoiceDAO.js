@@ -103,11 +103,12 @@ function listInvoicesByCustomerPending(customer_ListID, aReceiveFunction,aErrFun
 
 function listSalesByCustomerDateRange(initDate, finalDate, aReceiveFunction, aErrFunc){
 	db = openDatabaseZoe();
-	logZoe("listSalesByCustomerDateRange db=" + db);
+	logZoe("listSalesByCustomerDateRange db=====" + db);
 	invoiceReceiveListFunction = aReceiveFunction;
 	invoiceErrFunc = aErrFunc;	
 	filterDataInvoice = new Array();
 	filterDataInvoice = [initDate,finalDate];
+	console.log("filterDataInvoice: ========> "+filterDataInvoice);
 	db.transaction(doSalesByCustomerDateRange, invoiceErrFunc);
 }
 
@@ -234,7 +235,7 @@ function doCustomerInvoicesPending(tx){
 }
 
 function doSalesByCustomerDateRange(tx){
-	logZoe("doSalesByCustomerDateRange");
+	logZoe("doSalesByCustomerDateRange =========");
 	tx.executeSql("SELECT invoice.id_invoice, customer.billAddress1, refNumber, txnDate, appliedAmount AS Amount, balanceRemaining AS OpenBalance, invoice.needSync, invoice.needCorrection, invoice.origin " +
 	"FROM invoice, customer "+
 	"WHERE invoice.ListID = customer.ListID AND txnDate BETWEEN ? AND ? " +

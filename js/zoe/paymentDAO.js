@@ -63,6 +63,7 @@ function listPaymentsByCustomerDateRange(initDate, finalDate, aReceiveFunction,a
 	paymentErrFunc = aErrFunc;
 	filterDataPayment = new Array();
 	filterDataPayment = [initDate,finalDate];
+	console.log("filterDataPayment: ========> "+filterDataPayment);
 	db.transaction(doCustomerPaymentsByDateRange, paymentErrFunc);
 }
 
@@ -130,13 +131,15 @@ function doCustomerPayments(tx){
 }
 
 function doCustomerPaymentsByDateRange(tx){
-	logZoe("doCustomerPaymentsByDateRange");
-	tx.executeSql("SELECT TxnDate, customer.FullName AS Full_Name, refNumber, PaymentMethod.Name AS PaymentMethod_Name, TotalAmount "+
-	" FROM Payment " +
-	" LEFT JOIN PaymentMethod ON PaymentMethod.ListID = Payment.paymentsMethod_ListID " +
-	" LEFT JOIN customer ON customer.ListID = payment.ListID " +
-	" WHERE TxnDate BETWEEN ? AND ? " +
-	" ORDER BY TxnDate ASC", filterDataPayment,paymentLocalListReceiveFunction, paymentErrFunc);
+	logZoe("doCustomerPaymentsByDateRange ========");
+	strPayments = " SELECT TxnDate, customer.FullName AS Full_Name, refNumber, TotalAmount, PaymentMethod.Name AS PaymentMethod_Name "+
+				  " FROM Payment "+
+				  " LEFT JOIN customer ON customer.ListID = payment.ListID "+
+				  " LEFT JOIN PaymentMethod ON PaymentMethod.ListID = Payment.paymentsMethod_ListID "+
+				  " WHERE TxnDate BETWEEN ? AND ? "+
+				  " ORDER BY TxnDate ASC";
+	logZoe("strPayments ========"+strPayments);
+	tx.executeSql(strPayments, filterDataPayment,paymentLocalListReceiveFunction, paymentErrFunc);
 }
 
 function paymentLocalReceiveFunction(tx,results){
