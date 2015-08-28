@@ -9,8 +9,10 @@ var customerDAO = {list:listCustomers,
 		store:storeCustomer, 
 		updateVendor:updateCustomerVendor, 
 		deleteAll:deleteAllCustomer, 
+		delete:deleteCustomer,
 		markToSync:markToSyncCustomer, 
-		markSynchronized:markSynchronizedCustomer};
+		markSynchronized:markSynchronizedCustomer,
+		markSynchronizedError:markSynchronizedErrorCustomer};
 var filterDataCustomer;
 var customerReceiveFunction;
 var customerReceiveListFunction;
@@ -96,6 +98,15 @@ function deleteAllCustomer(aErrFunc,successCB){
 	db.transaction(doDeleteAllCustomer, errorCB, successCB);
 }
 
+function deleteCustomer(idCustomer,aErrFunc,successCB){
+	db = openDatabaseZoe();
+	logZoe("deleteCustomer db=" + db);
+	filterDataCustomer = idCustomer;
+	invoiceErrFunc = aErrFunc;
+	db.transaction(doDeleteCustomer, errorCB, successCB);
+}
+
+
 function markToSyncCustomer(ListID,aErrFunc,successCB){
 	db = openDatabaseZoe();
 	logZoe("markToSyncCustomer db=" + db);
@@ -111,6 +122,15 @@ function markSynchronizedCustomer(ListID,aErrFunc,successCB){
 	filterDataCustomer = ListID;
 	db.transaction(doMarkSynchorinizedCustomer, errorCB, successCB);
 }
+
+function markSynchronizedErrorCustomer(ListID,aErrFunc,successCB){
+	db = openDatabaseZoe();
+	logZoe("markSynchronizedErrorInvoice db=" + db);
+	customerErrFunc = aErrFunc;
+	filterDataCustomer = ListID;
+	db.transaction(doMarkSyncErrorCustomer, errorCB, successCB);
+}
+
 
 
 //----------------------
@@ -146,7 +166,6 @@ function customerLocalReceiveFunction(tx,results){
 }
 
 function customerLocalListReceiveFunction(tx,results){
-	print_call_stack();
 	var arrayCustomers= new Array();
 	if (results && results.rows){
 		logZoe("customerLocalListReceiveFunction results.length=" + results.rows.length);
@@ -232,9 +251,19 @@ function doDeleteAllCustomer(tx){
 	tx.executeSql('DELETE FROM customer',[]);
 }
 
+function doDeleteCustomer(tx){
+	console.log("doDeleteCustomer filterDataCustomer=" + filterDataCustomer);
+	tx.executeSql('DELETE FROM customer where ListID = ?',[filterDataCustomer+""]);
+}
+
+
 function doStoreCustomerVendor(tx){
 	console.log("update customer vendor " + JSON.stringify(recordCustomer));
 	for (var i in recordCustomer){
 		tx.executeSql("UPDATE customer SET vendor_ListID=? where vendor_ListID = ? ",[recordCustomer[i].ListID, recordCustomer[i].name.toUpperCase()]);
 	}
+}
+
+function doMarkSyncErrorCustomer(tx){
+	tx.executeSql("UPDATE customer SET needSync=0, zoeSyncDate=datetime('now', 'localtime'), needCorrection=1 where ListID = ?",[filterDataCustomer+""]);
 }

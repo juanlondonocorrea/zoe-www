@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 13/08/2015
+Modified: 26/08/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -184,6 +184,7 @@ CREATE TABLE customer
   origin TEXT,
   vendor_ListID TEXT,
   editSequence TEXT,
+  needCorrection INTEGER,
   CONSTRAINT Key3 PRIMARY KEY (ListID),
   CONSTRAINT sales_rep_customer FOREIGN KEY (id_salesrep) REFERENCES salesrep (id_salesrep),
   CONSTRAINT Relationship3 FOREIGN KEY (id_term) REFERENCES term (id_term),

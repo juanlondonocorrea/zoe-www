@@ -313,79 +313,8 @@
 		var i;
 		var customersVO = [];
 		for (i=0;i<customers.length;i++){
-			logZoe("customers[i]=" + JSON.stringify(customers[i]));
-			logZoe("customers[i].TermsRef=" + JSON.stringify(customers[i].TermsRef));
-			if (customers[i].TermsRef){
-				logZoe("customers[i].TermsRef.ListID=" + JSON.stringify(customers[i].TermsRef));					
-			}
-			var routeDay = "";
-			var vendorName = null;
-
-			console.log("customers[i].DataExtRet:" + JSON.stringify(customers[i].DataExtRet));
-			if (customers[i].DataExtRet && customers[i].DataExtRet.length>0){
-				for (var j = 0; j< customers[i].DataExtRet.length; j++){
-					console.log("customers[i].DataExtRet[j].DataExtName=" + customers[i].DataExtRet[j].DataExtName);
-					if ("ROUTEDAY" == customers[i].DataExtRet[j].DataExtName.toUpperCase()){
-						routeDay = customers[i].DataExtRet[j].DataExtValue;
-						console.log("routeday encontrado asi queda routeDay=" + routeDay);
-					}
-					if ("PAY TO" == customers[i].DataExtRet[j].DataExtName.toUpperCase()){
-						vendorName = customers[i].DataExtRet[j].DataExtValue.toUpperCase();
-						if (vendorNames.indexOf(vendorName)==-1){
-							vendorNames[vendorNames.length]=vendorName;
-						}
-					}
-				}
-			}else if (customers[i].DataExtRet && customers[i].DataExtRet.DataExtName.toUpperCase()=="ROUTEDAY"){
-						routeDay = customers[i].DataExtRet.DataExtValue;
-						console.log("routeday encontrado asi queda routeDay=" + routeDay);
-			}else if (customers[i].DataExtRet && customers[i].DataExtRet.DataExtName.toUpperCase()=="PAY TO"){
-						vendorName = customers[i].DataExtRet.DataExtValue.toUpperCase();
-						if (vendorNames.indexOf(vendorName)==-1){
-							vendorNames[vendorNames.length]=vendorName;
-						}
-			}
-			routeDay = routeDay.toUpperCase();
-			logZoe("routeday=" + routeDay);
-			var customerVO = {ListID:customers[i].ListID,
-			editSequence:customers[i].EditSequence+	"",
-			FullName:customers[i].FullName,
-			IsActive:customers[i].IsActive==true?1:0,
-			billAddress1:customers[i].BillAddress?customers[i].BillAddress.Addr1:null,
-			billAddress2:customers[i].BillAddress?customers[i].BillAddress.Addr2:null,
-			billAddress3:customers[i].BillAddress?customers[i].BillAddress.Addr3:null,
-			billAddresZipcode:customers[i].BillAddress?customers[i].BillAddress.PostalCode+"":null,
-			billAddresCity:customers[i].BillAddress?customers[i].BillAddress.City:null,
-			billAddressState:customers[i].BillAddress?customers[i].BillAddress.State:null,
-			billAddressCountry:customers[i].BillAddress?customers[i].BillAddress.Country:null,
-			shipAddress1:customers[i].ShipAddress?customers[i].ShipAddress.Addr1:null,
-			shipAddress2:customers[i].ShipAddress?customers[i].ShipAddress.Addr2:null,
-			shipAddress3:customers[i].ShipAddress?customers[i].ShipAddress.Addr3:null,
-			shipAddressZipcode:customers[i].ShipAddress?customers[i].ShipAddress.PostalCode+"":null,
-			shipAddressCity:customers[i].ShipAddress?customers[i].ShipAddress.City:null,
-			shipAddressState:customers[i].ShipAddress?customers[i].ShipAddress.State:null,
-			shipAddressCountry:customers[i].ShipAddress?customers[i].ShipAddress.Country:null,
-			openBalance:customers[i].Balance,
-			overdueBalance:customers[i].TotalBalance,
-			workPhone:customers[i].Phone,
-			cellPhone:customers[i].AltPhone,
-			email:customers[i].Email,
-			Fax:customers[i].Fax,
-			id_salesrep:customers[i].SalesRepRef?customers[i].SalesRepRef.ListID:null,
-			routeDay1:routeDay.indexOf("SUN")>-1||routeDay.indexOf("ALL")>-1?1:0,
-			routeDay2:routeDay.indexOf("MON")>-1||routeDay.indexOf("ALL")>-1?1:0,
-			routeDay3:routeDay.indexOf("TUE")>-1||routeDay.indexOf("ALL")>-1?1:0,
-			routeDay4:routeDay.indexOf("WED")>-1||routeDay.indexOf("ALL")>-1?1:0,
-			routeDay5:routeDay.indexOf("THU")>-1||routeDay.indexOf("ALL")>-1?1:0,
-			routeDay6:routeDay.indexOf("FRI")>-1||routeDay.indexOf("ALL")>-1?1:0,
-			routeDay7:routeDay.indexOf("SAT")>-1||routeDay.indexOf("ALL")>-1?1:0,
-			name:customers[i].Name,
-			companyName:customers[i].CompanyName,
-			id_term:customers[i].TermsRef?customers[i].TermsRef.ListID:null,
-			pricelevel_ListID:customers[i].PriceLevelRef?customers[i].PriceLevelRef.ListID:null,
-			vendor_ListID:vendorName,
-			origin:"remote"
-			};
+			var customer = customers[i];
+			customerVO = convertCustomerQB(customer);
 			logZoe("customerVO=" + JSON.stringify(customerVO));
 			customersVO[i] = customerVO;
 		}
@@ -393,6 +322,84 @@
 		customerDAO.deleteAll(errCustomerInsert);
 		customerDAO.store(customersVO, errCustomerInsert, successCustomerInsert,'remote');
 		
+	}
+	
+	function convertCustomerQB(customer){
+			console.log("customer=" + JSON.stringify(customer));
+			logZoe("customer.TermsRef=" + JSON.stringify(customer.TermsRef));
+			if (customer.TermsRef){
+				logZoe("customer.TermsRef.ListID=" + JSON.stringify(customer.TermsRef));					
+			}
+			var routeDay = "";
+			var vendorName = null;
+
+			console.log("customer.DataExtRet:" + JSON.stringify(customer.DataExtRet));
+			if (customer.DataExtRet && customer.DataExtRet.length>0){
+				for (var j = 0; j< customer.DataExtRet.length; j++){
+					console.log("customer].DataExtRet[j].DataExtName=" + customer.DataExtRet[j].DataExtName);
+					if ("ROUTEDAY" == customer.DataExtRet[j].DataExtName.toUpperCase()){
+						routeDay = customer.DataExtRet[j].DataExtValue;
+						console.log("routeday encontrado asi queda routeDay=" + routeDay);
+					}
+					if ("PAY TO" == customer.DataExtRet[j].DataExtName.toUpperCase()){
+						vendorName = customer.DataExtRet[j].DataExtValue.toUpperCase();
+						if (vendorNames.indexOf(vendorName)==-1){
+							vendorNames[vendorNames.length]=vendorName;
+						}
+					}
+				}
+			}else if (customer.DataExtRet && customer.DataExtRet.DataExtName.toUpperCase()=="ROUTEDAY"){
+						routeDay = customer.DataExtRet.DataExtValue;
+						console.log("routeday encontrado asi queda routeDay=" + routeDay);
+			}else if (customer.DataExtRet && customer.DataExtRet.DataExtName.toUpperCase()=="PAY TO"){
+						vendorName = customer.DataExtRet.DataExtValue.toUpperCase();
+						if (vendorNames.indexOf(vendorName)==-1){
+							vendorNames[vendorNames.length]=vendorName;
+						}
+			}
+			routeDay = routeDay.toUpperCase();
+			logZoe("routeday=" + routeDay);
+			var customerVO = {ListID:customer.ListID,
+			editSequence:customer.EditSequence+	"",
+			FullName:customer.FullName,
+			IsActive:customer.IsActive==true?1:0,
+			billAddress1:customer.BillAddress?customer.BillAddress.Addr1:null,
+			billAddress2:customer.BillAddress?customer.BillAddress.Addr2:null,
+			billAddress3:customer.BillAddress?customer.BillAddress.Addr3:null,
+			billAddresZipcode:customer.BillAddress?customer.BillAddress.PostalCode+"":null,
+			billAddresCity:customer.BillAddress?customer.BillAddress.City:null,
+			billAddressState:customer.BillAddress?customer.BillAddress.State:null,
+			billAddressCountry:customer.BillAddress?customer.BillAddress.Country:null,
+			shipAddress1:customer.ShipAddress?customer.ShipAddress.Addr1:null,
+			shipAddress2:customer.ShipAddress?customer.ShipAddress.Addr2:null,
+			shipAddress3:customer.ShipAddress?customer.ShipAddress.Addr3:null,
+			shipAddressZipcode:customer.ShipAddress?customer.ShipAddress.PostalCode+"":null,
+			shipAddressCity:customer.ShipAddress?customer.ShipAddress.City:null,
+			shipAddressState:customer.ShipAddress?customer.ShipAddress.State:null,
+			shipAddressCountry:customer.ShipAddress?customer.ShipAddress.Country:null,
+			openBalance:customer.Balance,
+			overdueBalance:customer.TotalBalance,
+			workPhone:customer.Phone,
+			cellPhone:customer.AltPhone,
+			email:customer.Email,
+			Fax:customer.Fax,
+			id_salesrep:customer.SalesRepRef?customer.SalesRepRef.ListID:null,
+			routeDay1:routeDay.indexOf("SUN")>-1||routeDay.indexOf("ALL")>-1?1:0,
+			routeDay2:routeDay.indexOf("MON")>-1||routeDay.indexOf("ALL")>-1?1:0,
+			routeDay3:routeDay.indexOf("TUE")>-1||routeDay.indexOf("ALL")>-1?1:0,
+			routeDay4:routeDay.indexOf("WED")>-1||routeDay.indexOf("ALL")>-1?1:0,
+			routeDay5:routeDay.indexOf("THU")>-1||routeDay.indexOf("ALL")>-1?1:0,
+			routeDay6:routeDay.indexOf("FRI")>-1||routeDay.indexOf("ALL")>-1?1:0,
+			routeDay7:routeDay.indexOf("SAT")>-1||routeDay.indexOf("ALL")>-1?1:0,
+			name:customer.Name,
+			companyName:customer.CompanyName,
+			id_term:customer.TermsRef?customer.TermsRef.ListID:null,
+			pricelevel_ListID:customer.PriceLevelRef?customer.PriceLevelRef.ListID:null,
+			vendor_ListID:vendorName,
+			origin:"remote"
+			};
+			return customerVO;
+
 	}
 
 
@@ -780,9 +787,23 @@
 	}
 
 //Synchronizaction UP customers
+	var CustomerModRs;
+	var CustomerAddRs;
+	var ListCustomerModRs;
+	var ListCustomerAddRs;
+	var currentCustomerModIndex;
+	var currentCustomerAddIndex;
+	var endCustomerAdd;
+	var endCustomerMod;
+	var message = "";
+	var qbxmlRouteDays="";
+	var hashRoutedays;
 	function syncUpCustomers(form){
 		console.log("entre a syncUpCustomers");
+		hashRoutedays = new Object();
 		var mensaje = "";
+		qbxmlRouteDays="";
+		message = "";
 		customerDAO.listAllToUpload(function(results){
 			console.log("syncUpCustomers results = " + JSON.stringify(results));
 			for (var i in results){
@@ -790,10 +811,10 @@
 				console.log("syncUpCustomers customer["+ i + "]=" + JSON.stringify(rec));
 				if (rec.origin=="remote"){
 					mensaje += '<CustomerModRq requestID="' + rec.ListID + '"><CustomerMod>';
+					mensaje +='<ListID>' + rec.ListID + '</ListID>';
 				}else{
 					mensaje += '<CustomerAddRq requestID="' + rec.ListID + '"><CustomerAdd>';
 				}
-				mensaje +='<ListID>' + rec.ListID + '</ListID>';
 				if (rec.origin=="remote"){
 					mensaje +='<EditSequence>'+ rec.editSequence + '</EditSequence>';
 				}
@@ -803,8 +824,8 @@
 					+fillXMLTag('Addr1',rec.billAddress1,true,true)
 					+fillXMLTag('Addr2',rec.billAddress2,true,true)
 					+fillXMLTag('Addr3',rec.billAddress3,true,true)
-					+fillXMLTag('State',rec.billAddressState,true,true)
 					+fillXMLTag('City',rec.billAddresscity,true,true)
+					+fillXMLTag('State',rec.billAddressState,true,true)
 					+fillXMLTag('PostalCode',rec.billAddressZipCode,true,true)
 					+fillXMLTag('Country',rec.billAddressCountry,true,true)
 					+'</BillAddress>'
@@ -819,11 +840,11 @@
 					+'</ShipAddress>'
 					+fillXMLTag('Phone',rec.workPhone,true,true)
 					+fillXMLTag('AltPhone',rec.cellPhone,true,true)
-					+fillXMLTag('Email',rec.email,true,true)
 					+fillXMLTag('Fax',rec.Fax,true,true)
+					+fillXMLTag('Email',rec.email,true,true)
 					+'<TermsRef><ListID>'+rec.id_term+'</ListID></TermsRef>'
 					+'<SalesRepRef><ListID>'+rec.id_salesrep+'</ListID></SalesRepRef>';
-					if (rec.pricelevel_ListID){
+					if (rec.pricelevel_ListID && ""!=rec.pricelevel_ListID){
 						mensaje +='<PriceLevelRef><ListID>'+rec.pricelevel_ListID+'</ListID></PriceLevelRef>';
 					}
 					if (rec.origin=="remote"){
@@ -831,23 +852,35 @@
 					}else{
 						mensaje +='</CustomerAdd></CustomerAddRq>';
 					}
-					
 					if (rec.routeDay1 + rec.routeDay1 + rec.routeDay3 +rec.routeDay4 + rec.routeDay5 + rec.routeDay6 + rec.routeDay7 >0){
+						var msg = "";
 						if (rec.origin=="remote"){
-							mensaje += '<DataExtModRq><DataExtMod>';
+							msg += '<DataExtModRq><DataExtMod>';
 						}else{
-							mensaje += '<DataExtAddRq><DataExtAdd>';
+							msg += '<DataExtAddRq><DataExtAdd>';
 						}
-						mensaje +='<OwnerID>0</OwnerID>'
+						msg +='<OwnerID>0</OwnerID>'
 								+'<DataExtName>RouteDay</DataExtName>'
 								+'<ListDataExtType>Customer</ListDataExtType>'
 								+'<ListObjRef><ListID>' + rec.ListID +  '</ListID></ListObjRef>'
 								+'<DataExtValue>'+(rec.routeDay1==1?'SUN,':'')+(rec.routeDay2==1?'MON,':'')+(rec.routeDay3==1?'TUE,':'')+(rec.routeDay4==1?'WED,':'')+(rec.routeDay5==1?'THU,':'')+(rec.routeDay6==1?'FRI,':'')+(rec.routeDay7==1?'SAT':'')+'</DataExtValue>';
 						if (rec.origin=="remote"){
-							mensaje+='</DataExtMod></DataExtModRq>';
+							msg+='</DataExtMod></DataExtModRq>';
 						}else{
-							mensaje+='</DataExtAdd></DataExtAddRq>';
+							msg+='</DataExtAdd></DataExtAddRq>';
 						}
+						console.log("add hashRoutedays=" + msg);
+						var routeInfo = {
+							qbxml: msg,
+							routeDay1:rec.routeDay1,
+							routeDay2:rec.routeDay2,
+							routeDay3:rec.routeDay3,
+							routeDay4:rec.routeDay4,
+							routeDay5:rec.routeDay5,
+							routeDay6:rec.routeDay6,
+							routeDay7:rec.routeDay7
+						}
+						hashRoutedays[rec.ListID] = routeInfo;
 					}
 			}
 			
@@ -858,71 +891,197 @@
 		return false;
 	}
 	
-	var CustomerModRs;
-	var ListCustomerModRs;
-	var currentCustomerIndex;
-	var message = "";
-	var currentCustomer;
 	function receiveSyncUpCustomersMessage(message){
 		console.log('receiveSyncUpCustomersMessage message=' + message);
 		ListCustomerModRs = message.CustomerModRs;
-		if (ListCustomerModRs==null || typeof ListCustomerModRs == "undefined"){
+		ListCustomerAddRs = message.CustomerAddRs;
+		if ((ListCustomerModRs==null || typeof ListCustomerModRs == "undefined") && (ListCustomerAddRs==null || typeof ListCustomerAddRs == "undefined")){
 			$("#currentTask").html("No data returned by server.  An error ocurred");
 			$("#btnSynchDialog").html("Accept");
 			return;
 		}
 		console.log("ListCustomerModRs=" + ListCustomerModRs);
-		currentCustomerIndex = 0;
-		processNextCustomerResponse();
+		if (ListCustomerModRs!=null && typeof ListCustomerModRs != "undefined"){
+			currentCustomerModIndex = 0;
+			endCustomerMod = false;
+			processNextCustomerModResponse();
+		}else{
+			endCustomerMod = true;
+		}
+
+		console.log("ListCustomerAddRs=" + ListCustomerAddRs);
+		if (ListCustomerAddRs!=null && typeof ListCustomerAddRs != "undefined"){
+			currentCustomerAddIndex = 0;
+			endCustomerAdd = false;
+			processNextCustomerAddResponse();
+		}else {
+			endCustomerAdd = true;
+		}
+		//send qbxml de routedays
+		maxWaitEndCustomer = 10;
+		setTimeout("waitEndCustomerSyncUp()",200);
+		
 	}
 	
-	function processNextCustomerResponse(){
-		console.log("currentCustomerIndex=" +currentCustomerIndex);
+	var maxWaitEndCustomer;
+	function waitEndCustomerSyncUp(){
+		if (maxWaitEndCustomer==0) return;
+		maxWaitEndCustomer--;
+		if (endCustomerAdd && endCustomerMod){
+			console.log("send qbxmlRouteDays=" + qbxmlRouteDays);
+			if (qbxmlRouteDays!=""){
+				consumeWS(qbxmlRouteDays, "JSON", receiveSyncUpRouteDays, null, null, null);
+			}
+		}else{
+			console.log("esperar waitEndCustomerSyncUp");
+			setTimeout("waitEndCustomerSyncUp()",200);
+		}
+	}
+	
+	
+	function receiveSyncUpRouteDays(message){
+		console.log("receiveSyncUpRouteDays message=" + JSON.stringify(message));
+	}
+	
+	function processNextCustomerModResponse(){
+		console.log("currentCustomerModIndex=" +currentCustomerModIndex);
 		if (message!=null&& message!=""){
 			$("#currentTask").html(message);
 		}
-			if (!ListCustomerModRs.length && currentCustomerIndex==1){
+			if (!ListCustomerModRs.length && currentCustomerModIndex>=1){
 				$("#btnSynchDialog").html("Accept");
+				endCustomerMod = true;
 				return;
-			}else if (currentCustomerIndex == ListCustomerModRs.length){
+			}else if (currentCustomerModIndex == ListCustomerModRs.length){
 				$("#btnSynchDialog").html("Accept");
 				return;
 			}
 		if (ListCustomerModRs.length){
-			CustomerModRs =ListCustomerModRs[currentCustomerIndex]
+			CustomerModRs =ListCustomerModRs[currentCustomerModIndex]
 		}else{
 			CustomerModRs = ListCustomerModRs;
 		}
 		console.log("CustomerModRs=" + JSON.stringify(CustomerModRs));
 		var statusMessage =CustomerModRs.statusMessage;
 		if (statusMessage == "Status OK"	){
-			customerDAO.markSynchronized( CustomerModRs.requestID,errorCustomerDB,processedCustomer);
+			var customer = CustomerModRs.CustomerRet;
+			var customerVO = convertCustomerQB(customer);
+			if (hashRoutedays[CustomerModRs.requestID]){
+				routeInfo = hashRoutedays[CustomerModRs.requestID];
+				customerVO.routeDay1 = routeInfo.routeDay1;
+				customerVO.routeDay2 = routeInfo.routeDay2;
+				customerVO.routeDay3 = routeInfo.routeDay3;
+				customerVO.routeDay4 = routeInfo.routeDay4;
+				customerVO.routeDay5 = routeInfo.routeDay5;
+				customerVO.routeDay6 = routeInfo.routeDay6;
+				customerVO.routeDay7 = routeInfo.routeDay7;
+			}
+			
+			customerDAO.store([customerVO],errorCustomerModDB,function(){
+				customerDAO.markSynchronized( CustomerModRs.requestID,errorCustomerModDB,processedCustomerMod);
+			},'remote');
 		}else{
-			if ( CustomerAddRs.statusCode=="3231" ){
-					message += "Customer " + CustomerAddRs.requestID + ":" + statusMessage + "<br>";
-					processNextCustomerResponse();
+			if ( CustomerModRs.statusCode=="3231" ){
+					message += "Customer " + CustomerModRs.requestID + ":" + statusMessage + "<br>";
+					processNextCustomerModResponse();
 			}else {
-				customerDAO.markSynchronizedError(CustomerAddRs.requestID, errorCustomerDB,function(){
-					currentCustomerIndex++;
-					message += "Fail to upload customer " + CustomerAddRs.requestID + ":" + statusMessage + "<br>";
+				customerDAO.markSynchronizedError(CustomerModRs.requestID, errorCustomerModDB,function(){
+					currentCustomerModIndex++;
+					message += "Fail to upload customer " + CustomerModRs.requestID + ":" + statusMessage + "<br>";
 					message += "This customer must be corrected and send it again<br>";
-					processNextCustomerResponse();
+					processNextCustomerModResponse();
 				});
 			}
 		}
 	}
 	
-	function processedCustomer(){
-		currentCustomerIndex++;
-		message += "Success upload Customer " + CustomerModRs.FullName + "<br>";
-		processNextCustomerResponse();
+	function processedCustomerMod(){
+		currentCustomerModIndex++;
+		message += "Success upload Customer " + CustomerModRs.CustomerRet.FullName + "<br>";
+		var msg =  hashRoutedays[CustomerModRs.requestID];
+		console.log("CustomerModRs.requestID=" + CustomerModRs.requestID);
+		if (msg){
+			qbxmlRouteDays += msg.qbxml;
+		}
+		console.log("add a qbxmlRouteDays=" + hashRoutedays[CustomerModRs.requestID]);
+		processNextCustomerModResponse();
+	}
+
+	function	errorCustomerModDB(err) {
+		message += "Fail to store customer " + CustomerAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
+		currentCustomerModIndex++;
+		processNextCustomeModResponse();
 	}
 	
+	function processNextCustomerAddResponse(){
+		console.log("processNextCustomerAddResponse currentCustomerAddIndex=" +currentCustomerAddIndex + ",ListCustomerAddRs.length=" + ListCustomerAddRs.length);
+		if (message!=null&& message!=""){
+			$("#currentTask").html(message);
+		}
+			if (typeof ListCustomerAddRs.length == "undefined" && currentCustomerAddIndex>=1){
+				$("#btnSynchDialog").html("Accept");
+				console.log("processNextCustomerAddResponse return");
+				endCustomerAdd = true;
+				return;
+			}else if (currentCustomerAddIndex >= ListCustomerAddRs.length){
+				$("#btnSynchDialog").html("Accept");
+				return;
+			}
+		if (ListCustomerAddRs.length){
+			CustomerAddRs =ListCustomerAddRs[currentCustomerAddIndex]
+		}else{
+			CustomerAddRs = ListCustomerAddRs;
+		}
+		console.log("CustomerAddRs=" + JSON.stringify(CustomerAddRs));
+		var statusMessage =CustomerAddRs.statusMessage;
+		if (statusMessage == "Status OK"	){
+			var customer = CustomerAddRs.CustomerRet;
+			var customerVO = convertCustomerQB(customer);
+			if (hashRoutedays[CustomerAddRs.requestID]){
+				routeInfo = hashRoutedays[CustomerAddRs.requestID];
+				customerVO.routeDay1 = routeInfo.routeDay1;
+				customerVO.routeDay2 = routeInfo.routeDay2;
+				customerVO.routeDay3 = routeInfo.routeDay3;
+				customerVO.routeDay4 = routeInfo.routeDay4;
+				customerVO.routeDay5 = routeInfo.routeDay5;
+				customerVO.routeDay6 = routeInfo.routeDay6;
+				customerVO.routeDay7 = routeInfo.routeDay7;
+			}
+			customerDAO.store([customerVO],errorCustomerAddDB,function(){
+				customerDAO.delete( CustomerAddRs.requestID,errorCustomerAddDB,processedCustomerAdd);
+			}, 'remote');
+		}else{
+			if ( CustomerAddRs.statusCode=="3231" ){
+					message += "Customer " + CustomerAddRs.requestID + ":" + statusMessage + "<br>";
+					processNextCustomerAddResponse();
+			}else {
+				customerDAO.markSynchronizedError(CustomerAddRs.requestID, errorCustomerAddDB,function(){
+					currentCustomerAddIndex++;
+					message += "Fail to upload customer " + CustomerAddRs.requestID + ":" + statusMessage + "<br>";
+					message += "This customer must be corrected and send it again<br>";
+					processNextCustomerAddResponse();
+				});
+			}
+		}
+	}
+	
+	function processedCustomerAdd(){
+		currentCustomerAddIndex++;
+		message += "Success upload Customer " + CustomerAddRs.CustomerRet.FullName + "<br>";
+		console.log("CustomerAddRs.requestID=" + CustomerAddRs.requestID);
+		var msg = hashRoutedays[CustomerAddRs.requestID];
+		if (msg){
+			msg.replace(CustomerAddRs.requestID,CustomerAddRs.CustomerRet.ListID);
+			qbxmlRouteDays +=  msg.qbxml;
+			console.log("add a qbxmlRouteDays=" + msg.qbxml);
+		}
+		processNextCustomerAddResponse();
+	}
 
-	function	errorCustomerDB(err) {
-		message += "Fail to store customer " + CustomerModRs.requestID + ":" + JSON.stringify(err) + "<br>";
-		currentCustomerIndex++;
-		processNextCustomerResponse();
+	function	errorCustomerAddDB(err) {
+		message += "Fail to store customer " + CustomerAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
+		currentCustomerAddIndex++;
+		processNextCustomeAddResponse();
 	}
 
 //SYNCHRONIZATION CreditMemos	
