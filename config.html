@@ -908,7 +908,28 @@
 		}else{
 			endCustomerMod = true;
 		}
+		
+		maxWaitEndCustomer = 20;
+		waitEndCustomerMod();
 
+		//send qbxml de routedays
+		maxWaitEndCustomer = 20;
+		setTimeout("waitEndCustomerSyncUp()",200);
+		
+	}
+	
+	function waitEndCustomerMod(){
+		console.log("waitEndCustomerMod");
+		if (maxWaitEndCustomer>0){
+	
+			maxWaitEndCustomer--;
+	
+			if (!endCustomerMod){
+				setTimeout("waitEndCustomerMod()",200);
+				return;
+			}
+		}
+		
 		console.log("ListCustomerAddRs=" + ListCustomerAddRs);
 		if (ListCustomerAddRs!=null && typeof ListCustomerAddRs != "undefined"){
 			currentCustomerAddIndex = 0;
@@ -917,24 +938,23 @@
 		}else {
 			endCustomerAdd = true;
 		}
-		//send qbxml de routedays
-		maxWaitEndCustomer = 10;
-		setTimeout("waitEndCustomerSyncUp()",200);
+		
 		
 	}
 	
 	var maxWaitEndCustomer;
 	function waitEndCustomerSyncUp(){
-		if (maxWaitEndCustomer==0) return;
-		maxWaitEndCustomer--;
-		if (endCustomerAdd && endCustomerMod){
-			console.log("send qbxmlRouteDays=" + qbxmlRouteDays);
-			if (qbxmlRouteDays!=""){
-				consumeWS(qbxmlRouteDays, "JSON", receiveSyncUpRouteDays, null, null, null);
+		if (maxWaitEndCustomer>0){
+			maxWaitEndCustomer--;
+			if (endCustomerAdd && endCustomerMod){
+				console.log("send qbxmlRouteDays=" + qbxmlRouteDays);
+				if (qbxmlRouteDays!=""){
+					consumeWS(qbxmlRouteDays, "JSON", receiveSyncUpRouteDays, null, null, null);
+				}
+			}else{
+				console.log("esperar waitEndCustomerSyncUp");
+				setTimeout("waitEndCustomerSyncUp()",200);
 			}
-		}else{
-			console.log("esperar waitEndCustomerSyncUp");
-			setTimeout("waitEndCustomerSyncUp()",200);
 		}
 	}
 	
@@ -954,6 +974,7 @@
 				return;
 			}else if (currentCustomerModIndex == ListCustomerModRs.length){
 				$("#btnSynchDialog").html("Accept");
+				endCustomerMod = true;
 				return;
 			}
 		if (ListCustomerModRs.length){
@@ -1025,6 +1046,7 @@
 				return;
 			}else if (currentCustomerAddIndex >= ListCustomerAddRs.length){
 				$("#btnSynchDialog").html("Accept");
+				endCustomerAdd = true;
 				return;
 			}
 		if (ListCustomerAddRs.length){

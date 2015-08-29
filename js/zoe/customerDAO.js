@@ -240,11 +240,12 @@ function doListAllCustomersToUpload(tx){
  }
 
 function doMarkToSyncCustomer(tx){
-	tx.executeSql("UPDATE customer SET needSync=1, zoeUpdateDate=datetime('now', 'localtime') where ListID = ?",[filterDataCustomer]);
+	tx.executeSql("UPDATE customer SET needSync=1, zoeUpdateDate=datetime('now', 'localtime') where ListID = ?",[filterDataCustomer+""]);
 }
 
 function doMarkSynchorinizedCustomer(tx){
-	tx.executeSql("UPDATE customer SET needSync=0, zoeSyncDate=datetime('now', 'localtime') where ListID = ?",[filterDataCustomer]);
+	console.log("doMarkSynchorinizedCustomer filterDataCustomer=" + filterDataCustomer);
+	tx.executeSql("UPDATE customer SET needSync=0, zoeSyncDate=datetime('now', 'localtime') where ListID = ?",[filterDataCustomer+""]);
 }
 
 function doDeleteAllCustomer(tx){
