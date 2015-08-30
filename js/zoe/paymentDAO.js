@@ -132,10 +132,10 @@ function doCustomerPayments(tx){
 
 function doCustomerPaymentsByDateRange(tx){
 	logZoe("doCustomerPaymentsByDateRange ========");
-	strPayments = " SELECT TxnDate, customer.FullName AS Full_Name, refNumber, TotalAmount, PaymentMethod.Name AS PaymentMethod_Name "+
+	strPayments = " SELECT TxnDate, customer.FullName AS Full_Name, refNumber, TotalAmount AS TotAmount, PaymentMethod.Name AS PaymentMethod_Name "+
 				  " FROM Payment "+
 				  " LEFT JOIN customer ON customer.ListID = payment.ListID "+
-				  " LEFT JOIN PaymentMethod ON PaymentMethod.ListID = Payment.paymentsMethod_ListID "+
+				  " LEFT JOIN PaymentMethod ON PaymentMethod.ListID = Payment.paymentMethod_ListID "+
 				  " WHERE TxnDate BETWEEN ? AND ? "+
 				  " ORDER BY TxnDate ASC";
 	logZoe("strPayments ========"+strPayments);
