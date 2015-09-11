@@ -67,7 +67,7 @@
 				var htmlString1 = "";
 				listInventory = arrayInventory; // Copy local array to global array
 				for(var i=0; i< arrayInventory.length; i++) {
-					var li =  '<li data-filtertext="' + arrayInventory[i].FullName + '"><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '" ><h3>'+arrayInventory[i].FullName+'</h3><p></p><span class="ui-li-count">'+arrayInventory[i].QuantityOnHand+'</span></a><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
+					var li =  '<li data-filtertext="' + arrayInventory[i].salesDesc + '"><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '" ><h3>'+ arrayInventory[i].salesDesc +'</h3><p></p><span class="ui-li-count">'+arrayInventory[i].QuantityOnHand+'</span></a><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
 					
 					htmlString1 += li;
 					console.log("li=" + li);					
@@ -84,7 +84,7 @@
 			}			
 			
 			function inventoryDetails(index){
-				$('#FullName').val(listInventory[index].FullName);
+				$('#FullName').val(listInventory[index].salesDesc);
 				$('#QuantityOnHand').val(listInventory[index].QuantityOnHand);
 				$('#salesPrice').val(listInventory[index].salesPrice);
 				$('#salesTax').val(listInventory[index].desc);
@@ -107,7 +107,7 @@
 						'<tr>';
 						inventoryItems +=
 						'<tr>'
-						  +'<td style="vertical-align:top" align="left"><div id="FullNameP" class="TinyFont">'+listInventory[i].FullName+'</div></td>'
+						  +'<td style="vertical-align:top" align="left"><div id="FullNameP" class="TinyFont">'+ listInventory[index].salesDesc + '</div></td>'
 						  +'<td style="vertical-align:top" align="right"><div id="QuantityOnHandP" class="TinyFont">'+listInventory[i].QuantityOnHand+'</div></td>'
 						  +'<td style="vertical-align:top" align="right"><div id="salesPriceP" class="TinyFont">$ '+listInventory[i].salesPrice+'</div></td>';
 							if (listInventory[i].desc != null) {

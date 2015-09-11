@@ -35,16 +35,23 @@ function doGenerateInvoiceRefNum(prefix){
 	var date = new Date();
 	var daysSince = Math.floor((date.getTime() - dateBase.getTime()) / milsByDay);
 	console.log("doGenerateRefNum daysSince="+daysSince);
-	var currentMinuteDay = date.getHours()*60+date.getMinutes();
-	var generatedNumber = Math.floor(currentMinuteDay/15);
-	console.log("doGenerateRefNum generatedNumber="+generatedNumber);
-	var lastGeneratedInvoice  = window.localStorage.getItem("lastGeneratedInvoice")*1;
-	console.log("doGenerateRefNum lastGeneratedInvoice="+lastGeneratedInvoice);
-	if (lastGeneratedInvoice+1<generatedNumber){
-		generatedNumber = lastGeneratedInvoice+1;
+	var daysSinceStored = window.localStorage.getItem("daysSinceStored")*1;
+	window.localStorage.setItem("daysSinceStored", daysSince);
+	console.log("doGenerateRefNum daysSinceStored="+daysSinceStored);
+	var lastGeneratedInvoice;
+	var generatedNumber;
+	if (daysSinceStored!=daysSince){
+		lastGeneratedInvoice = 0;
+	}else{
+	  lastGeneratedInvoice = window.localStorage.getItem("lastGeneratedInvoice")*1;
 	}
+	console.log("doGenerateRefNum lastGeneratedInvoice="+lastGeneratedInvoice);
+	generatedNumber = lastGeneratedInvoice+1;
+
 	lastGeneratedInvoiceToConfirm = generatedNumber;
+
 	console.log("doGenerateRefNum lastGeneratedInvoiceToConfirm="+lastGeneratedInvoiceToConfirm);
+
 	var toReturn = prefix + daysSince+""+generatedNumber+"";
 	return toReturn;
 }

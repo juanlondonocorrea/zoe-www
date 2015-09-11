@@ -112,7 +112,7 @@ function doListInventory(tx){
 
 function doListInventorySite(tx){
 	logZoe("doListInventorySite");
-	tx.executeSql("SELECT inventory.ListID, FullName, InventorySite_ListID, QuantityOnHand, salesPrice, salesTax_ListID, salesTax.desc FROM inventory LEFT JOIN salesTax ON salesTax_ListID = salesTax.ListID WHERE inventorySite_ListID IS NOT NULL", [],inventoryLocalListReceiveFunction, inventoryErrFunc);
+	tx.executeSql("SELECT inventory.ListID, FullName, InventorySite_ListID, QuantityOnHand, salesPrice, salesDesc, salesTax_ListID, salesTax.desc FROM inventory LEFT JOIN salesTax ON salesTax_ListID = salesTax.ListID WHERE inventorySite_ListID IS NOT NULL", [],inventoryLocalListReceiveFunction, inventoryErrFunc);
 }
 
 function doListInventoryByCustomer(tx){
