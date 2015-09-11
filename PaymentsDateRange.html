@@ -105,11 +105,11 @@
 						console.log("ico=" + ico);
 						paymentsByCustomer +=
 						'<tr>'
-						  +'<td><div class="TinyFont">'+payments[i].FullName+'</div></td>'
+						  +'<td><div class="TinyFont">'+payments[i].PaymentMethod_Name+'</div></td>'
 						  +'<td><div class="TinyFont">'+payments[i].refNumber+'</div></td>'
 
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(payments[i].PaymentMethod_Name,2,0)+'</div></td>'
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(payments[i].Amount,2,0)+'</div></td>'
+						  +'<td><div class="TinyFont" align="right">'+payments[i].PaymentMethod_Name+'</div></td>'
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(payments[i].TotAmount,2,0)+'</div></td>'
 						  +'<td><table ><tr>';
 						  if (ico!=""){
 						  	paymentsByCustomer +='<td style="border: none;"><img src="css/themes/images/' + ico + '" height="10" width="10"></td>';
@@ -119,11 +119,12 @@
 						  }
 					  	paymentsByCustomer +=  '<td style="border: none;"><a href="payment.html?id_payment=' + payments[i].id_payment + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-print"  data-ajax="false"></a></td>';
 						paymentsByCustomer +='</tr></table></td></tr>';
-						console.log("paymentsByCustomer=" + paymentsByCustomer);
-
-						totalAmount += NumberCast(payments[i].Amount,2,0)*1;
-						
+						console.log("paymentsByCustomer==============" + paymentsByCustomer);
+						console.log("payments[i].TotAmount===========" + payments[i].TotAmount);
+						totalAmount += NumberCast(payments[i].TotAmount,2,0)*1;
+						console.log("totalAmount===========" + totalAmount);
 						totalOpenBalance += NumberCast(payments[i].OpenBalance,2,0)*1;
+						console.log("payments[i].OpenBalance===========" + payments[i].OpenBalance);
 						}
 				}
 				else  {
