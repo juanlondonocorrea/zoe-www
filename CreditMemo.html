@@ -133,7 +133,7 @@ $(document).ready(function() {
 				console.log("salesRep=" + JSON.stringify(salesrepVO));
 				
 				$('#refNumber').val( invoiceDAO.generateRefNum(salesrepVO.initial+ "") );
-				$('#PONumber').val($('#refNumber').val());
+				$('#PONumber').val(salesrepVO.Name);
 				$("#SalesRep").val(window.localStorage.getItem("salesRepName"));
 
 				var now = new Date();
@@ -493,8 +493,8 @@ $(document).ready(function() {
 					return false;
 				}
 				window.localStorage.setItem("id_creditMemo", $("#refNumber").val());
-				console.log("onClickInvoicePreview id_creditMemo=" + window.localStorage.getItem("id_creditMemo"));
-				window.location = "InvoicePreview.html?id_creditMemo=" + $("#refNumber").val();
+				console.log("onClickCreditMemoPreview id_creditMemo=" + window.localStorage.getItem("id_creditMemo"));
+				window.location = "CreditMemoPreview.html?id_creditMemo=" + $("#refNumber").val();
 			}
 
 		var id_creditMemoPhoto;
