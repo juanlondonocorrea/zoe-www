@@ -43,6 +43,10 @@
 		
 			// Cordova Device Ready.
 			function print() {
+			if (!cordova.plugins || !cordova.plugins.printer){
+				alert("no printer plugin");
+				return;
+			}
 				try{
 					cordova.plugins.printer.isAvailable(
 					//Check whether the printer is available or not.

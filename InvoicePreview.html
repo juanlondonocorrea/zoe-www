@@ -51,6 +51,11 @@
 
 		// Cordova Device Ready.
 		function print() {
+			if (!cordova.plugins || !cordova.plugins.printer){
+				alert("no printer plugin");
+				return;
+			}
+			
 			try{
 				cordova.plugins.printer.isAvailable(
 				//Check whether the printer is available or not.
@@ -183,7 +188,6 @@
 				invoiceItems += '</tbody></table>';
 				$("#tableBodyItems").html(invoiceItems); 
 				}
-				print();
 			} 
 		</script>
 		<style type="text/css">
@@ -343,13 +347,19 @@
                 <br>
                 <div id="customer_msg_FullName" class="SmallFont"></div>
                 <div id="SignatureT" class="SmallFont">Signature:</div>
-              </div>
+                <div style="background-color:white;">
+                    <image id="signature">
+                </div>
+                </div>
 
-			<div style="background-color:white;">
-                <image id="signature">
-            </div>
+            			<!-- divs de header, menu y footer-->
+			<div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
+			<div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
+			<div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
+			<!-- fin divs -->    
+
                 
 	  		</div>
-		</div>				
+
 	</body>
 </html>
