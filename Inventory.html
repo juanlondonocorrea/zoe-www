@@ -102,6 +102,7 @@
                       +'<td style="vertical-align:top">Quantity On Hand</td>'
                       +'<td style="vertical-align:top">Sales Price</td>'
                       +'<td style="vertical-align:top">Sales Tax</td>'
+                      +'<td style="vertical-align:top">Amount</td>'
                     +'</tr>';
 
 				$("#tableInventoryItems").html("");
@@ -117,8 +118,11 @@
 							if (listInventory[i].desc != null) {
 								inventoryItems += '<td style="vertical-align:top" align="left"><div id="salesTaxP" class="TinyFont">'+listInventory[i].desc+'</div></td>';
 							}
-							else
+							else{
 						  		inventoryItems += '<td>&nbsp;</td>';
+							}
+						inventoryItems +='<td style="vertical-align:top" align="right"><div id="AmountP" class="TinyFont">'+(listInventory[i].QuantityOnHand*listInventory[i].salesPrice)+'</div></td>'
+
 						inventoryItems +='</tr>';
 					}						  
 				}
