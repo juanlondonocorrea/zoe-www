@@ -149,7 +149,14 @@ function doSelectAllCustomer(tx){
 
 function doListCustomersByRouteDay(tx){
 	logZoe("doListCustomersByRouteDay")
-	var query = "SELECT customer.ListID, editSequence, FullName, IsActive, billAddress1, billAddress2, shipAddress1, shipAddress2, openBalance, overdueBalance, workPhone, cellPhone, email, shipAddressZipcode, billAddresZipcode, billAddresCity, billAddressState, billAddressCountry, shipAddressCity, shipAddressState, shipAddressCountry, id_salesrep, routeDay1, routeDay2, routeDay3, routeDay4, routeDay5, routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails, customer.id_term, pricelevel_ListID ,ifnull(inv.salesofday,0) as salesofday, vendor_ListID, origin FROM customer left join (select listid, sum(subtotal+salestaxtotal) salesofday FROM invoice where shipdate=date('now','localtime') group by listid) as inv on inv.listid= customer.listid"
+	var query = "SELECT customer.ListID, editSequence, FullName, IsActive, billAddress1, billAddress2, "
+	+" shipAddress1, shipAddress2, openBalance, overdueBalance, workPhone, cellPhone, email, shipAddressZipcode,"
+	+" billAddresZipcode, billAddresCity, billAddressState, billAddressCountry, shipAddressCity,"
+	+" shipAddressState, shipAddressCountry, id_salesrep, routeDay1, routeDay2, routeDay3, routeDay4, routeDay5,"
+	+" routeDay6, routeDay7, Fax, billAddress3, shipAddress3, name, companyName, otherDetails, customer.id_term,"
+	+" pricelevel_ListID ,ifnull(inv.salesofday,0) as salesofday, ifnull(cred.creditsofday,0) as creditsofday, vendor_ListID, origin FROM customer"
+	+" LEFT JOIN (select listid, sum(subtotal+salestaxtotal) salesofday FROM invoice where shipdate=date('now','localtime') group by listid) as inv on inv.listid= customer.listid"
+	+" LEFT JOIN (select listid, sum(subtotal+salestaxtotal) creditsofday FROM creditMemo where shipdate=date('now','localtime') group by listid) as cred on cred.listid= customer.listid"
 	+" WHERE customer.routeday" + filterDataCustomer + "=1" ;
 	console.log("doListCustomersByRouteDay query=" + query);
 	tx.executeSql(query,[],customerLocalListReceiveFunction, customerErrFunc);
