@@ -33,6 +33,7 @@ function doGenerateInvoiceRefNum(prefix){
 	var milsByDay = 1000*60*60*24;
 	var dateBase = new Date('2015-06-01');
 	var date = new Date();
+	date = new Date(date.getFullYear(),date.getMonth(), date.getDate()); 
 	var daysSince = Math.floor((date.getTime() - dateBase.getTime()) / milsByDay);
 	console.log("doGenerateRefNum daysSince="+daysSince);
 	var daysSinceStored = window.localStorage.getItem("daysSinceStored")*1;

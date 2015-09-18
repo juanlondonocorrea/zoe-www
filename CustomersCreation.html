@@ -51,7 +51,6 @@
 				logZoe("copyState: ========> "+copyState);
 				if (copyState == true) { // Copy Bill to Ship
 					$('#shipAddress2').val($('#billAddress2').val());
-					$('#shipAddress3').val($('#billAddress3').val());
 					$('#shipCity').val($('#billCity').val());
 					$('#shipState').val($('#billState').val());
 					$('#shipZipCode').val($('#billZipCode').val());
@@ -59,7 +58,6 @@
 				}
 				else if (copyState == false) {
 					$('#shipAddress2').val('');
-					$('#shipAddress3').val('');
 					$('#shipCity').val('');
 					$('#shipState').val('');
 					$('#shipZipCode').val('');
@@ -85,7 +83,7 @@
 				$('#Terms').empty();
 				for (var i in arrayTerms) {
 					//	toSelectIndex=i;
-					var selected = arrayTerms[i].name.toLowerCase()=='due on reciept'?"selected":"";
+					var selected = arrayTerms[i].name.toLowerCase()=='due on receipt'?"selected":"";
 					var option='<option value="'+arrayTerms[i].id_term+'"' + selected + '>'+arrayTerms[i].name+'</option>'
 					$('#Terms').append(option);					
 				}
@@ -140,14 +138,13 @@
 
 					billAddress1:$('#FullName').val(),
 					billAddress2:$('#billAddress2').val(),
-					billAddress3:$('#billAddress3').val(),
 					billAddresCity:$('#billCity').val(),
 					billAddressState:$('#billState').val(),
 					billAddresZipcode:$('#billZipCode').val(),
 					billAddressCountry:$('#billCountry').val(),
 
+					shipAddress1:$('#FullName').val(),
 					shipAddress2:$('#shipAddress2').val(),
-					shipAddress3:$('#shipAddress3').val(),
 					shipAddressCity:$('#shipCity').val(),
 					shipAddressState:$('#shipState').val(),
 					shipAddressZipcode:$('#shipZipCode').val(),
@@ -322,15 +319,9 @@
 						<legend><h4>Billing Address</h4></legend>
 						<div data-role="fieldcontain">
 							<div>
-								<label for="billAddress2">Bill Address Line 2:</label>
+								<label for="billAddress2">Bill Address</label>
 							</div>
 							<input type="text" data-theme="b" name="billAddress2" id="billAddress2" value=""  />
-						</div>
-						<div data-role="fieldcontain">
-							<div>
-								<label for="billAddress3">Bill Address Line 3:</label>
-							</div>
-							<input type="text" data-theme="b" name="billAddress3" id="billAddress3" value=""  />
 						</div>
 						
 						<div data-role="fieldcontain">
@@ -375,15 +366,9 @@
 						<legend><h4>Shiping Address</h4></legend>
 						<div data-role="fieldcontain">
 							<div>
-								<label for="shipAddress2">Ship Address Line 2:</label>
+								<label for="shipAddress2">Ship Address</label>
 							</div>
 							<input type="text" data-theme="b" name="shipAddress2" id="shipAddress2" value=""  />
-						</div>
-						<div data-role="fieldcontain">
-							<div>
-								<label for="shipAddress3">Ship Address Line 3:</label>
-							</div>
-							<input type="text" data-theme="b" name="shipAddress3" id="shipAddress3" value=""  />
 						</div>
 						<div data-role="fieldcontain">
 							<div>

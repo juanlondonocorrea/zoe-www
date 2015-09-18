@@ -31,6 +31,10 @@
 
 			// Cordova Device Ready.
 			function print() {
+			if (!cordova.plugins || !cordova.plugins.printer){
+				alert("no printer plugin");
+				return;
+			}
 				try{
 					cordova.plugins.printer.isAvailable(
 					//Check whether the printer is available or not.
@@ -103,7 +107,6 @@
 					+'</tr>';
 				itemsReturnedByDay += '</tbody></table>';
 				$("#tableBodyItemsReturned").html(itemsReturnedByDay); 
-				print();
 			} 
 		</script>
 		<style type="text/css">
@@ -172,6 +175,12 @@
                 </div>
               	<div id="tableBodyItemsReturned"></div>
             </div>
+            			<!-- divs de header, menu y footer-->
+			<div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
+			<div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
+			<div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
+			<!-- fin divs -->    
+
 		</div>				
 	</body>
 </html>
