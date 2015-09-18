@@ -43,6 +43,10 @@
 		
 			// Cordova Device Ready.
 			function print() {
+			if (!cordova.plugins || !cordova.plugins.printer){
+				alert("no printer plugin");
+				return;
+			}
 				try{
 					cordova.plugins.printer.isAvailable(
 					//Check whether the printer is available or not.
@@ -98,13 +102,17 @@
                       +'<td style="vertical-align:top">Quantity On Hand</td>'
                       +'<td style="vertical-align:top">Sales Price</td>'
                       +'<td style="vertical-align:top">Sales Tax</td>'
+                      +'<td style="vertical-align:top">Amount</td>'
                     +'</tr>';
 				
 				$("#tableInventoryItems").html("");
 				if (listInventory){
 					for (var i=0; i < listInventory.length; i++) {
+<<<<<<< HEAD
 						// inventoryItems +=
 						// '<tr>';
+=======
+>>>>>>> ecd0ea3a4c2bc6d091a423040ff93718dc6988ea
 						inventoryItems +=
 						'<tr>'
 						  +'<td style="vertical-align:top" align="left"><div id="FullNameP" class="TinyFont">'+ listInventory[i].salesDesc + '</div></td>'
@@ -113,8 +121,11 @@
 							if (listInventory[i].desc != null) {
 								inventoryItems += '<td style="vertical-align:top" align="left"><div id="salesTaxP" class="TinyFont">'+listInventory[i].desc+'</div></td>';
 							}
-							else
+							else{
 						  		inventoryItems += '<td>&nbsp;</td>';
+							}
+						inventoryItems +='<td style="vertical-align:top" align="right"><div id="AmountP" class="TinyFont">'+(listInventory[i].QuantityOnHand*listInventory[i].salesPrice)+'</div></td>'
+
 						inventoryItems +='</tr>';
 					}
 				}
@@ -126,7 +137,6 @@
 				}
 				inventoryItems += '</tbody></table>';
 				$("#tableInventoryItems").html(inventoryItems); 
-				print();
 			} 
 		</script>
 
