@@ -223,7 +223,9 @@
 					$('#Terms').append(option);					
 				}
 				$('#Terms')[0].selectedIndex = toSelectIndex;
-				$('#Terms').selectmenu('refresh');
+				try{
+					$('#Terms').selectmenu('refresh');
+				}catch(exception){}
 				$('#Terms').trigger("chosen:updated");
 			}
 
@@ -238,7 +240,9 @@
 					$('#priceLevel').append(option);
 				}
 				$('#priceLevel')[0].selectedIndex = toSelectIndex;
+				try{
 				$('#priceLevel').selectmenu('refresh');
+				}catch(exception){}
 				$('#priceLevel').trigger("chosen:updated");
 			}
 			

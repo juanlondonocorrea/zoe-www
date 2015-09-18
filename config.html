@@ -115,6 +115,8 @@
 	        return;
 		}
 		whatToUpload = $("#syncUpSelect").val();
+		message = "";
+		console.log("whatToUpload=" + whatToUpload);
 		currentUp = -1;
 		$("#synchDialog").popup("open"); 
 		upNext();
@@ -122,20 +124,24 @@
 
 	function upNext(){
 		currentUp += 1;
+		console.log("upNext currentUp=" + currentUp);
 		if (currentUp<whatToUpload.length){
 			console.log("uploading " +  whatToUpload[currentUp]);
-			$("#currentTask").html(whatToUpload[currentUp] + "...");
+			message += "<B>" + whatToUpload[currentUp] + "...</B>";
+			$("#currentTask").html(message);
 			if (whatToUpload[currentUp] == "syncUpInvoices" ){
 				syncUpInvoices();
 			}else if (whatToUpload[currentUp] == "syncUpCreditMemos" ){
 				syncUpCreditMemos();
 			}else if (whatToUpload[currentUp] == "syncUpCustomers" ){
 				syncUpCustomers();
+			}else{
+				upNext();
 			}
 		}else{
 			console.log("Synch upload finish!");
 			$("#currentTask").html("Finish!!");
-			setTimeout(function(){ $("#synchDialog").popup("close"); }, 3000);
+			setTimeout(function(){ $("#synchDialog").popup("close"); }, 5000);
 			; 
 		}
 	}
@@ -182,8 +188,8 @@
 				syncTerms();
 			}else if (whatToDownload[currentDown] == "syncClasses" ){
 				syncClasses();
-			}else if (whatToDownload[currentDown] == "syncPaymentMethods" ){
-				syncPaymentMethods();
+/*			}else if (whatToDownload[currentDown] == "syncPaymentMethods" ){
+				syncPaymentMethods();*/
 			}else if (whatToDownload[currentDown] == "syncDownInventory" ){
 				syncInventoryItems();
 			}else if (whatToDownload[currentDown] == "syncDownInventorySite" ){
@@ -609,9 +615,11 @@
 		}
 			if (!ListInvoiceAddRs.length && currentInvoiceIndex==1){
 				$("#btnSynchDialog").html("Accept");
+				upNext();
 				return;
 			}else if (currentInvoiceIndex == ListInvoiceAddRs.length){
 				$("#btnSynchDialog").html("Accept");
+				upNext();
 				return;
 			}
 		if (ListInvoiceAddRs.length){
@@ -736,9 +744,11 @@
 		}
 			if (!ListCreditMemoAddRs.length && currentCreditMemoIndex==1){
 				$("#btnSynchDialog").html("Accept");
+				upNext();
 				return;
 			}else if (currentCreditMemoIndex == ListCreditMemoAddRs.length){
 				$("#btnSynchDialog").html("Accept");
+				upNext();
 				return;
 			}
 		if (ListCreditMemoAddRs.length){
@@ -950,7 +960,10 @@
 				console.log("send qbxmlRouteDays=" + qbxmlRouteDays);
 				if (qbxmlRouteDays!=""){
 					consumeWS(qbxmlRouteDays, "JSON", receiveSyncUpRouteDays, null, null, null);
+				}else{
+					upNext();
 				}
+
 			}else{
 				console.log("esperar waitEndCustomerSyncUp");
 				setTimeout("waitEndCustomerSyncUp()",200);
@@ -961,6 +974,7 @@
 	
 	function receiveSyncUpRouteDays(message){
 		console.log("receiveSyncUpRouteDays message=" + JSON.stringify(message));
+		upNext();
 	}
 	
 	function processNextCustomerModResponse(){
@@ -1689,7 +1703,7 @@
                         <option value="syncTaxes">Taxes</option>
                         <option value="syncTerms">Terms</option>
                         <option value="syncClasses">Classes</option>
-                        <option value="syncPaymentMethods">Payment Methods</option>
+                        <!-option value="syncPaymentMethods">Payment Methods</option--!>
                         <option value="syncCustomerMsgs">Customer Messages</option>
                         <option value="syncDownInventory">Inventory</option>
                         <option value="syncDownInventorySite">InventorySite</option>
@@ -1708,9 +1722,9 @@
                 <div class="ui-block-a" style="width:85%">
 			    <select name="syncUpSelect" id="syncUpSelect" multiple="multiple" data-native-menu="false">
 			        <option  data-placeholder="true">Choose what to upload</option>
-			        <option value="syncUpInvoices">Upload Invoices</option>
-			        <option value="syncUpCreditMemos">Upload Credit Memos</option>
 			        <option value="syncUpCustomers">Upload Customers</option>
+			        <option value="syncUpCreditMemos">Upload Credit Memos</option>
+			        <option value="syncUpInvoices">Upload Invoices</option>
 			    </select>
                   </div>
                   <div class="ui-block-b"  style="width:15%"><button class="ui-btn" id="syncUp" onclick="syncUp(); return false;">Go</button></div>

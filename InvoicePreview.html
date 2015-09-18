@@ -51,6 +51,11 @@
 
 		// Cordova Device Ready.
 		function print() {
+			if (!cordova.plugins || !cordova.plugins.printer){
+				alert("no printer plugin");
+				return;
+			}
+			
 			try{
 				cordova.plugins.printer.isAvailable(
 				//Check whether the printer is available or not.
@@ -143,7 +148,7 @@
 
 				$('#customer_msg_FullName').html(InvoiceVO.customer_msg_FullName);
 
-				var invoiceItems = '<table class="tblItems">'
+				var invoiceItems = '<table border="1">'
 				  +'<tbody>'
 					+'<tr>' 
 					  +'<td><div class="TinyFont">Description</div></td>'
@@ -183,9 +188,13 @@
 				invoiceItems += '</tbody></table>';
 				$("#tableBodyItems").html(invoiceItems); 
 				}
-				print();
 			} 
 		</script>
+	</head> 
+
+	<body>
+        <div data-role="page" data-title="Print Invoice" data-theme="a">
+            <div data-role="content" id="InvoicePreview" >
 		<style type="text/css">
 			.BigFont { font-family: Arial; color:black; font-weight:bolder; font-size:14px; vertical-align:top;}
 			.MediumFont {font-family: Arial; color:black; font-weight:bolder; font-size:12px; vertical-align:top;}
@@ -221,12 +230,7 @@
 			span { vertical-align:top; }
 			#Footer { float:right; width: 50%;}
 		</style> 
-	</head> 
-
-	<body>
-        <div data-role="page" id="InvoicePreview" data-title="Print Invoice" data-theme="a">
-            <div data-role="content">
-                <table class="tblHeader">
+                <table class="tblHeader" border="1">
                   <tbody>
                     <tr>
                       <td colspan="2">
@@ -343,13 +347,19 @@
                 <br>
                 <div id="customer_msg_FullName" class="SmallFont"></div>
                 <div id="SignatureT" class="SmallFont">Signature:</div>
-              </div>
+                <div style="background-color:white;">
+                    <image id="signature">
+                </div>
+                </div>
 
-			<div style="background-color:white;">
-                <image id="signature">
-            </div>
+            			<!-- divs de header, menu y footer-->
+			<div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
+			<div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
+			<div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
+			<!-- fin divs -->    
+
                 
 	  		</div>
-		</div>				
+
 	</body>
 </html>
