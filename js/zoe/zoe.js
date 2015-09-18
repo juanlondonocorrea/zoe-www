@@ -124,10 +124,10 @@ function openDatabaseZoe(){
 	}
 
 	function doNeedToSync(tx) {
-	var	sql = "select 'Invoices' as entity, sum(1) as total FROM invoice WHERE needSync=1"
+	var	sql = "select 'Customers' as entity, sum(1) as total FROM customer  WHERE needSync=1"
 		+" UNION ALL select 'CreditMemos' as entity, sum(1) as total FROM creditMemo WHERE needSync=1"
-		+" UNION ALL select 'Customers' as entity, sum(1) as total FROM customer WHERE needSync=1"
-		+" UNION ALL select 'Payments' as entity, sum(1) as total FROM payment WHERE needSync=1";
+		+" UNION ALL select 'Payments' as entity, sum(1) as total FROM payment WHERE needSync=1"
+		+" UNION ALL select  'Invoices' as entity, sum(1) as total FROM invoice WHERE needSync=1 ";
 		console.log("doNeedToSync sql=" + sql);
 		tx.executeSql(sql,[],receiveCheckNeedToSync);
 	}

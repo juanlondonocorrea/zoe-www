@@ -39,6 +39,10 @@
 
 			// Cordova Device Ready.
 			function print() {
+			if (!cordova.plugins || !cordova.plugins.printer){
+				alert("no printer plugin");
+				return;
+			}
 				try{
 					cordova.plugins.printer.isAvailable(
 					//Check whether the printer is available or not.
@@ -101,7 +105,6 @@
 						}else if (sales[i].origin=="synch"){
 								ico = "sync.png";
 						}
-						console.log("ico=" + ico);
 						salesByCustomer +=
 						'<tr>'
 						  +'<td><div class="TinyFont">'+sales[i].billAddress1+'</div></td>'
@@ -141,7 +144,6 @@
 					+'</tr>';
 				salesByCustomer += '</tbody></table>';
 				$("#tableBodySales").html(salesByCustomer); 
-				print();
 			} 
 		</script>
 		<style type="text/css">
@@ -210,6 +212,12 @@
               	<div id="tableBodySales"></div>
             </div>
 		  </div>	
+            			<!-- divs de header, menu y footer-->
+			<div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
+			<div data-role="panel" data-display="overlay" data-position="left" id="menu" class="app-menu"></div>
+			<div data-role="footer" data-position="fixed" data-id="thefooter" class="app-footer"></div>
+			<!-- fin divs -->    
+
         </div>
 	</body>
 </html>
