@@ -99,15 +99,15 @@
                       +'<td style="vertical-align:top">Sales Price</td>'
                       +'<td style="vertical-align:top">Sales Tax</td>'
                     +'</tr>';
-
+				
 				$("#tableInventoryItems").html("");
 				if (listInventory){
 					for (var i=0; i < listInventory.length; i++) {
-						inventoryItems +=
-						'<tr>';
+						// inventoryItems +=
+						// '<tr>';
 						inventoryItems +=
 						'<tr>'
-						  +'<td style="vertical-align:top" align="left"><div id="FullNameP" class="TinyFont">'+ listInventory[index].salesDesc + '</div></td>'
+						  +'<td style="vertical-align:top" align="left"><div id="FullNameP" class="TinyFont">'+ listInventory[i].salesDesc + '</div></td>'
 						  +'<td style="vertical-align:top" align="right"><div id="QuantityOnHandP" class="TinyFont">'+listInventory[i].QuantityOnHand+'</div></td>'
 						  +'<td style="vertical-align:top" align="right"><div id="salesPriceP" class="TinyFont">$ '+listInventory[i].salesPrice+'</div></td>';
 							if (listInventory[i].desc != null) {
@@ -116,7 +116,7 @@
 							else
 						  		inventoryItems += '<td>&nbsp;</td>';
 						inventoryItems +='</tr>';
-					}						  
+					}
 				}
 				else {
 					inventoryItems +=
