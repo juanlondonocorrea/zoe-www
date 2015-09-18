@@ -104,7 +104,7 @@
                       +'<td style="vertical-align:top">Sales Tax</td>'
                       +'<td style="vertical-align:top">Amount</td>'
                     +'</tr>';
-				
+
 				$("#tableInventoryItems").html("");
 				if (listInventory){
 					for (var i=0; i < listInventory.length; i++) {
@@ -122,7 +122,7 @@
 						inventoryItems +='<td style="vertical-align:top" align="right"><div id="AmountP" class="TinyFont">'+(listInventory[i].QuantityOnHand*listInventory[i].salesPrice)+'</div></td>'
 
 						inventoryItems +='</tr>';
-					}
+					}						  
 				}
 				else {
 					inventoryItems +=
