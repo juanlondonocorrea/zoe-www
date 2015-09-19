@@ -196,7 +196,7 @@
 					else {
 						$("#openB").css("color", "black");
 					} */
-					var li =  '<li data-filtertext="' + arrayCustomers[i].FullName + '"><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '" ><h3>'+arrayCustomers[i].FullName+'</h3><p>' + ((type=='route')?'Total sales':'Balance') + '</p><span id="openB" class="ui-li-count">'+((type=='route')?(arrayCustomers[i].salesofday-arrayCustomers[i].creditsofday):arrayCustomers[i].openBalance)+'</span></a><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
+					var li =  '<li data-filtertext="' + arrayCustomers[i].FullName + '"><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '" ><h3>'+arrayCustomers[i].FullName+'</h3><p>' + ((type=='route')?'Total sales':'Balance') + '</p><span id="openB" class="ui-li-count">'+((type=='route')?NumberCast(arrayCustomers[i].salesofday-arrayCustomers[i].creditsofday,2,"0.0"):arrayCustomers[i].openBalance)+'</span></a><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
 					
 					htmlString1 += li;
 					}
@@ -724,6 +724,7 @@
 								</div>
 								<div data-role="fieldcontain">
 									<div>
+
 										<label for="Fax">Fax:</label>
 									</div>
 									<input type="text" data-theme="b" name="Fax" id="Fax" value=""  />              
