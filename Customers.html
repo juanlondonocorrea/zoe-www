@@ -535,6 +535,19 @@
 					
 					}
 			}			
+
+				
+	function changeCreateNew(){
+		var ListID = listCustomers[selectedIndex].ListID;
+		
+		if ($("#createSelect").val() == "Invoice"){
+			window.location = "invoice.html?ListID=" + ListID;
+		}else if ($("#createSelect").val() == "CreditMemo"){
+			window.location = "CreditMemo.html?ListID=" + ListID;
+		}else if ($("#createSelect").val() == "Payment"){
+			window.location = "payment.html?ListID=" + ListID;
+		}
+	}
 	
 		</script>
 		<style type="text/css">
@@ -542,7 +555,7 @@
 
 			.inlinetabs .ui-navbar {
 				margin: 0px 2px;
-				height: 54px;
+				height: 10x;
 				padding-left: 6px !important;
 			}
 			
@@ -651,6 +664,13 @@
                                         </address>
                                     </div>
                                 </div><!-- /grid-b -->
+                                <select  class="myFormsControl"  name="createSelect" id="createSelect" data-theme="a" onChange="changeCreateNew();">
+                                <option value="" >Create new ....</option>
+                                <option value="Invoice" >Invoice</option>
+                                <option value="CreditMemo" >Creditmemo</option>
+                                <option value="Payment" >Payment</option>
+                                </select>
+
                             </div>
                         </div>
                         <div class="ui-block-b" style="height:100%">            
@@ -951,8 +971,8 @@
 							<!-- Done and Cancel Buttons -->
                             <fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px;">
                                 <div class="ui-grid-a" style="height:45px">
-                                    <div class="ui-block-a ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="cancel" data-add-back-btn="true" data-theme="b">Cancel</button></div>
-                                    <div class="ui-block-b ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="btnUpdateCustomer"  onClick="UpdateCustomer(); return false;" data-theme="c">Done</button></div>	
+                                    <div class="ui-block-a ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="btnUpdateCustomer"  onClick="UpdateCustomer(); return false;" data-theme="c">Done</button></div>	
+                                    <div class="ui-block-b ui-btn ui-corner-all ui-shadow" style="height:100%"><button id="cancel" data-add-back-btn="true" data-theme="b">Cancel</button></div>
                                 </div>
                             </fieldset>
 						</form>		
@@ -983,7 +1003,17 @@
 					</div>
 				</div>				
 
+            <div id="menuCreate"  style="display: none; position: 'absolute'; top:20; left:20">
+                <h3>Create</h3>
+                <ul  data-role="listview">
+                    <li><a href="invoice.html" data-ajax="false">Invoices</a></li>
+                    <li><a href="CreditMemo.html" data-ajax="false">Credit memos</a></li>
+                    <li><a href="payment.html" data-ajax="false">Payment</a></li>
+                </ul>   
+             </div>
+
 			</div>
+
 
 			<!-- divs de header, menu y footer-->
 			<div data-role="header" data-position="fixed" data-id="theheader2" class="app-header"></div>
