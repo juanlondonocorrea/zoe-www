@@ -25,7 +25,7 @@
 				initAnyPage(event.target);
 				initThisPage(event);
 			});
-			
+
 			var type="";
 			function initThisPage(event){ 
 				//receiveCustomers();
@@ -120,7 +120,7 @@
 			});			
 
 			function openBalanceRed(){ // Colocar valor en rojo para openBalance en la lista
-				if ($('#openBalance').val() < 0) {
+				if ($('#openBalance').val() > 0) {
 					$("#openBalance").css("color", "Crimson");
 				} else {
 					$("#openBalance").css("color", "black");
@@ -128,7 +128,7 @@
 			}
 			
 			function overdueBalanceRed(){ // Colocar valor en rojo para overdueBalance en Customers Details
-				if ($('#openBalance').val() < 0) {
+				if ($('#openBalance').val() > 0) {
 					$("#openBalance").css("color", "Crimson");
 				} else {
 					$("#openBalance").css("color", "black");
@@ -196,10 +196,9 @@
 					else {
 						$("#openB").css("color", "black");
 					} */
-					var li =  '<li data-filtertext="' + arrayCustomers[i].FullName + '"><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '" ><h3>'+arrayCustomers[i].FullName+'</h3><p>' + ((type=='route')?'Total sales':'Balance') + '</p><span id="openB" class="ui-li-count">'+((type=='route')?arrayCustomers[i].salesofday:arrayCustomers[i].openBalance)+'</span></a><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
+					var li =  '<li data-filtertext="' + arrayCustomers[i].FullName + '"><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '" ><h3>'+arrayCustomers[i].FullName+'</h3><p>' + ((type=='route')?'Total sales':'Balance') + '</p><span id="openB" class="ui-li-count">'+((type=='route')?NumberCast(arrayCustomers[i].salesofday-arrayCustomers[i].creditsofday,2,"0.0"):arrayCustomers[i].openBalance)+'</span></a><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
 					
 					htmlString1 += li;
-					console.log("li=" + li);					
 					}
 					console.log("========= FIN LISTA =========");
 					try{$('#custList').html(htmlString1).listview('refresh');}catch(e){}
@@ -215,6 +214,8 @@
 			function receiveTerms(arrayTerms){
 				$('#Terms').empty();
 				var toSelectIndex = 0;
+				console.log("selectedIndex=" + selectedIndex);
+				console.log("listCustomers[selectedIndex]=" + listCustomers[selectedIndex]);
 				for (var i in arrayTerms) {
 					if (arrayTerms[i].id_term == listCustomers[selectedIndex].id_term){
 						toSelectIndex=i;
@@ -223,26 +224,24 @@
 					$('#Terms').append(option);					
 				}
 				$('#Terms')[0].selectedIndex = toSelectIndex;
-				try{
-					$('#Terms').selectmenu('refresh');
-				}catch(exception){}
+				$('#Terms').selectmenu('refresh');
 				$('#Terms').trigger("chosen:updated");
 			}
 
 			function receivePriceLevel(arrayPriceList){
 				$('#priceLevel').empty();
 				var toSelectIndex = 0;
+				var option='<option value="">Chose a pricelevel</option>'
+				$('#priceLevel').append(option);
 				for (var i in arrayPriceList) {
 					if (arrayPriceList[i].ListID == listCustomers[selectedIndex].pricelevel_ListID){
 						toSelectIndex=i;
 					}
-					var option='<option value="'+arrayPriceList[i].ListID+'">'+arrayPriceList[i].name+'</option>'
+					option='<option value="'+arrayPriceList[i].ListID+'">'+arrayPriceList[i].name+'</option>'
 					$('#priceLevel').append(option);
 				}
 				$('#priceLevel')[0].selectedIndex = toSelectIndex;
-				try{
 				$('#priceLevel').selectmenu('refresh');
-				}catch(exception){}
 				$('#priceLevel').trigger("chosen:updated");
 			}
 			
@@ -259,7 +258,10 @@
 				var TotAmount = 0.00;
 				
 				for(var i=0; i< arrayListInvoicesByCust.length; i++) {
-						var dueDays = restaFechas(arrayListInvoicesByCust[i].dueDate,hoy); // Date in format yyyy-mm-dd
+						var dueDays = 0;
+						if (arrayListInvoicesByCust[i].balanceRemaining>0){
+							dueDays =  restaFechas(arrayListInvoicesByCust[i].dueDate,hoy); // Date in format yyyy-mm-dd
+						}
 						if (dueDays<0){
 							dueDays = 0;
 						}
@@ -267,7 +269,7 @@
 						monsthsAgo = monsthsAgo.toFixed(1); // Calc months with 1 decimal number
 						htmlString2 += '<li data-filtertext="' + arrayListInvoicesByCust[i].id_invoice + '">'+
 						'<table width="100%" border="0" style="border:none !important;"><tr><td width="80%" valign="top" style="border:none;">Invoice #' + arrayListInvoicesByCust[i].refNumber +
-						'<div>Amount: <span id="overdueBal">'+arrayListInvoicesByCust[i].appliedAmount+'</span><br/>Balance Remaining:<span> '+arrayListInvoicesByCust[i].balanceRemaining+'</span><br/>';
+						'<div>Applied Amount: <span id="overdueBal">'+arrayListInvoicesByCust[i].appliedAmount+'</span><br/>Balance Remaining:<span> '+arrayListInvoicesByCust[i].balanceRemaining+'</span><br/>';
 						if (dueDays>0){
 							htmlString2 +='<span id="OberdueBy">Overdue by '+dueDays+' days</span><br/><span id="AddedMonthsAgo">Added '+monsthsAgo+' months ago</span>';
 						}
@@ -330,6 +332,8 @@
 				$('#SalesRep').val(listCustomers[index].id_salesrep);
 				$('#SalesRepName').val(window.localStorage.getItem("salesRepName"));
 				$('#ListID').val(listCustomers[index].ListID);
+				$('#editSequence').val(listCustomers[index].editSequence);
+				$('#origin').val(listCustomers[index].origin);
 				$('#IsActive').val(listCustomers[index].IsActive);
 				$('#FullName').val(listCustomers[index].FullName);
 				$('#openBalance').val(listCustomers[index].openBalance);
@@ -363,15 +367,18 @@
 				$('#Terms').val(listCustomers[index].id_term);
 				$('#OtherDetails').val(listCustomers[index].otherDetails);
 			
-				$('#routeDay1').val(listCustomers[index].routeDay1);
-				$('#routeDay2').val(listCustomers[index].routeDay2);	
-				$('#routeDay3').val(listCustomers[index].routeDay3);
-				$('#routeDay4').val(listCustomers[index].routeDay4);
-				$('#routeDay5').val(listCustomers[index].routeDay5);
-				$('#routeDay6').val(listCustomers[index].routeDay6);
-				$('#routeDay7').val(listCustomers[index].routeDay7);
+				(listCustomers[index].routeDay1)?$('#routeDay1').prop("checked", true):$('#routeDay1').prop("checked", false);
+				(listCustomers[index].routeDay2)?$('#routeDay2').prop("checked", true):$('#routeDay2').prop("checked", false);
+				(listCustomers[index].routeDay3)?$('#routeDay3').prop("checked", true):$('#routeDay3').prop("checked", false);
+				(listCustomers[index].routeDay4)?$('#routeDay4').prop("checked", true):$('#routeDay4').prop("checked", false);
+				(listCustomers[index].routeDay5)?$('#routeDay5').prop("checked", true):$('#routeDay5').prop("checked", false);
+				(listCustomers[index].routeDay6)?$('#routeDay6').prop("checked", true):$('#routeDay6').prop("checked", false);
+				(listCustomers[index].routeDay7)?$('#routeDay7').prop("checked", true):$('#routeDay7').prop("checked", false);
+				
+				console.log("pricelevel_ListID=" + listCustomers[index].pricelevel_ListID);
 				$('#pricelevel_ListID').val(listCustomers[index].pricelevel_ListID);
-
+				console.log("listCustomers[index].pricelevel_ListID =======> "+listCustomers[index].pricelevel_ListID);
+								
 				// Address for LocateAddress function
 				CustomerAddress = listCustomers[index].billAddress2+', '+listCustomers[index].billAddresCity+', '+listCustomers[index].billAddressState;
 				CustomerEmail = listCustomers[index].email;
@@ -402,13 +409,14 @@
 			}	
 			
 			function UpdateCustomer(){
+				
 				var customersVO = [];
 								
 				var customerVO = {
 					id_salesrep:salesRepVO.id_salesrep,
-
+					editSequence:$('#editSequence').val(),
 					ListID:$('#ListID').val(),
-					IsActive:$('#IsActive').val(),
+					IsActive:1,
 					FullName:$('#FullName').val(),
 					name:$('#Name').val(),
 					companyName:$('#CompanyName').val(),
@@ -440,22 +448,25 @@
 					id_term:$('#Terms').val(),
 					otherDetails:$('#OtherDetails').val(),
 
-					routeDay1:$('#routeDay1').val(),
-					routeDay2:$('#routeDay2').val(),
-					routeDay3:$('#routeDay3').val(),
-					routeDay4:$('#routeDay4').val(),
-					routeDay5:$('#routeDay5').val(),
-					routeDay6:$('#routeDay6').val(),
-					routeDay7:$('#routeDay7').val(),
 
-					pricelevel_ListID:$('#pricelevel_ListID').val()
+					routeDay1:$('#routeDay1').is(':checked')?1:0,
+					routeDay2:$('#routeDay2').is(':checked')?1:0,
+					routeDay3:$('#routeDay3').is(':checked')?1:0,
+					routeDay4:$('#routeDay4').is(':checked')?1:0,
+					routeDay5:$('#routeDay5').is(':checked')?1:0,
+					routeDay6:$('#routeDay6').is(':checked')?1:0,
+					routeDay7:$('#routeDay7').is(':checked')?1:0,
+					pricelevel_ListID:$('#priceLevel').val(), 
+					needSync:1,
+					zoeUpdateDate:new Date()
 				};
+				console.log("$('#pricelevel_ListID').val() =======> "+$('#priceLevel').val());
 				logZoe("ListID ========> " +$('#ListID').val());
 				logZoe("FullName ========> " +$('#FullName').val());
 				logZoe("Phone ========> " +$('#Phone').val());				
 				logZoe("customerVO ========> " + JSON.stringify(customerVO));
 				customersVO[0] = customerVO;
-				customerDAO.store(customersVO, errCustomerUpdate, successCustomerUpdate, "local");
+				customerDAO.store(customersVO, errCustomerUpdate, successCustomerUpdate, $("#origin").val());
 			}
 
 			function successCustomerUpdate(){
@@ -528,36 +539,37 @@
 		</script>
 		<style type="text/css">
 		
-.inlinetabs .ui-navbar {
-    margin: 0px 2px;
-	height: 54px;
-	padding-left: 6px !important;
-}
 
-.inlinetabs .ui-tabs-nav > li {
-    margin: 0 2px;
-    width: auto;
-    clear: none;
-	height:15px;
-}
-
-.inlinetabs .ui-tabs-nav .ui-btn {
-    border-bottom: none;
-    border-top-left-radius: .6em;
-    border-top-right-radius: .6em;
-	width:55px;
-}
-
-.inlinetabs .ui-tabs-panel {
-    background: #fff;
-    border-radius: .6em;
-    border: 1px solid #ddd;
-}
-
-.inlinetabs div {
-   margin:2px 2px 2px 2px;
-    outline:none;
-}
+			.inlinetabs .ui-navbar {
+				margin: 0px 2px;
+				height: 54px;
+				padding-left: 6px !important;
+			}
+			
+			.inlinetabs .ui-tabs-nav > li {
+				margin: 0 2px;
+				width: auto;
+				clear: none;
+				height:15px;
+			}
+			
+			.inlinetabs .ui-tabs-nav .ui-btn {
+				border-bottom: none;
+				border-top-left-radius: .6em;
+				border-top-right-radius: .6em;
+				width:55px;
+			}
+			
+			.inlinetabs .ui-tabs-panel {
+				background: #fff;
+				border-radius: .6em;
+				border: 1px solid #ddd;
+			}
+			
+			.inlinetabs div {
+			   margin:2px 2px 2px 2px;
+				outline:none;
+			}
 			thead {color:black;}
 			tbody {color:gray;}
 			tfoot {
@@ -583,7 +595,7 @@
 			#lblOverdueBalance1 {color:Crimson; font-weight:bolder; font-size:large;}
 			#lblOverdueBalance2 {color:grey; font-weight:bolder; font-size:medium;}
 			#Invoice {color:black; font-weight:bolder; font-size:medium;}
-			#overdueBal {color:Crimson; font-weight:bolder; font-size:medium;}
+			#overdueBal {color:black; font-weight:bolder; font-size:medium;}
 			#OberdueBy {color:white; font-weight:bolder; background-color:Crimson; font-size:medium;}
 			#AddedMonthsAgo {color:grey; font-size:medium;}
 		</style> 
@@ -674,8 +686,10 @@
 							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<div data-role="fieldcontain">
 									<div>
+									<input type="hidden" data-theme="b" name="editSequence" id="editSequence" value=""/>
+									<input type="hidden" data-theme="b" name="editSequence" id="editSequence" value=""/>
 									<input type="hidden" data-theme="b" name="ListID" id="ListID" value=""/>
-									<input type="hidden" data-theme="b" name="IsActive" id="IsActive" value=""/>
+									<input type="hidden" data-theme="b" name="origin" id="origin" value=""/>
 										<label for="FullName">Full Name:</label>
 									</div>
 									<input  class="myFormsControl" type="text" data-theme="b" name="FullName" id="FullName" value=""/>
@@ -710,6 +724,7 @@
 								</div>
 								<div data-role="fieldcontain">
 									<div>
+
 										<label for="Fax">Fax:</label>
 									</div>
 									<input type="text" data-theme="b" name="Fax" id="Fax" value=""  />              
