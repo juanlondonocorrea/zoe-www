@@ -108,8 +108,8 @@
 						var tr ='<tr>'
 						  +'<td><div class="TinyFont">'+creditMemos[i].billAddress1+'</div></td>'
 						  +'<td><div class="TinyFont">'+creditMemos[i].refNumber+'</div></td>'
-						  +'<td><div class="TinyFont" align="right">-'+NumberCast(creditMemos[i].Amount,2,0)+'</div></td>'
-						  +'<td><div class="TinyFont" align="right">-'+NumberCast(creditMemos[i].OpenBalance,2,0)+'</div></td>'
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(creditMemos[i].Amount,2,0)*-1+'</div></td>'
+						  +'<td><div class="TinyFont" align="right">'+NumberCast(creditMemos[i].OpenBalance,2,0)*-1+'</div></td>'
 						  +'<td><table><tr>';
 						  if (ico!=""){
 						  	tr +='<td style="border: none;"><img src="css/themes/images/' + ico + '" height="10" width="10"></td>';
@@ -134,8 +134,8 @@
 				creditMemosByCustomer +=
 					'<tr>'
 						+'<td colspan="2"><div align="right" class="SmallFontN">Totals Amount & Open Balance</div></td>'
-						+'<td><div align="right" class="SmallFontN">-'+NumberCast(totalAmount,2,0, '')+'</div></td>'
-						+'<td><div align="right" class="SmallFontN">-'+NumberCast(totalOpenBalance,2,0, '')+'</div></td>'
+						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalAmount,2,0, '')*-1+'</div></td>'
+						+'<td><div align="right" class="SmallFontN">'+NumberCast(totalOpenBalance,2,0, '')*-1+'</div></td>'
 					+'</tr>';
 				creditMemosByCustomer += '</tbody></table>';
 				$("#tableBodyCreditMemos").html(creditMemosByCustomer); 
