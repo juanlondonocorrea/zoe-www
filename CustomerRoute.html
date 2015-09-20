@@ -269,7 +269,7 @@
 						monsthsAgo = monsthsAgo.toFixed(1); // Calc months with 1 decimal number
 						htmlString2 += '<li data-filtertext="' + arrayListInvoicesByCust[i].id_invoice + '">'+
 						'<table width="100%" border="0" style="border:none !important;"><tr><td width="80%" valign="top" style="border:none;">Invoice #' + arrayListInvoicesByCust[i].refNumber +
-						'<div>Applied Amount: <span id="overdueBal">'+arrayListInvoicesByCust[i].appliedAmount+'</span><br/>Balance Remaining:<span> '+arrayListInvoicesByCust[i].balanceRemaining+'</span><br/>';
+						'<div>Applied Amount: <span id="overdueBal">'+ NumberCast(arrayListInvoicesByCust[i].appliedAmount,2, 0.00)*(-1)+'</span><br/>Balance Remaining:<span> '+arrayListInvoicesByCust[i].balanceRemaining+'</span><br/>';
 						if (dueDays>0){
 							htmlString2 +='<span id="OberdueBy">Overdue by '+dueDays+' days</span><br/><span id="AddedMonthsAgo">Added '+monsthsAgo+' months ago</span>';
 						}
@@ -283,7 +283,7 @@
 						htmlString2 +='</td></tr></table></li>';
 						console.log("appliedAmount " + arrayListInvoicesByCust[i].appliedAmount + ", casted=" + NumberCast(arrayListInvoicesByCust[i].appliedAmount,2, 0.00)  )
 						TotBalanceRem += NumberCast(arrayListInvoicesByCust[i].balanceRemaining,2, 0.00)*1;
-						TotAmount += NumberCast(arrayListInvoicesByCust[i].appliedAmount,2, 0.00)*1;
+						TotAmount += NumberCast(arrayListInvoicesByCust[i].appliedAmount,2, 0.00)*-1;
 						console.log("TotAmount =" + TotAmount  )
 					}
 					htmlString2 += '</ul>';
@@ -488,14 +488,14 @@
 			function receiveCreditMemos(arrayListCreditMemosByCust){
 				listCreditMemos = arrayListCreditMemosByCust; // Copy local array to global array
 				
-				// Build customers' Credit memos by Customer, list with <ul> <li>
+				// Build customers' Credit memos by Customer, list with <ul> <li> 
 				var TotBalanceRemCM = 0.00;
 				var TotAmountCM = 0.00;				
 				var htmlString3 = '<ul id="ListCreditMemosByCust" data-role="listview" data-filter="true" data-filter-placeholder="Search Credit Memo...">';
 				for(var i=0; i< arrayListCreditMemosByCust.length; i++) {
 						htmlString3 += '<li data-filtertext="' + arrayListCreditMemosByCust[i].refNumber + '">'+
 						'<table width="100%" border="0" style="border:none !important;"><tr><td width="80%" valign="top" style="border:none;">Credit Memo #' + arrayListCreditMemosByCust[i].refNumber +
-						'<div>Amount: <span id="overdueBal">'+ifNull(arrayListCreditMemosByCust[i].subtotal,'')+'</span><br/>Balance Remaining:<span> '+ifNull(arrayListCreditMemosByCust[i].balanceRemaining,'')+'</span><br/>';
+						'<div>Amount: <span id="overdueBal">'+NumberCast(arrayListCreditMemosByCust[i].subtotal,2, 0.00)*-1+'</span><br/>Balance Remaining:<span> '+NumberCast(arrayListCreditMemosByCust[i].balanceRemaining,2, 0.00)+'</span><br/>';
 						htmlString3 +='</div></td><td width="20%" style:"border:none !important;" valign="top">';
 						if (arrayListCreditMemosByCust[i].origin == 'local'){
 							htmlString3 += '<a href="CreditMemo.html?id_creditMemo=' + arrayListCreditMemosByCust[i].id_creditMemo + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
@@ -507,7 +507,7 @@
 						TotAmountCM += NumberCast(arrayListCreditMemosByCust[i].subtotal,2, 0.00)*1+NumberCast(arrayListCreditMemosByCust[i].salesTaxTotal,2, 0.00);
 					}
 					htmlString3 += '</ul>';
-					htmlString3 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Balance Remaining</td><td>Total Applied Amount</td></tr><tr><td>'+NumberCast(TotBalanceRemCM,2, 0.00)+'</td><td>'+NumberCast(TotAmountCM,2, 0.00)+'</td></tr></table>';
+					htmlString3 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Balance Remaining</td><td>Total Applied Amount</td></tr><tr><td>'+NumberCast(TotBalanceRemCM,2, 0.00)+'</td><td>'+NumberCast(TotAmountCM,2, 0.00)*-1+'</td></tr></table>';
 					try{
 						$('#CreditMemoList').html(htmlString3);
 						$("#ListCreditMemosByCust").listview().listview("refresh");
