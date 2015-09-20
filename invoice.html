@@ -161,6 +161,7 @@ $(document).ready(function() {
 				$('#selCustomer').trigger("chosen:updated");
 				if (ListID!=null){
 					$("#selCustomer").val(ListID).selectmenu("refresh");
+					setTimeout("selCustomerChange()",1500);
 				}
 			}
 			
