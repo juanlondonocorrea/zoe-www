@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Invoices</title>
+  <title>CreditMemo</title>
   
   <link rel="stylesheet" href="css/themes/zoe.min.css" />
   <link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
@@ -48,6 +48,7 @@ $(document).ready(function() {
 				alert("Error " + JSON.stringify(err));
 			}
 			var id_creditMemo = null;
+			var ListID = null;
 			function initThisPage(event){
 				console.log("initThisPage credit memo event.currentTarget.URL=" + event.currentTarget.URL);
 				if (event.currentTarget.URL && event.currentTarget.URL.indexOf("?")>-1){
@@ -57,6 +58,8 @@ $(document).ready(function() {
 						var parameterDupla = parameters[i].split("=");
 						if (parameterDupla[0]=="id_creditMemo"){
 							id_creditMemo = parameterDupla[1];
+						}else if(parameterDupla[0]=="ListID"){
+							ListID = parameterDupla[1];
 						}
 					}
 				}else if (window.localStorage.getItem("id_creditMemo")){
@@ -153,7 +156,11 @@ $(document).ready(function() {
 				$('#selCustomer').empty();
 				$('#selCustomer').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');
 				for (var i in list) {
-					$('#selCustomer').append('<option value="' + list[i].ListID +'">'+list[i].FullName+'</option>');
+					var str = '<option value="' + list[i].ListID +'">'+list[i].FullName+'</option>'; 
+					$('#selCustomer').append(str);
+				}
+				if (ListID!=null){
+					$("#selCustomer").val(ListID).selectmenu("refresh");
 				}
 				$('#selCustomer').trigger("chosen:updated");
 			}
