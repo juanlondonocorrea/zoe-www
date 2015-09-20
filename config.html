@@ -188,8 +188,8 @@
 				syncTerms();
 			}else if (whatToDownload[currentDown] == "syncClasses" ){
 				syncClasses();
-/*			}else if (whatToDownload[currentDown] == "syncPaymentMethods" ){
-				syncPaymentMethods();*/
+			}else if (whatToDownload[currentDown] == "syncPaymentMethods" ){
+				syncPaymentMethods();
 			}else if (whatToDownload[currentDown] == "syncDownInventory" ){
 				syncInventoryItems();
 			}else if (whatToDownload[currentDown] == "syncDownInventorySite" ){
@@ -434,6 +434,9 @@
 
 	var invoicesVO = [];
 	function receiveInvoicesMessage(message){
+		if (!message || !message.InvoiceQueryRs || !message.InvoiceQueryRs.InvoiceRet){
+			return;
+		}
 		var invoices = message.InvoiceQueryRs.InvoiceRet;
 		var i;
 		invoicesVO = [];
@@ -1699,18 +1702,18 @@
                     <select name="syncDownSelect" id="syncDownSelect" multiple="multiple" data-native-menu="false" onChange="onChangeSyncDownSelect()">
                         <option data-placeholder="true">Choose what to download </option>
                         <option value="all">All</option>
-                        <option value="syncDownSalesRep">Sales Rep</option>
                         <option value="syncTaxes">Taxes</option>
                         <option value="syncTerms">Terms</option>
                         <option value="syncClasses">Classes</option>
-                        <!-option value="syncPaymentMethods">Payment Methods</option--!>
+                        <option value="syncPaymentMethods">Payment Methods</option>
                         <option value="syncCustomerMsgs">Customer Messages</option>
+                        <option value="syncDownSalesRep">Sales Rep</option>
+                        <option value="syncDownCustomers">Customers</option>
                         <option value="syncDownInventory">Inventory</option>
                         <option value="syncDownInventorySite">InventorySite</option>
                         <option value="syncDownPricelevel">Pricelevel</option>
                         <option value="syncDownInvoices">Invoices</option>
                         <option value="syncDownCreditMemos">Credit Memos</option>
-                        <option value="syncDownCustomers">Customers</option>
                     </select>
                   </div>
                   <div class="ui-block-b"  style="width:15%"><button class="ui-btn" id="syncDown" onclick="syncDown(); return false;">Go</button></div>

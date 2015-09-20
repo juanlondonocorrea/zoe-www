@@ -95,7 +95,9 @@
 			}
 
 			function inventoryPrint(){
-                var inventoryItems = '<table width="100%" border="1" cellspacing="0" cellpadding="0">'
+                var inventoryItems = '<b>Inventory Rep</b>.  Printed date ' + new Date() + '<br>';
+				+ 'Sales rep:' + window.localStorage.getItem("salesRepName") +'<br>'
+				+ '<table width="100%" border="1" cellspacing="0" cellpadding="0">'
                   +'<tbody>'
                     +'<tr>'
                       +'<td style="vertical-align:top">Full Name</td>'
@@ -103,6 +105,7 @@
                       +'<td style="vertical-align:top">Sales Price</td>'
                       +'<td style="vertical-align:top">Sales Tax</td>'
                       +'<td style="vertical-align:top">Amount</td>'
+                      +'<td style="vertical-align:top">Physical Inv.</td>'
                     +'</tr>';
 
 				$("#tableInventoryItems").html("");
@@ -121,13 +124,13 @@
 							}
 						inventoryItems +='<td style="vertical-align:top" align="right"><div id="AmountP" class="TinyFont">'+(listInventory[i].QuantityOnHand*listInventory[i].salesPrice)+'</div></td>'
 
-						inventoryItems +='</tr>';
+						inventoryItems +='<td>&nbsp;</td></tr>';
 					}						  
 				}
 				else {
 					inventoryItems +=
 						'<tr>'
-							+'<td colspan="6"><div align="center" class="SmallFont">No items</div></td>'
+							+'<td colspan="7"><div align="center" class="SmallFont">No items</div></td>'
 						+'</tr>';
 				}
 				inventoryItems += '</tbody></table>';
