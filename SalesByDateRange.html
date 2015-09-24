@@ -82,14 +82,14 @@
 				var totalOpenBalance = 0.00;				
 				$("#tableBodySales").html("");
 				var salesByCustomer = '<div class="MediumFont" align="center">Sales by Customer since '+Date1+' to '+Date2+'</div>'
-				+'<table class="tblSales">'
+				+'<table class="tblSales" border="1" width="100%">'
 				  +'<tbody>'
 					+'<tr>' 
-					  +'<td><div class="TinyFont">Customer</div></td>'
-					  +'<td><div class="TinyFont">Invoice #</div></td>'
-					  +'<td><div class="TinyFont">Amount</div></td>'
-					  +'<td><div class="TinyFont">Open Balance</div></td>'
-					  +'<td><div class="TinyFont">Sync</div></td>'
+					  +'<td><div class="SmallFont">Customer</div></td>'
+					  +'<td><div class="SmallFont">Invoice #</div></td>'
+					  +'<td><div class="SmallFont">Amount</div></td>'
+					  +'<td><div class="SmallFont">Open Balance</div></td>'
+					  +'<td><div class="SmallFont">Sync</div></td>'
 					+'</tr>';
 				if (sales && sales.length>0){
 					var ico = "";
@@ -107,11 +107,11 @@
 						}
 						salesByCustomer +=
 						'<tr>'
-						  +'<td><div class="TinyFont">'+sales[i].billAddress1+'</div></td>'
-						  +'<td><div class="TinyFont">'+sales[i].refNumber+'</div></td>'
+						  +'<td><div class="SmallFont">'+sales[i].billAddress1+'</div></td>'
+						  +'<td><div class="SmallFont">'+sales[i].refNumber+'</div></td>'
 
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(sales[i].Amount,2,0)+'</div></td>'
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(sales[i].OpenBalance,2,0)+'</div></td>'
+						  +'<td><div class="SmallFont" align="right">'+NumberCast(sales[i].Amount,2,0)+'</div></td>'
+						  +'<td><div class="SmallFont" align="right">'+NumberCast(sales[i].OpenBalance,2,0)+'</div></td>'
 						  +'<td><table ><tr>';
 						  if (ico!=""){
 						  	salesByCustomer +='<td style="border: none;"><img src="css/themes/images/' + ico + '" height="10" width="10"></td>';
@@ -132,7 +132,7 @@
 					salesByCustomer +=
 						'<tr>'
 
-							+'<td colspan="4"><div align="center" class="TinyFont">No sales in this dates range</div></td>'
+							+'<td colspan="4"><div align="center" class="SmallFont">No sales in this dates range</div></td>'
 						+'</tr>';
 				}
 				salesByCustomer +=
@@ -146,7 +146,14 @@
 				$("#tableBodySales").html(salesByCustomer); 
 			} 
 		</script>
-		<style type="text/css">
+	</head>
+
+	<body>
+        <div data-role="page" data-title="Sales by Customer" data-theme="a">
+            <div data-role="content" id="SalesByCustomer_1" >
+            <html>
+            <head>
+            		<style type="text/css">
 			.BigFont { font-family: Arial; color:black; font-weight:bolder; font-size:14px; vertical-align:top;}
 			.MediumFont {font-family: Arial; color:black; font-weight:bolder; font-size:12px; vertical-align:top;}
 			.SmallFontN {font-family: Arial; color:black; font-weight:bolder; font-size:10px; vertical-align:top;}
@@ -182,11 +189,8 @@
 			#Footer { float:right; width: 50%;}
 			
 		</style> 
-	</head>
-
-	<body>
-        <div data-role="page" id="SalesByCustomer_1" data-title="Sales by Customer" data-theme="a">
-            <div data-role="content">
+		</head>
+        <body>
             	<div id="dateRange">
                 <table>
                 	<tr>
@@ -211,6 +215,8 @@
                  </table>
               	<div id="tableBodySales"></div>
             </div>
+            </body>
+            </html>
 		  </div>	
             			<!-- divs de header, menu y footer-->
 			<div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
