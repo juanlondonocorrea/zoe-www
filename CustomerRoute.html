@@ -46,6 +46,7 @@
 					$("#zoeTitle").html($("#zoeTitle").html() + " route day " + routeDay);
 					console.log("zoeTitle="+ $("#zoeTitle").html());
 					$("#customerType").html("Customer on route today");
+					 window.localStorage.removeItem("current_type");
 				}else{
 					customerDAO.list(receiveCustomers, errReceiveCustomers);
 				}
