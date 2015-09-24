@@ -43,7 +43,7 @@
 				//Check whether the printer is available or not.
 				function (isAvailable) {
 					 //Enter the page location.
-					 var page = $('#itemsSoldByDay_1').html(); //location.href;
+					 var page = $('#content').html(); //location.href;
 					 cordova.plugins.printer.print(page, 'Document.html', function () {
 					 alert('printing finished or canceled')
 						});
@@ -64,20 +64,20 @@
 				var totalItems = 0.00;
 				$("#tableBodyItemsSold").html("");
 				var itemsSoldByDay = '<div class="MediumFont" align="center">Items Sold since '+Date1+' to '+Date2+'</div>'
-				+'<table class="tblItemsSold">'
+				+'<table class="tblItemsSold" width="100%">'
 				  +'<tbody>'
 					+'<tr>' 
-					  +'<td><div class="TinyFont">Fullname</div></td>'
-					  +'<td><div class="TinyFont">Description</div></td>'
-					  +'<td><div class="TinyFont">Quantity</div></td>'
+					  +'<td><div class="SmallFont">Fullname</div></td>'
+					  +'<td><div class="SmallFont">Description</div></td>'
+					  +'<td><div class="SmallFont">Quantity</div></td>'
 					+'</tr>';
 				if (itemsSold){
 					for (var i=0; i < itemsSold.length; i++) {
 						itemsSoldByDay +=
 						'<tr>'
-						  +'<td><div class="TinyFont">'+itemsSold[i].FullName+'</div></td>'
-						  +'<td><div class="TinyFont">'+itemsSold[i].salesDesc+'</div></td>'
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(itemsSold[i].Quantity,0)+'</div></td>';
+						  +'<td><div class="SmallFont">'+itemsSold[i].FullName+'</div></td>'
+						  +'<td><div class="SmallFont">'+itemsSold[i].salesDesc+'</div></td>'
+						  +'<td><div class="SmallFont" align="right">'+NumberCast(itemsSold[i].Quantity,0)+'</div></td>';
 						itemsSoldByDay +='</tr>';
 						totalItems += itemsSold[i].Quantity;
 						}
@@ -85,7 +85,7 @@
 				else {
 					itemsSoldByDay +=
 						'<tr>'
-							+'<td colspan="3"><div align="center" class="TinyFont">No items sold</div></td>'
+							+'<td colspan="3"><div align="center" class="SmallFont">No items sold</div></td>'
 						+'</tr>';
 				}
 				itemsSoldByDay +=
@@ -97,7 +97,14 @@
 				$("#tableBodyItemsSold").html(itemsSoldByDay); 
 			} 
 		</script>
-		<style type="text/css">
+	</head> 
+
+	<body>
+        <div data-role="page" id="itemsSoldByDay_1" data-title="Items sold by day" data-theme="a">
+            <div data-role="content">
+            <html>
+            <head>
+            		<style type="text/css">
 			.BigFont { font-family: Arial; color:black; font-weight:bolder; font-size:14px; vertical-align:top;}
 			.MediumFont {font-family: Arial; color:black; font-weight:bolder; font-size:12px; vertical-align:top;}
 			.SmallFontN {font-family: Arial; color:black; font-weight:bolder; font-size:10px; vertical-align:top;}
@@ -132,13 +139,12 @@
 			span { vertical-align:top; }
 			#Footer { float:right; width: 50%;}
 		</style> 
-	</head> 
-
-	<body>
-        <div data-role="page" id="itemsSoldByDay_1" data-title="Items sold by day" data-theme="a">
-            <div data-role="content">
+		</head>
+        <body>
               <div id="tableBodyItemsSold"></div>
-            </div>
+           </body>
+           </html>
+          </div>
             
             			<!-- divs de header, menu y footer-->
 			<div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
