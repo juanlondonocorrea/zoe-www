@@ -72,22 +72,22 @@
 				var totalItemsRetDamaged = 0.00;
 				$("#tableBodyItemsReturned").html("");
 				var itemsReturnedByDay = '<div class="MediumFont" align="center">Items Sold since '+Date1+' to '+Date2+'</div>'
-				+'<table class="tblItemsSold">'
+				+'<table class="tblItemsSold" width="100%" border="1">'
 				  +'<tbody>'
 					+'<tr>' 
-					  +'<td><div class="TinyFont">Fullname</div></td>'
-					  +'<td><div class="TinyFont">Description</div></td>'
-					  +'<td><div class="TinyFont">Items Returned Goood</div></td>'
-					  +'<td><div class="TinyFont">Items Returned Damaged</div></td>'
+					  +'<td><div class="SmallFont">Fullname</div></td>'
+					  +'<td><div class="SmallFont">Description</div></td>'
+					  +'<td><div class="SmallFont">Items Returned Goood</div></td>'
+					  +'<td><div class="SmallFont">Items Returned Damaged</div></td>'
 					+'</tr>';
 				if (itemsReturned && itemsReturned.length>0){
 					for (var i=0; i < itemsReturned.length; i++) {
 						itemsReturnedByDay +=
 						'<tr>'
-						  +'<td><div class="TinyFont">'+itemsReturned[i].FullName+'</div></td>'
-						  +'<td><div class="TinyFont">'+itemsReturned[i].salesDesc+'</div></td>'
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(itemsReturned[i].GoodsQuantity,0,0)+'</div></td>'
-						  +'<td><div class="TinyFont" align="right">'+NumberCast(itemsReturned[i].DamagedQuantity,0,0)+'</div></td>';
+						  +'<td><div class="SmallFont">'+itemsReturned[i].FullName+'</div></td>'
+						  +'<td><div class="SmallFont">'+itemsReturned[i].salesDesc+'</div></td>'
+						  +'<td><div class="SmallFont" align="right">'+NumberCast(itemsReturned[i].GoodsQuantity,0,0)+'</div></td>'
+						  +'<td><div class="SmallFont" align="right">'+NumberCast(itemsReturned[i].DamagedQuantity,0,0)+'</div></td>';
 						itemsReturnedByDay +='</tr>';
 						totalItemsRetDamaged += (NumberCast(itemsReturned[i].DamagedQuantity,0,0)*1);
 						totalItemsRetGood += (NumberCast(itemsReturned[i].GoodsQuantity,0,0)*1);
@@ -96,7 +96,7 @@
 				else  {
 					itemsReturnedByDay +=
 						'<tr>'
-							+'<td colspan="4"><div align="center" class="TinyFont">No items returned</div></td>'
+							+'<td colspan="4"><div align="center" class="SmallFont">No items returned</div></td>'
 						+'</tr>';
 				}
 				itemsReturnedByDay +=
@@ -109,7 +109,14 @@
 				$("#tableBodyItemsReturned").html(itemsReturnedByDay); 
 			} 
 		</script>
-		<style type="text/css">
+	</head>
+
+	<body>
+        <div data-role="page"  data-title="Items sold by day" data-theme="a">
+            <div data-role="content" id="itemsReturnedByDay_1">
+            <html>
+            <head>
+            		<style type="text/css">
 			.BigFont { font-family: Arial; color:black; font-weight:bolder; font-size:14px; vertical-align:top;}
 			.MediumFont {font-family: Arial; color:black; font-weight:bolder; font-size:12px; vertical-align:top;}
 			.SmallFontN {font-family: Arial; color:black; font-weight:bolder; font-size:10px; vertical-align:top;}
@@ -145,11 +152,8 @@
 			#Footer { float:right; width: 50%;}
 
 		</style> 
-	</head>
-
-	<body>
-        <div data-role="page" id="itemsReturnedByDay_1" data-title="Items sold by day" data-theme="a">
-            <div data-role="content">
+		</head>
+        <body>
             	<div id="dateRange">
                 <table>
                 	<tr>
@@ -174,6 +178,8 @@
                  </table>
                 </div>
               	<div id="tableBodyItemsReturned"></div>
+              </body>
+              </html>
             </div>
             			<!-- divs de header, menu y footer-->
 			<div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>
