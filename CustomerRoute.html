@@ -90,9 +90,7 @@
 			function BillToShipCopy(){
 				copyState = $('#copyBillToShip').is(':checked');
 				if (copyState == true) { // Copy Bill to Ship
-					$('#shipAddress1').val($('#billAddress1').val());
 					$('#shipAddress2').val($('#billAddress2').val());
-					$('#shipAddress3').val($('#billAddress3').val());
 					$('#shipCity').val($('#billCity').val());
 					$('#shipState').val($('#billState').val());
 					$('#shipZipCode').val($('#billZipCode').val());
@@ -196,7 +194,7 @@
 					else {
 						$("#openB").css("color", "black");
 					} */
-					var li =  '<li data-filtertext="' + arrayCustomers[i].FullName + '"><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '" ><h3>'+arrayCustomers[i].FullName+'</h3><p>' + ((type=='route')?'Total sales':'Balance') + '</p><span id="openB" class="ui-li-count">'+((type=='route')?NumberCast(arrayCustomers[i].salesofday-arrayCustomers[i].creditsofday,2,"0.0"):arrayCustomers[i].openBalance)+'</span></a><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
+					var li =  '<li data-filtertext="' + arrayCustomers[i].FullName + '"><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '" ><h3>'+arrayCustomers[i].FullName+'</h3><p>' + ((type=='route')?'Total sales':'Balance') + '</p><span id="openB" class="ui-li-count">'+((type=='route')?NumberCast(arrayCustomers[i].salesofday-arrayCustomers[i].creditsofday,2,"0.0"):NumberCast(arrayCustomers[i].openBalance,2,"0.0"))+'</span></a><a class="linkDetail" href="#CustomersDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
 					
 					htmlString1 += li;
 					}
@@ -240,7 +238,7 @@
 					option='<option value="'+arrayPriceList[i].ListID+'">'+arrayPriceList[i].name+'</option>'
 					$('#priceLevel').append(option);
 				}
-				$('#priceLevel')[0].selectedIndex = toSelectIndex;
+				$('#priceLevel').val(arrayPriceList[toSelectIndex].ListID);
 				$('#priceLevel').selectmenu('refresh');
 				$('#priceLevel').trigger("chosen:updated");
 			}
@@ -345,17 +343,13 @@
 				$('#Fax').val(listCustomers[index].Fax);
 				$('#Email').val(listCustomers[index].email);
 				
-				$('#billAddress1').val(listCustomers[index].billAddress1);
 				$('#billAddress2').val(listCustomers[index].billAddress2);
-				$('#billAddress3').val(listCustomers[index].billAddress3);
 				$('#billCity').val(listCustomers[index].billAddresCity);
 				$('#billState').val(listCustomers[index].billAddressState);
 				$('#billZipCode').val(listCustomers[index].billAddresZipcode);
 				$('#billCountry').val(listCustomers[index].billAddressCountry);
 				
-				$('#shipAddress1').val(listCustomers[index].shipAddress1);
 				$('#shipAddress2').val(listCustomers[index].shipAddress2);
-				$('#shipAddress3').val(listCustomers[index].shipAddress3);
 				$('#shipCity').val(listCustomers[index].shipAddressCity);
 				$('#shipState').val(listCustomers[index].shipAddressState);
 				$('#shipZipCode').val(listCustomers[index].shipAddressZipcode);
@@ -426,17 +420,15 @@
 					Fax:$('#Fax').val(),
 					email:$('#Email').val(),
 
-					billAddress1:$('#billAddress1').val(),
+					billAddress1:$('#FullName').val(),
 					billAddress2:$('#billAddress2').val(),
-					billAddress3:$('#billAddress3').val(),
 					billAddresCity:$('#billCity').val(),
 					billAddressState:$('#billState').val(),
 					billAddresZipcode:$('#billZipCode').val(),
 					billAddressCountry:$('#billCountry').val(),
 
-					shipAddress1:$('#shipAddress1').val(),
+					shipAddress1:$('#FullName').val(),
 					shipAddress2:$('#shipAddress2').val(),
-					shipAddress3:$('#shipAddress3').val(),
 					shipAddressCity:$('#shipCity').val(),
 					shipAddressState:$('#shipState').val(),
 					shipAddressZipcode:$('#shipZipCode').val(),
@@ -495,7 +487,7 @@
 				for(var i=0; i< arrayListCreditMemosByCust.length; i++) {
 						htmlString3 += '<li data-filtertext="' + arrayListCreditMemosByCust[i].refNumber + '">'+
 						'<table width="100%" border="0" style="border:none !important;"><tr><td width="80%" valign="top" style="border:none;">Credit Memo #' + arrayListCreditMemosByCust[i].refNumber +
-						'<div>Amount: <span id="overdueBal">'+NumberCast(arrayListCreditMemosByCust[i].subtotal,2, 0.00)*-1+'</span><br/>Balance Remaining:<span> '+NumberCast(arrayListCreditMemosByCust[i].balanceRemaining,2, 0.00)+'</span><br/>';
+						'<div>Amount: <span id="overdueBal">'+NumberCast(arrayListCreditMemosByCust[i].subtotal,2, 0.00)*-1+'</span><br/>Balance Remaining:<span> '+NumberCast(arrayListCreditMemosByCust[i].balanceRemaining,2, 0.00)*-1+'</span><br/>';
 						htmlString3 +='</div></td><td width="20%" style:"border:none !important;" valign="top">';
 						if (arrayListCreditMemosByCust[i].origin == 'local'){
 							htmlString3 += '<a href="CreditMemo.html?id_creditMemo=' + arrayListCreditMemosByCust[i].id_creditMemo + '" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-notext ui-icon-edit"  data-ajax="false"></a>';
@@ -507,7 +499,7 @@
 						TotAmountCM += NumberCast(arrayListCreditMemosByCust[i].subtotal,2, 0.00)*1+NumberCast(arrayListCreditMemosByCust[i].salesTaxTotal,2, 0.00);
 					}
 					htmlString3 += '</ul>';
-					htmlString3 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Balance Remaining</td><td>Total Applied Amount</td></tr><tr><td>'+NumberCast(TotBalanceRemCM,2, 0.00)+'</td><td>'+NumberCast(TotAmountCM,2, 0.00)*-1+'</td></tr></table>';
+					htmlString3 += '<br/><table cellspacing="0" class="ui-block-a"><tr><td>Total Balance Remaining</td><td>Total Applied Amount</td></tr><tr><td>'+NumberCast(TotBalanceRemCM,2, 0.00)*-1+'</td><td>'+NumberCast(TotAmountCM,2, 0.00)*-1+'</td></tr></table>';
 					try{
 						$('#CreditMemoList').html(htmlString3);
 						$("#ListCreditMemosByCust").listview().listview("refresh");
@@ -763,21 +755,9 @@
 								<legend><h4>Billing Address</h4></legend>
 								<div data-role="fieldcontain">
 									<div>
-										<label for="billAddress1">Bill Address Line 1:</label>
-									</div>
-									<input type="text" data-theme="b" name="billAddress1" id="billAddress1" value=""  />
-								</div>
-								<div data-role="fieldcontain">
-									<div>
-										<label for="billAddress2">Bill Address Line 2:</label>
+										<label for="billAddress2">Bill Address</label>
 									</div>
 									<input type="text" data-theme="b" name="billAddress2" id="billAddress2" value=""  />
-								</div>
-								<div data-role="fieldcontain">
-									<div>
-										<label for="billAddress3">Bill Address Line 3:</label>
-									</div>
-									<input type="text" data-theme="b" name="billAddress3" id="billAddress3" value=""  />
 								</div>
 								
 								<div data-role="fieldcontain">
@@ -822,21 +802,9 @@
 								<legend><h4>Shiping Address</h4></legend>
 								<div data-role="fieldcontain">
 									<div>
-										<label for="shipAddress1">Ship Address Line 1:</label>
-									</div>
-									<input type="text" data-theme="b" name="shipAddress1" id="shipAddress1" value=""  />
-								</div>
-								<div data-role="fieldcontain">
-									<div>
-										<label for="shipAddress2">Ship Address Line 2:</label>
+										<label for="shipAddress2">Ship Address</label>
 									</div>
 									<input type="text" data-theme="b" name="shipAddress2" id="shipAddress2" value=""  />
-								</div>
-								<div data-role="fieldcontain">
-									<div>
-										<label for="shipAddress3">Ship Address Line 3:</label>
-									</div>
-									<input type="text" data-theme="b" name="shipAddress3" id="shipAddress3" value=""  />
 								</div>
 								<div data-role="fieldcontain">
 									<div>

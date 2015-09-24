@@ -172,7 +172,7 @@ $(document).ready(function() {
 				listTerms = list;
 				console.log("receiveTerms length="+list.length); 
 				$('#selTerm').empty();
-				$('#selTerm').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');
+				$('#selTerm').append('<option value="" data-placeholder="true">Choose one...</option>');
 				for (var i in list) {
 					console.log("term =" + JSON.stringify(list[i]));
 					$('#selTerm').append('<option value="' + list[i].id_term +'">'+list[i].name+'</option>');
@@ -373,6 +373,10 @@ $(document).ready(function() {
 			}
 			
 			function selTermChange(event){
+				if ($("#selTerm").val()==""){
+					alert("Select a valid term");
+					return false;
+				}
 				termSelectedIndex = $("#selTerm")[0].selectedIndex-1;
 
 				console.log("selTermChange #Date=" + $("#Date").val());
@@ -413,6 +417,11 @@ $(document).ready(function() {
 					alert("Please select a customer");
 					return false;
 				}
+				if ($("#selTerm").val()==""){
+					alert("Please select a term");
+					return false;
+				}
+				
 				if (!currentItems || currentItems.length<1){
 					alert("Please add at least one item");
 					return false;
