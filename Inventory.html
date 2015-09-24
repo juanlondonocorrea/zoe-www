@@ -122,7 +122,7 @@
 							else{
 						  		inventoryItems += '<td>&nbsp;</td>';
 							}
-						inventoryItems +='<td style="vertical-align:top" align="right"><div id="AmountP" class="TinyFont">'+(listInventory[i].QuantityOnHand*listInventory[i].salesPrice)+'</div></td>'
+						inventoryItems +='<td style="vertical-align:top" align="right"><div id="AmountP" class="TinyFont">'+NumberCast(listInventory[i].QuantityOnHand*listInventory[i].salesPrice,2,"0.0")+'</div></td>'
 
 						inventoryItems +='<td>&nbsp;</td></tr>';
 					}						  
@@ -194,8 +194,8 @@
         </div>
         <!-- END INVENTORY DETAILS-->
 		<!-- BEGIN PRINT INVENTORY -->
-		<div data-role="page" id="PrintInventory" data-title="Print Inventory" data-theme="a">
-			<div data-role="content">
+		<div data-role="page" data-title="Print Inventory" data-theme="a">
+			<div data-role="content" id="PrintInventory" >
 				<div id="tableInventoryItems">
 
             	</div>
