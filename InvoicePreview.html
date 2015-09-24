@@ -117,15 +117,13 @@
 				
 				if (InvoiceVO.isPending == 1) {
 					$('#isPending').html('Yes');
-				}
-				else if (InvoiceVO.isPending == 0) {
+				}else {
 					$('#isPending').html('No');
 				}
 				
 				if (InvoiceVO.isPaid == 1) {
 					$('#isPaid').html('Yes');
-				}
-				else if (InvoiceVO.isPaid == 0) {
+				}else{
 					$('#isPaid').html('No');
 				}
 				var taxTotal = 0.00;
@@ -148,14 +146,14 @@
 
 				$('#customer_msg_FullName').html(InvoiceVO.customer_msg_FullName);
 
-				var invoiceItems = '<table border="1">'
+				var invoiceItems = '<table border="1" width="100%">'
 				  +'<tbody>'
 					+'<tr>' 
-					  +'<td><div class="TinyFont">Description</div></td>'
-					  +'<td><div class="TinyFont">Unit Cost</div></td>'
-					  +'<td><div class="TinyFont">Quantity</div></td>'
-					  +'<td><div class="TinyFont">Amount</div></td>'
-					  +'<td><div class="TinyFont">Tax</div></td>'
+					  +'<td><div class="SmallFont">Description</div></td>'
+					  +'<td><div class="SmallFont">Unit Cost</div></td>'
+					  +'<td><div class="SmallFont">Quantity</div></td>'
+					  +'<td><div class="SmallFont">Amount</div></td>'
+					  +'<td><div class="SmallFont">Tax</div></td>'
 					+'</tr>';
 				var TotItems = 0;
 				$("#tableBodyItems").html("");
@@ -163,11 +161,11 @@
 					for (var i=0; i < InvoiceVO.items.length; i++) {
 						invoiceItems +=
 						'<tr>'
-						  +'<td><div class="TinyFont">'+InvoiceVO.items[i].Inventory_FullName+'-'+InvoiceVO.items[i].Desc+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(InvoiceVO.items[i].Rate,2, 0.00)+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">'+NumberCast(InvoiceVO.items[i].Quantity,0, 0)+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(InvoiceVO.items[i].Amount,2, 0.00)+'</div></td>';
-						invoiceItems += '<td><div class="TinyFont">'+NumberCast(InvoiceVO.items[i].salesTax_Name,0, '')+'</div></td>';
+						  +'<td><div class="SmallFont">'+InvoiceVO.items[i].Inventory_FullName+'-'+InvoiceVO.items[i].Desc+'</div></td>'
+						  +'<td><div align="right" class="SmallFont">$ '+NumberCast(InvoiceVO.items[i].Rate,2, 0.00)+'</div></td>'
+						  +'<td><div align="right" class="SmallFont">'+NumberCast(InvoiceVO.items[i].Quantity,0, 0)+'</div></td>'
+						  +'<td><div align="right" class="SmallFont">$ '+NumberCast(InvoiceVO.items[i].Amount,2, 0.00)+'</div></td>';
+						invoiceItems += '<td><div class="SmallFont">'+NumberCast(InvoiceVO.items[i].salesTax_Name,0, '')+'</div></td>';
 						invoiceItems +='</tr>';
 						TotItems += InvoiceVO.items[i].Quantity;
 						logZoe("invoiceItems: ============> "+invoiceItems);
@@ -176,13 +174,13 @@
 				else {
 					invoiceItems +=
 						'<tr>'
-							+'<td colspan="5"><div align="center" class="TinyFont">No items</div></td>'
+							+'<td colspan="5"><div align="center" class="SmallFont">No items</div></td>'
 						+'</tr>';
 				}
 				invoiceItems +=
 					'<tr>'
-						+'<td colspan="2"><div align="right" class="TinyFont">Total Items</div></td>'
-						+'<td><div align="right" class="TinyFont">'+NumberCast(TotItems,0, '')+'</div></td>'
+						+'<td colspan="2"><div align="right" class="SmallFont">Total Items</div></td>'
+						+'<td><div align="right" class="SmallFont">'+NumberCast(TotItems,0, '')+'</div></td>'
 						+'<td colspan="2"></td>'
 					+'</tr>';
 				invoiceItems += '</tbody></table>';
@@ -236,35 +234,35 @@
                       <td colspan="2">
                         <div id="InvoiceTitle" class="BigFont">Invoice</div>
                         <div id="vendor_name" class="MediumFont"></div>
-                        <div id="vendor_addr1" class="TinyFont"></div>
-                        <div id="vendor_addr2" class="TinyFont"></div>
-                        <div id="vendor_addr3" class="TinyFont"></div>
-                        <div id="vendor_city" class="TinyFont"></div>
-                        <div id="vendor_state" class="TinyFont"></div>
-                        <div id="vendor_country" class="TinyFont"></div>              
+                        <div id="vendor_addr1" class="SmallFont"></div>
+                        <div id="vendor_addr2" class="SmallFont"></div>
+                        <div id="vendor_addr3" class="SmallFont"></div>
+                        <div id="vendor_city" class="SmallFont"></div>
+                        <div id="vendor_state" class="SmallFont"></div>
+                        <div id="vendor_country" class="SmallFont"></div>              
                       </td>
                       <td colspan="3">
-                        <span class="TinyFont">COMPANY NAME</span><br>
+                        <span class="SmallFont">COMPANY NAME</span><br>
                         <div class="SmallFont" id="customer_companyName"></div>              
                       </td>
                     </tr>
                     <tr>
                       <td width="21%">
-                        <span class="TinyFont">INVOICE # </span><br>
+                        <span class="SmallFont">INVOICE # </span><br>
                         <div class="SmallFont" id="refNumber"></div>              
                       </td>
                       <td width="16%">
-                        <span class="TinyFont">DATE</span><br>
+                        <span class="SmallFont">DATE</span><br>
                         <div class="SmallFont" id="Date"></div>
                       </td>
                       <td width="31%" rowspan="2" style="vertical-align:top">
-                        <span class="TinyFont">BILLING ADDRESS</span>
+                        <span class="SmallFont">BILLING ADDRESS</span>
                         <div class="SmallFont" id="billAddress_addr1"></div>
                         <div class="SmallFont" id="billAddress_addr2"></div>
                         <div class="SmallFont" id="billAddress_addr3"></div>              
                       </td>
                       <td colspan="2" rowspan="2" style="vertical-align:top">
-                        <span class="TinyFont">SHIPING ADDRESS</span>
+                        <span class="SmallFont">SHIPING ADDRESS</span>
                         <div class="SmallFont" id="shipAddress_addr1"></div>
                         <div class="SmallFont" id="shipAddress_addr2"></div>
                         <div class="SmallFont" id="shipAddress_addr3"></div>              
@@ -300,7 +298,7 @@
                         <div class="SmallFont" id="salesrep_Name"></div>
                       </td>
                       <td width="16%">
-                        <span class="TinyFont">PENDIND</span><br>
+                        <span class="TinyFont">PENDING</span><br>
                         <div class="SmallFont" id="isPending"></div>              
                       </td>
                       <td width="16%">
