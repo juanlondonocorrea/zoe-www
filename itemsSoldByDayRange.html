@@ -43,7 +43,7 @@
 				//Check whether the printer is available or not.
 				function (isAvailable) {
 					 //Enter the page location.
-					 var page = $('#content').html(); //location.href;
+					 var page = $('#itemsSoldByDay_1').html(); //location.href;
 					 cordova.plugins.printer.print(page, 'Document.html', function () {
 					 alert('printing finished or canceled')
 						});
@@ -100,8 +100,8 @@
 	</head> 
 
 	<body>
-        <div data-role="page" id="itemsSoldByDay_1" data-title="Items sold by day" data-theme="a">
-            <div data-role="content">
+        <div data-role="page"  data-title="Items sold by day" data-theme="a">
+            <div data-role="content" id="itemsSoldByDay_1">
             <html>
             <head>
             		<style type="text/css">
