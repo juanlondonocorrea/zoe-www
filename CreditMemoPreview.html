@@ -147,15 +147,15 @@
 
 				$('#customer_msg_FullName').html(CreditMemoVO.customer_msg_FullName);
 
-				var creditMemoItems = '<table  class="tblItems">'
+				var creditMemoItems = '<table  class="tblItems" width="100%">'
 				  +'<tbody>'
 					+'<tr>'
-					  +'<td><div class="TinyFont">Description</div></td>'
-					  +'<td><div class="TinyFont">Unit Cost</div></td>'
-					  +'<td><div class="TinyFont">Quantity</div></td>'
-					  +'<td><div class="TinyFont">Amount</div></td>'
-					  +'<td><div class="TinyFont">Tax</div></td>'
-					  +'<td><div class="TinyFont">Class</div></td>'
+					  +'<td><div class="SmallFont">Description</div></td>'
+					  +'<td><div class="SmallFont">Unit Cost</div></td>'
+					  +'<td><div class="SmallFont">Quantity</div></td>'
+					  +'<td><div class="SmallFont">Amount</div></td>'
+					  +'<td><div class="SmallFont">Tax</div></td>'
+					  +'<td><div class="SmallFont">Class</div></td>'
 					+'</tr>';
 				var TotItems = 0;
 				$("#tableBodyItems").html("");
@@ -163,12 +163,12 @@
 					for (var i=0; i < CreditMemoVO.items.length; i++) {
 						creditMemoItems +=
 						'<tr>'
-						  +'<td><div class="TinyFont">'+CreditMemoVO.items[i].Inventory_FullName+'-'+CreditMemoVO.items[i].Desc+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(CreditMemoVO.items[i].Rate,2, 0.00)+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">'+NumberCast(CreditMemoVO.items[i].Quantity,0, 0)+'</div></td>'
-						  +'<td><div align="right" class="TinyFont">$ '+NumberCast(CreditMemoVO.items[i].Amount,2, 0.00)*-1+'</div></td>';
-					  	creditMemoItems += '<td><div class="TinyFont">'+NumberCast(CreditMemoVO.items[i].salesTax_Name,0, '')+'</div></td>';
-					  	creditMemoItems += '<td><div class="TinyFont">'+(CreditMemoVO.items[i].class_name==null?'':CreditMemoVO.items[i].class_name)+'</div></td>';
+						  +'<td><div class="SmallFont">'+CreditMemoVO.items[i].Inventory_FullName+'-'+CreditMemoVO.items[i].Desc+'</div></td>'
+						  +'<td><div align="right" class="SmallFont">$ '+NumberCast(CreditMemoVO.items[i].Rate,2, 0.00)+'</div></td>'
+						  +'<td><div align="right" class="SmallFont">'+NumberCast(CreditMemoVO.items[i].Quantity,0, 0)+'</div></td>'
+						  +'<td><div align="right" class="SmallFont">$ '+NumberCast(CreditMemoVO.items[i].Amount,2, 0.00)*-1+'</div></td>';
+					  	creditMemoItems += '<td><div class="SmallFont">'+NumberCast(CreditMemoVO.items[i].salesTax_Name,0, '')+'</div></td>';
+					  	creditMemoItems += '<td><div class="SmallFont">'+(CreditMemoVO.items[i].class_name==null?'':CreditMemoVO.items[i].class_name)+'</div></td>';
 						creditMemoItems +='</tr>';
 						TotItems += CreditMemoVO.items[i].Quantity;
 						logZoe("creditMemoItems: ============> "+creditMemoItems);
@@ -177,13 +177,13 @@
 				else {
 					creditMemoItems += 
 							'<tr>'
-								+'<td colspan="5"><div align="center" class="TinyFont">No items</div></td>'
+								+'<td colspan="5"><div align="center" class="SmallFont">No items</div></td>'
 							+'</tr>';
 				}
 				creditMemoItems +=
 					'<tr>'
-						+'<td colspan="2"><div align="right" class="TinyFont">Total Items</div></td>'
-						+'<td><div align="right" class="TinyFont">'+NumberCast(TotItems,0, '')+'</div></td>'
+						+'<td colspan="2"><div align="right" class="SmallFont">Total Items</div></td>'
+						+'<td><div align="right" class="SmallFont">'+NumberCast(TotItems,0, '')+'</div></td>'
 						+'<td colspan="2"></td>'
 					+'</tr>';
 				creditMemoItems += '</tbody></table>';
@@ -191,7 +191,14 @@
 				}
 			} 
 		</script>
-		<style type="text/css">
+	</head> 
+
+	<body>
+        <div data-role="page" id="CreditMemoPreview" data-title="Print Credit Memo" data-theme="a">
+            <div data-role="content">
+            <html>
+            <head>
+            		<style type="text/css">
 			.BigFont { font-family: Arial; color:black; font-weight:bolder; font-size:14px; vertical-align:top;}
 			.MediumFont {font-family: Arial; color:black; font-weight:bolder; font-size:12px; vertical-align:top;}
 			.SmallFontN {font-family: Arial; color:black; font-weight:bolder; font-size:10px; vertical-align:top;}
@@ -224,48 +231,46 @@
 				border: 1px solid black;
 			}
 			span { vertical-align:top; }
-			#Footer { float:right; width: 50%;}
+			#footerRight { float:right; width: 50%;}
+			#footerLeft { float:left; width: 50%;}
 		</style> 
-	</head> 
-
-	<body>
-        <div data-role="page" id="CreditMemoPreview" data-title="Print Credit Memo" data-theme="a">
-            <div data-role="content">
-                <table class="tblHeader">
+		</head>
+        <body>
+                <table class="tblHeader" width="100%" border="1">
                   <tbody>
                     <tr>
                       <td colspan="2">
                         <div id="CreditMemoTitle" class="BigFont">Credit Memo</div>
                         <div id="vendor_name" class="MediumFont"></div>				  
-                        <div id="vendor_addr1" class="TinyFont"></div>
-                        <div id="vendor_addr2" class="TinyFont"></div>
-                        <div id="vendor_addr3" class="TinyFont"></div>
-                        <div id="vendor_city" class="TinyFont"></div>
-                        <div id="vendor_state" class="TinyFont"></div>
-                        <div id="vendor_country" class="TinyFont"></div>              
+                        <div id="vendor_addr1" class="SmallFont"></div>
+                        <div id="vendor_addr2" class="SmallFont"></div>
+                        <div id="vendor_addr3" class="SmallFont"></div>
+                        <div id="vendor_city" class="SmallFont"></div>
+                        <div id="vendor_state" class="SmallFont"></div>
+                        <div id="vendor_country" class="SmallFont"></div>              
                       </td>
                       <td colspan="3">
-                        <span class="TinyFont">COMPANY NAME</span><br>
+                        <span class="SmallFont">COMPANY NAME</span><br>
                         <div class="SmallFont" id="customer_companyName"></div>              
                       </td>
                     </tr>
                     <tr>
                       <td width="21%">
-                        <span class="TinyFont">Credit Memo # </span><br>
+                        <span class="SmallFont">Credit Memo # </span><br>
                         <div class="SmallFont" id="refNumber"></div>              
                       </td>
                       <td width="16%">
-                        <span class="TinyFont">DATE</span><br>
+                        <span class="SmallFont">DATE</span><br>
                         <div class="SmallFont" id="Date"></div>
                       </td>
                       <td width="31%" rowspan="2" style="vertical-align:top">
-                        <span class="TinyFont">BILLING ADDRESS</span>
+                        <span class="SmallFont">BILLING ADDRESS</span>
                         <div class="SmallFont" id="billAddress_addr1"></div>
                         <div class="SmallFont" id="billAddress_addr2"></div>
                         <div class="SmallFont" id="billAddress_addr3"></div>              
                       </td>
                       <td colspan="2" rowspan="2" style="vertical-align:top">
-                        <span class="TinyFont">SHIPING ADDRESS</span>
+                        <span class="SmallFont">SHIPING ADDRESS</span>
                         <div class="SmallFont" id="shipAddress_addr1"></div>
                         <div class="SmallFont" id="shipAddress_addr2"></div>
                         <div class="SmallFont" id="shipAddress_addr3"></div>              
@@ -273,11 +278,11 @@
                     </tr>
                     <tr>
                       <td>
-                        <span class="TinyFont">SHIP DATE</span><br>
+                        <span class="SmallFont">SHIP DATE</span><br>
                         <div class="SmallFont" id="shipDate"></div>
                       </td>
                       <td>
-                        <span class="TinyFont">DUE DATE</span><br>
+                        <span class="SmallFont">DUE DATE</span><br>
                         <div class="SmallFont" id="dueDate"></div>             
                       </td>
                     </tr>
@@ -289,23 +294,23 @@
                     </tr>
                     <tr>
                       <td>
-                        <span class="TinyFont">P.O NUMBER</span><br>
+                        <span class="SmallFont">P.O NUMBER</span><br>
                         <div class="SmallFont" id="po_number"></div>
                       </td>
                       <td>
-                        <span class="TinyFont">TERMS</span><br>
+                        <span class="SmallFont">TERMS</span><br>
                         <div class="SmallFont" id="term_name"></div>
                       </td>
                       <td>
-                        <span class="TinyFont">SALES REP.</span><br>
+                        <span class="SmallFont">SALES REP.</span><br>
                         <div class="SmallFont" id="salesrep_Name"></div>
                       </td>
                       <td width="16%">
-                        <span class="TinyFont">PENDIND</span><br>
+                        <span class="SmallFont">PENDIND</span><br>
                         <div class="SmallFont" id="isPending"></div>              
                       </td>
                       <td width="16%">
-                        <span class="TinyFont">PAID</span><br>
+                        <span class="SmallFont">PAID</span><br>
                         <div class="SmallFont" id="isPaid"></div>              
                       </td>
                     </tr>
@@ -315,8 +320,8 @@
 
                 <div id="tableBodyItems"></div>
                 <br>
-                <div id="Footer">
-                    <table class="tblFooter">
+                <div id="footerRight">
+                    <table class="tblFooter" width="100%">
                       <tbody>
                       <tr>
                           <td colspan="2" class="SmallFontN">Subtotal</td>
@@ -345,12 +350,15 @@
                   </tbody>
                 </table>
             </div>
-            <br>
-            <div id="customer_msg_FullName" class="SmallFont"></div>
-            <div id="SignatureT" class="SmallFont">Signature:</div>
-              <div style="background-color:white;">
-                <image id="signature">
-            	</div>
+            <div id="leftFooter">
+                <div id="customer_msg_FullName" class="SmallFont"></div>
+                <div id="SignatureT" class="SmallFont">Signature:</div>
+                  <div style="background-color:white;">
+                    <image id="signature">
+                    </div>
+             </div>
+             </body>
+             </html>
                 
            </div>
 
