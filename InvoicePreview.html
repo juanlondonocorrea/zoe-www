@@ -107,9 +107,7 @@
 				$('#billAddress_state').html(InvoiceVO.billAddress_state);
 				$('#billAddress_postalcode').html(InvoiceVO.billAddress_postalcode);
 				
-				$('#shipAddress_addr1').html(InvoiceVO.shipAddress_addr1);
-				$('#shipAddress_addr2').html(InvoiceVO.shipAddress_addr2);
-				$('#shipAddress_addr3').html(InvoiceVO.shipAddress_addr3);
+				$('#shipAddress_addr2').html(InvoiceVO.billAddress_addr1);
 				$('#shipAddress_city').html(InvoiceVO.shipAddress_city);
 				$('#shipAddress_state').html(InvoiceVO.shipAddress_state);
 				$('#shipAddress_postalcode').html(InvoiceVO.shipAddress_postalcode);
@@ -268,9 +266,10 @@
                       </td>
                       <td colspan="2" rowspan="2" style="vertical-align:top">
                         <span class="SmallFont">SHIPING ADDRESS</span>
-                        <div class="SmallFont" id="shipAddress_addr1"></div>
                         <div class="SmallFont" id="shipAddress_addr2"></div>
-                        <div class="SmallFont" id="shipAddress_addr3"></div>              
+                        <div class="SmallFont" id="shipAddress_city"></div>              
+                        <div class="SmallFont" id="shipAddress_state"></div>              
+                        <div class="SmallFont" id="shipAddress_postalcode"></div>              
                       </td>
                     </tr>
                     <tr>

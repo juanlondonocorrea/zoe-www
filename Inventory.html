@@ -143,7 +143,7 @@
         <!-- INVENTORY LIST -->
         <div data-role="page" id="Inventory" data-theme="a" data-title="Inventory">
             <div data-role="content" id="InventoryList">
-                <a href="#PrintInventory" data-role="button" data-icon="print" data-iconpos="left" onClick="inventoryPrint();">Print Inventory</a>
+                <a href="#showPrintInventory" data-role="button" data-icon="print" data-iconpos="left" onClick="inventoryPrint();">Print Inventory</a>
                 <ul id="InvList" data-role="listview" data-filter="true" data-filter-placeholder="Search Inventory..." data-inset="true">
             
                 </ul>
@@ -194,7 +194,7 @@
         </div>
         <!-- END INVENTORY DETAILS-->
 		<!-- BEGIN PRINT INVENTORY -->
-		<div data-role="page" data-title="Print Inventory" data-theme="a">
+		<div data-role="page" id="showPrintInventory" data-title="Print Inventory" data-theme="a">
 			<div data-role="content" id="PrintInventory" >
 				<div id="tableInventoryItems">
 
