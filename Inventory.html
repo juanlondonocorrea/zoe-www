@@ -100,12 +100,12 @@
 				+ '<table width="100%" border="1" cellspacing="0" cellpadding="0">'
                   +'<tbody>'
                     +'<tr>'
-                      +'<td style="vertical-align:top">Full Name</td>'
-                      +'<td style="vertical-align:top">Quantity On Hand</td>'
-                      +'<td style="vertical-align:top">Sales Price</td>'
-                      +'<td style="vertical-align:top">Sales Tax</td>'
-                      +'<td style="vertical-align:top">Amount</td>'
-                      +'<td style="vertical-align:top">Physical Inv.</td>'
+                      +'<td style="vertical-align:top" class="SmallFontN">Full Name</td>'
+                      +'<td style="vertical-align:top" class="SmallFontN">Quantity On Hand</td>'
+                      +'<td style="vertical-align:top" class="SmallFontN">Sales Price</td>'
+                      +'<td style="vertical-align:top" class="SmallFontN">Sales Tax</td>'
+                      +'<td style="vertical-align:top" class="SmallFontN">Amount</td>'
+                      +'<td style="vertical-align:top" class="SmallFontN">Physical Inv.</td>'
                     +'</tr>';
 
 				$("#tableInventoryItems").html("");
@@ -113,16 +113,16 @@
 					for (var i=0; i < listInventory.length; i++) {
 						inventoryItems +=
 						'<tr>'
-						  +'<td style="vertical-align:top" align="left"><div id="FullNameP" class="TinyFont">'+ listInventory[i].salesDesc + '</div></td>'
-						  +'<td style="vertical-align:top" align="right"><div id="QuantityOnHandP" class="TinyFont">'+listInventory[i].QuantityOnHand+'</div></td>'
-						  +'<td style="vertical-align:top" align="right"><div id="salesPriceP" class="TinyFont">$ '+listInventory[i].salesPrice+'</div></td>';
+						  +'<td style="vertical-align:top" align="left" class="SmallFont"><div id="FullNameP" class="SmallFont">'+ listInventory[i].salesDesc + '</div></td>'
+						  +'<td style="vertical-align:top" align="right"><div id="QuantityOnHandP" class="SmallFont">'+listInventory[i].QuantityOnHand+'</div></td>'
+						  +'<td style="vertical-align:top" align="right"><div id="salesPriceP" class="SmallFont">$ '+listInventory[i].salesPrice+'</div></td>';
 							if (listInventory[i].desc != null) {
-								inventoryItems += '<td style="vertical-align:top" align="left"><div id="salesTaxP" class="TinyFont">'+listInventory[i].desc+'</div></td>';
+								inventoryItems += '<td style="vertical-align:top" align="left"><div id="salesTaxP" class="SmallFont">'+listInventory[i].desc+'</div></td>';
 							}
 							else{
 						  		inventoryItems += '<td>&nbsp;</td>';
 							}
-						inventoryItems +='<td style="vertical-align:top" align="right"><div id="AmountP" class="TinyFont">'+NumberCast(listInventory[i].QuantityOnHand*listInventory[i].salesPrice,2,"0.0")+'</div></td>'
+						inventoryItems +='<td style="vertical-align:top" align="right"><div id="AmountP" class="SmallFont">'+NumberCast(listInventory[i].QuantityOnHand*listInventory[i].salesPrice,2,"0.0")+'</div></td>'
 
 						inventoryItems +='<td>&nbsp;</td></tr>';
 					}						  
@@ -196,9 +196,23 @@
 		<!-- BEGIN PRINT INVENTORY -->
 		<div data-role="page" id="showPrintInventory" data-title="Print Inventory" data-theme="a">
 			<div data-role="content" id="PrintInventory" >
+            	<html>
+                <head>
+                		<style type="text/css">
+			.BigFont { font-family: Arial; color:black; font-weight:bolder; font-size:14px; vertical-align:top;}
+			.MediumFont {font-family: Arial; color:black; font-weight:bolder; font-size:12px; vertical-align:top;}
+			.SmallFontN {font-family: Arial; color:black; font-weight:bolder; font-size:10px; vertical-align:top;}
+			.SmallFont {font-family: Arial; color:black; font-weight:normal; font-size:10px; vertical-align:top;}
+			.TinyFont {font-family: Arial; color:black; font-weight:bolder; font-size:8px; vertical-align:bottom;}
+			</style>
+            </head>
+            <body>
+
 				<div id="tableInventoryItems">
 
             	</div>
+             </body>
+             </html>
             </div>
             <!-- divs de header, menu y footer-->
             <div data-role="header" data-position="fixed" data-id="theheader" class="app-header"></div>

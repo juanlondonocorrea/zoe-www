@@ -245,10 +245,11 @@ $(document).ready(function() {
 				//verifica si el producto ya fue adicionado a la factura anteriormente
 				for (var i in currentItems){
 					if (currentItems[i].Inventory_ListID == listItems[productSelectedIndex].ListID){
-						alert("This product is already in the invoice");
-						$( "#selProduct" )[0].selectedIndex = 0;
-						$('#selProduct').trigger("chosen:updated");
-						return false;
+						alert("This product is already in the invoice, please modify the quantity on this form");
+						$("#Quantity").val(currentItems[i].Quantity);
+						$("#RatePrice").val(currentItems[i].Rate);
+						$("#Amount").val(currentItems[i].Amount);
+						currentItems.splice(i,1);
 					}
 				}
 

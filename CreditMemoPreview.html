@@ -93,7 +93,11 @@
 				$('#vendor_state').html(CreditMemoVO.vendor_state);
 				$('#vendor_country').html(CreditMemoVO.vendor_country);
 			
-				$('#po_number').html(CreditMemoVO.po_number);
+				if (!CreditMemoVO.po_number || CreditMemoVO.po_number ==""){
+					$('#po_number').html(CreditMemoVO.salesrep_Name);
+				}else{
+					$('#po_number').html(CreditMemoVO.po_number);
+				}
 				$('#term_name').html(CreditMemoVO.term_name);
 				$('#salesrep_Name').html(CreditMemoVO.salesrep_Name);
 
