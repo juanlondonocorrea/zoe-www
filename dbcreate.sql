@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 26/08/2015
+Modified: 23/10/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -51,6 +51,7 @@ DROP INDEX IF EXISTS idx_salesrep_1@
 
 -- Drop tables section ---------------------------------------------------
 
+DROP TABLE IF EXISTS LinkedToPaymentCreditMemo@
 DROP TABLE IF EXISTS InventorySite@
 DROP TABLE IF EXISTS paymentAppliedTo@
 DROP TABLE IF EXISTS Payment@
@@ -571,6 +572,18 @@ CREATE TABLE InventorySite
   Name TEXT,
   SiteDesc TEXT,
   CONSTRAINT Key18 PRIMARY KEY (ListID)
+)@
+
+-- Table LinkedToPaymentCreditMemo
+
+CREATE TABLE LinkedToPaymentCreditMemo
+(
+  id_creditMemo TEXT NOT NULL,
+  TxnID TEXT NOT NULL,
+  id_payment TEXT NOT NULL,
+  CONSTRAINT Key19 PRIMARY KEY (id_creditMemo,TxnID,id_payment),
+  CONSTRAINT Relationship32 FOREIGN KEY (id_creditMemo) REFERENCES creditMemo (id_creditMemo),
+  CONSTRAINT Relationship33 FOREIGN KEY (TxnID, id_payment) REFERENCES paymentAppliedTo (TxnID, id_payment)
 )@
 
 

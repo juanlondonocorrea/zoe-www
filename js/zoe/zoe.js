@@ -15,6 +15,7 @@
 		  var toPage = target.id;
 		  console.log("target=" + target);
 		  console.log("toPage=" + toPage);
+		  checkExistDB();
 		  if(!toPage || toPage.indexOf("Login") < 0  && toPage.indexOf("config")<0) {
 			  if (toPage && toPage.indexOf(".html")>-1){
 				   window.localStorage.setItem("pageToGoAfterLogin", + toPage);
@@ -74,9 +75,28 @@ function openDatabaseZoe(){
 	return db;
 }
 
+	//retorna true si existe la bd
+	function checkExistDB(){
+		openDatabaseZoe();
+		db.transaction(checkTableSalesrep,errorExistDB,successExistDB);
+	}
+	
+	function checkTableSalesrep(tx){
+			tx.executeSql("SELECT * FROM salesrep");
+	}
+	var existDB = false;
+	function successExistDB(){
+		existDB = true;
+		console.log("database exist!");
+	}
+	function errorExistDB(){
+		existDB = false;
+		console.log("database not exist!");
+	}
+	
 	var sqls;
-	function checkDatabase(){
-		logZoe("checkDatabase");
+	function createDatabase(){
+		logZoe("createDatabase");
 	    $.ajax({
             url : "dbcreate.sql",
             dataType: "text",
@@ -129,7 +149,7 @@ function openDatabaseZoe(){
 		+" UNION ALL select 'Payments' as entity, sum(1) as total FROM payment WHERE needSync=1"
 		+" UNION ALL select  'Invoices' as entity, sum(1) as total FROM invoice WHERE needSync=1 ";
 		console.log("doNeedToSync sql=" + sql);
-		tx.executeSql(sql,[],receiveCheckNeedToSync);
+		tx.executeSql(sql,[],receiveCheckNeedToSync, errCheckNeedToSync);
 	}
 	
 	var needToSync;
@@ -153,6 +173,11 @@ function openDatabaseZoe(){
 			$("#iconSync").html('<a class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-icon-sync"></a>');
 		}
 	}
+	
+	function errCheckNeedToSync(){
+		needToSync = new Array();
+	}
+	
 
 
 	function nullHandler(tx, results){

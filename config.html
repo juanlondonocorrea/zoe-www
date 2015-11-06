@@ -50,10 +50,15 @@
 			}
 			$('#syncURL').val(window.localStorage.getItem("syncURL"));	
 			$('#submitConfig').click(submitFormConfig);	
-			$('#createDB').click(checkDatabase);	
+			$('#createDB').click(submitCreateDatabase);	
 			fillNeedToSync();
 			logZoe("config.html listo pagebeforecreate");
-		}		
+		}
+		
+	function submitCreateDatabase(){
+		console.log("create dabatase call");
+		createDatabase();
+	}
 
 	function submitFormConfig(form) {
 		window.localStorage.setItem("salesRepName", $('#salesRepName').val());
@@ -1692,8 +1697,22 @@
                     <lable for="syncURL">Synchronization URL</lable><input type="text" id="syncURL" name="syncURL" placeholder="syncURL"><br>
                                  
                         <input id="submitConfig" type="submit" value="Save">
-		                <button class="ui-btn" id="createDB">create database</button>
                 </form>
+				<a href="#popupCreateDB" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-icon="check" data-theme="a" data-transition="flip">Create database</a>
+
+				<div data-role="popup" id="popupMenu" data-theme="a">
+					<div data-role="popup" id="popupCreateDB" data-theme="a" class="ui-corner-all">
+						<form>
+							<div style="padding:10px 20px;">
+							  <h3>Please Write "CONFIRM" to confirm</h3>
+					          <label for="un" class="ui-hidden-accessible">Please write CONFIRM:</label>
+					          <input type="text" name="confirm" id="confirm" value="" placeholder="CONFIRM" data-theme="a" onKeyUp="if ($('#confirm').val()=='CONFIRM') $('#confirmCreateDBButton').prop('disabled',false); else $('#confirmCreateDBButton').prop('disabled', true);">
+
+					    	  <button id="confirmCreateDBButton" type="button" data-theme="b" data-icon="check"  onClick="submitCreateDatabase(); $('#popupCreateDB').popup( 'close' ); $('#confirmCreateDBButton').prop('disabled', true); $('#confirm').val('')" disabled="true">Confirm</button>
+							</div>
+						</form>
+					</div>
+				</div>                
             </div>
 
             <label for="syncDownSelect">Download</label>
