@@ -127,7 +127,7 @@ function doListInventoryByCustomerAndAll(tx){
 		+' (Select c.ListId as c_listid, i.*,pli.customprice FROM inventory i LEFT JOIN pricelevel_item pli ON pli.inventory_listid = i.listid LEFT JOIN pricelevel pl ON pl.listid=pli.pricelevel_listid LEFT JOIN customer c ON c.pricelevel_listid = pl.listid WHERE c.listid=?' 
 		+' UNION ALL' 
 		+' SELECT null as c_listid, i.*, null as customprice from inventory i Where i.ListID not IN (Select i.ListID FROM inventory i LEFT JOIN pricelevel_item pli ON pli.inventory_listid = i.listid LEFT JOIN pricelevel pl ON pl.listid=pli.pricelevel_listid LEFT JOIN customer c ON c.pricelevel_listid = pl.listid WHERE c.listid=?) '
-		+' )  order by InventorySite_ListID desc, salesdesc asc';
+		+' )  order by salesdesc asc';
 	
 	tx.executeSql(sql,	[filterDataInventory,filterDataInventory],inventoryLocalListReceiveFunction, inventoryErrFunc);
 }
