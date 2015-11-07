@@ -114,6 +114,7 @@
 						  if (ico!=""){
 						  	tr +='<td style="border: none;"><img src="css/themes/images/' + ico + '" height="10" width="10"></td>';
 						  }
+						  console.log("creditMemos[i].origin=" + creditMemos[i].origin);
 						  if (creditMemos[i].origin=="local"){
 							  tr +=  '<td style="border: none;"><a href="CreditMemo.html?id_creditMemo=' + creditMemos[i].id_creditMemo + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-edit"  data-ajax="false"></a></td>';
 						  }
