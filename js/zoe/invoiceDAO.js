@@ -192,7 +192,7 @@ function markSynchronizedErrorInvoice(id_invoice,aErrFunc,successCB){
 function doSelectInvoice(tx){
 	logZoe("doSelectInvoice filterData=" + filterDataInvoice);
 	tx.executeSql("SELECT invoice.*, term.name AS term_name, cm.FullName as customer_msg_FullName,  " +
-	" salesrep.Name as salesrep_Name, customer.companyName as customer_companyName,  " +
+	" salesrep.Name as salesrep_Name, customer.companyName as customer_companyName, customer.name as customer_name,  " +
 	" vendor.Name as vendor_name , vendor.addr1 as vendor_addr1, vendor.addr2 as vendor_addr2," +
 	" vendor.addr3 as vendor_addr3 , vendor.city as vendor_city, vendor.state as vendor_state," +
 	" vendor.country as vendor_country " +
@@ -244,7 +244,7 @@ function doCustomerInvoicesPending(tx){
 
 function doSalesByCustomerDateRange(tx){
 	logZoe("doSalesByCustomerDateRange =========");
-	tx.executeSql("SELECT invoice.id_invoice, customer.billAddress1, refNumber, txnDate, appliedAmount AS Amount, balanceRemaining AS OpenBalance, invoice.needSync, invoice.needCorrection, invoice.origin " +
+	tx.executeSql("SELECT invoice.id_invoice, customer.name, customer.billAddress1, refNumber, txnDate, appliedAmount AS Amount, balanceRemaining AS OpenBalance, invoice.needSync, invoice.needCorrection, invoice.origin " +
 	"FROM invoice, customer "+
 	"WHERE invoice.ListID = customer.ListID AND txnDate BETWEEN ? AND ? " +
 	"ORDER BY customer.billAddress1, invoice.txnDate ASC;", filterDataInvoice, invoiceLocalListReceiveFunction, invoiceErrFunc);

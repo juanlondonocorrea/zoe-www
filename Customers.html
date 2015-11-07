@@ -229,7 +229,7 @@
 
 			function receivePriceLevel(arrayPriceList){
 				$('#priceLevel').empty();
-				var toSelectIndex = 0;
+				var toSelectIndex = -1;
 				var option='<option value="">Chose a pricelevel</option>'
 				$('#priceLevel').append(option);
 				for (var i in arrayPriceList) {
@@ -239,9 +239,11 @@
 					option='<option value="'+arrayPriceList[i].ListID+'">'+arrayPriceList[i].name+'</option>'
 					$('#priceLevel').append(option);
 				}
-				$('#priceLevel').val(arrayPriceList[toSelectIndex].ListID);
-				$('#priceLevel').selectmenu('refresh');
-				$('#priceLevel').trigger("chosen:updated");
+				try{
+					$('#priceLevel').val(arrayPriceList[toSelectIndex].ListID);
+				}catch(e){}
+					$('#priceLevel').selectmenu('refresh');
+					$('#priceLevel').trigger("chosen:updated");
 			}
 			
 			
