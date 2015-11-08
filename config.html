@@ -114,13 +114,14 @@
 	
 	var whatToUpload = new Array();
 	var currentUp = 0;
+	var messagePopup = "";
 	function syncUp(){
 		if (itemsToSync==0){
 			alert("Nothing to do");
 	        return;
 		}
 		whatToUpload = $("#syncUpSelect").val();
-		message = "";
+		messagePopup = "";
 		console.log("whatToUpload=" + whatToUpload);
 		currentUp = -1;
 		$("#synchDialog").popup("open"); 
@@ -132,8 +133,8 @@
 		console.log("upNext currentUp=" + currentUp);
 		if (currentUp<whatToUpload.length){
 			console.log("uploading " +  whatToUpload[currentUp]);
-			message += "<B>" + whatToUpload[currentUp] + "...</B>";
-			$("#currentTask").html(message);
+			messagePopup += "<B>" + whatToUpload[currentUp] + "...</B>";
+			$("#currentTask").html(messagePopup);
 			if (whatToUpload[currentUp] == "syncUpInvoices" ){
 				syncUpInvoices();
 			}else if (whatToUpload[currentUp] == "syncUpCreditMemos" ){
@@ -145,9 +146,12 @@
 			}
 		}else{
 			console.log("Synch upload finish!");
-			$("#currentTask").html("Finish!!");
-			setTimeout(function(){ $("#synchDialog").popup("close"); }, 5000);
-			; 
+			var html = $("#currentTask").html();
+			messagePopup +=  "<br><b>Finish</b>";
+			$("#currentTask").html(messagePopup);
+			$("#btnSynchDialog").html("Accept");
+			
+//			setTimeout(function(){ $("#synchDialog").popup("close"); }, 5000);
 		}
 	}
 
@@ -184,7 +188,8 @@
 				return;
 			}
 			console.log("downloading " +  whatToDownload[currentDown]);
-			$("#currentTask").html(whatToDownload[currentDown] + "...");
+			messagePopup += whatToDownload[currentDown] + "...<br>";
+			$("#currentTask").html(messagePopup);
 			if (whatToDownload[currentDown] == "syncDownSalesRep" ){
 				syncSalesRep();
 			}else if (whatToDownload[currentDown] == "syncTaxes" ){
@@ -229,6 +234,7 @@
 		synchronizing = false;
 		whatToUpload = new Array();
 		currentUp = -1;
+		window.location ="config.html";
 	}
 
 
@@ -606,7 +612,6 @@
 	var InvoiceAddRs;
 	var ListInvoiceAddRs;
 	var currentInvoiceIndex;
-	var message = "";
 	var currentInvoice;
 	function receiveSyncUpInvoicesMessage(message){
 		console.log('receiveSyncUpInvoicesMessage message=' + message);
@@ -618,15 +623,13 @@
 	
 	function processNextInvoiceResponse(){
 		console.log("currentInvoiceIndex=" +currentInvoiceIndex);
-		if (message!=null&& message!=""){
-			$("#currentTask").html(message);
+		if (messagePopup!=null&& messagePopup!=""){
+			$("#currentTask").html(messagePopup);
 		}
 			if (!ListInvoiceAddRs.length && currentInvoiceIndex==1){
-				$("#btnSynchDialog").html("Accept");
 				upNext();
 				return;
 			}else if (currentInvoiceIndex == ListInvoiceAddRs.length){
-				$("#btnSynchDialog").html("Accept");
 				upNext();
 				return;
 			}
@@ -649,13 +652,13 @@
 			});
 		}else{
 			if ( InvoiceAddRs.statusCode=="3231" ){
-					message += "Invoice " + InvoiceAddRs.requestID + ":" + statusMessage + "<br>";
+					messagePopup += "Invoice " + InvoiceAddRs.requestID + ":" + statusMessage + "<br>";
 					processNextInvoiceResponse();
 			}else {
 				invoiceDAO.markSynchronizedError(InvoiceAddRs.requestID, errorInvoiceDB,function(){
 					currentInvoiceIndex++;
-					message += "Fail to upload invoice " + InvoiceAddRs.requestID + ":" + statusMessage + "<br>";
-					message += "This invoice must be corrected and send it again<br>";
+					messagePopup += "Fail to upload invoice " + InvoiceAddRs.requestID + ":" + statusMessage + "<br>";
+					messagePopup += "This invoice must be corrected and send it again<br>";
 					processNextInvoiceResponse();
 				});
 			}
@@ -664,13 +667,13 @@
 	
 	function processedInvoice(){
 		currentInvoiceIndex++;
-		message += "Success upload Invoice " + InvoiceAddRs.requestID + "<br>";
+		messagePopup += "Success upload Invoice " + InvoiceAddRs.requestID + "<br>";
 		processNextInvoiceResponse();
 	}
 	
 
 	function	errorInvoiceDB(err) {
-		message += "Fail to store invoice " + InvoiceAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
+		messagePopup += "Fail to store invoice " + InvoiceAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
 		currentInvoiceIndex++;
 		processNextInvoiceResponse();
 	}
@@ -734,28 +737,24 @@
 	var CreditMemoAddRs;
 	var ListCreditMemoAddRs;
 	var currentCreditMemoIndex;
-	var message = "";
 	var currentCreditMemo;
 	function receiveSyncUpCreditMemosMessage(message){
 		console.log('receiveSyncUpCreditMemosMessage message=' + message);
 		ListCreditMemoAddRs = message.CreditMemoAddRs;
 		console.log("ListCreditMemoAddRs=" + ListCreditMemoAddRs);
 		currentCreditMemoIndex = 0;
-		message = "";
 		processNextCreditMemoResponse();
 	}
 	
 	function processNextCreditMemoResponse(){
 		console.log("currentCreditMemoIndex=" +currentCreditMemoIndex);
-		if (message!=null&& message!=""){
-			$("#currentTask").html(message);
+		if (messagePopup!=null&& messagePopup!=""){
+			$("#currentTask").html(messagePopup);
 		}
 			if (!ListCreditMemoAddRs.length && currentCreditMemoIndex==1){
-				$("#btnSynchDialog").html("Accept");
 				upNext();
 				return;
 			}else if (currentCreditMemoIndex == ListCreditMemoAddRs.length){
-				$("#btnSynchDialog").html("Accept");
 				upNext();
 				return;
 			}
@@ -778,13 +777,13 @@
 			});
 		}else{
 			if ( CreditMemoAddRs.statusCode=="3231" ){
-					message += "CreditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
+					messagePopup += "CreditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
 					processNextCreditMemoResponse();
 			}else {
 				creditMemoDAO.markSynchronizedError(CreditMemoAddRs.requestID, errorCreditMemoDB,function(){
 					currentCreditMemoIndex++;
-					message += "Fail to upload creditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
-					message += "This creditMemo must be corrected and send it again<br>";
+					messagePopup += "Fail to upload creditMemo " + CreditMemoAddRs.requestID + ":" + statusMessage + "<br>";
+					messagePopup += "This creditMemo must be corrected and send it again<br>";
 					processNextCreditMemoResponse();
 				});
 			}
@@ -793,13 +792,13 @@
 	
 	function processedCreditMemo(){
 		currentCreditMemoIndex++;
-		message += "Success upload CreditMemo " + CreditMemoAddRs.requestID + "<br>";
+		messagePopup += "Success upload CreditMemo " + CreditMemoAddRs.requestID + "<br>";
 		processNextCreditMemoResponse();
 	}
 	
 
 	function	errorCreditMemoDB(err) {
-		message += "Fail to store creditMemo " + CreditMemoAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
+		messagePopup += "Fail to store creditMemo " + CreditMemoAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
 		currentCreditMemoIndex++;
 		processNextCreditMemoResponse();
 	}
@@ -813,7 +812,6 @@
 	var currentCustomerAddIndex;
 	var endCustomerAdd;
 	var endCustomerMod;
-	var message = "";
 	var qbxmlRouteDays="";
 	var hashRoutedays;
 	function syncUpCustomers(form){
@@ -821,7 +819,6 @@
 		hashRoutedays = new Object();
 		var mensaje = "";
 		qbxmlRouteDays="";
-		message = "";
 		customerDAO.listAllToUpload(function(results){
 			console.log("syncUpCustomers results = " + JSON.stringify(results));
 			for (var i in results){
@@ -836,8 +833,8 @@
 				if (rec.origin=="remote"){
 					mensaje +='<EditSequence>'+ rec.editSequence + '</EditSequence>';
 				}
-				mensaje +='<Name>'+rec.FullName+'</Name>'
-					+'<CompanyName>'+rec.companyName+'</CompanyName>'
+				mensaje +=fillXMLTag('Name',rec.FullName, true, true)
+					+fillXMLTag('CompanyName',rec.companyName, true, true)
 					+'<BillAddress>'
 					+fillXMLTag('Addr1',rec.billAddress1,true,true)
 					+fillXMLTag('Addr2',rec.billAddress2,true,true)
@@ -914,8 +911,8 @@
 		ListCustomerModRs = message.CustomerModRs;
 		ListCustomerAddRs = message.CustomerAddRs;
 		if ((ListCustomerModRs==null || typeof ListCustomerModRs == "undefined") && (ListCustomerAddRs==null || typeof ListCustomerAddRs == "undefined")){
-			$("#currentTask").html("No data returned by server.  An error ocurred");
-			$("#btnSynchDialog").html("Accept");
+			messagePopup += "No data returned by server.  An error ocurred";
+			$("#currentTask").html(messagePopup);
 			return;
 		}
 		console.log("ListCustomerModRs=" + ListCustomerModRs);
@@ -961,13 +958,19 @@
 	}
 	
 	var maxWaitEndCustomer;
+	var endCustomerRouteAdd;
 	function waitEndCustomerSyncUp(){
 		if (maxWaitEndCustomer>0){
 			maxWaitEndCustomer--;
 			if (endCustomerAdd && endCustomerMod){
 				console.log("send qbxmlRouteDays=" + qbxmlRouteDays);
+				messagePopup += "<B> Sync up customers routes...</B>";
+				$("#currentTask").html(messagePopup);
 				if (qbxmlRouteDays!=""){
 					consumeWS(qbxmlRouteDays, "JSON", receiveSyncUpRouteDays, null, null, null);
+					maxWaitEndSyncUpRoute=200;
+					endCustomerRouteAdd = false;
+					waitEndSyncUpRouteDays();
 				}else{
 					upNext();
 				}
@@ -979,23 +982,36 @@
 		}
 	}
 	
-	
 	function receiveSyncUpRouteDays(message){
 		console.log("receiveSyncUpRouteDays message=" + JSON.stringify(message));
-		upNext();
+		endCustomerRouteAdd=true;
+	}
+	
+	var maxWaitEndSyncUpRoute;
+	function waitEndSyncUpRouteDays(){
+		if (maxWaitEndSyncUpRoute>0){
+			maxWaitEndSyncUpRoute--;
+			if (endCustomerRouteAdd){
+				upNext();
+			}else{
+				console.log("esperar waitEndSyncUpRouteDays");
+				setTimeout("waitEndSyncUpRouteDays()",1000);
+			}
+		}else{
+			upNext();
+		}
+		
 	}
 	
 	function processNextCustomerModResponse(){
 		console.log("currentCustomerModIndex=" +currentCustomerModIndex);
-		if (message!=null&& message!=""){
-			$("#currentTask").html(message);
+		if (messagePopup!=null&& messagePopup!=""){
+			$("#currentTask").html(messagePopup);
 		}
 			if (!ListCustomerModRs.length && currentCustomerModIndex>=1){
-				$("#btnSynchDialog").html("Accept");
 				endCustomerMod = true;
 				return;
 			}else if (currentCustomerModIndex == ListCustomerModRs.length){
-				$("#btnSynchDialog").html("Accept");
 				endCustomerMod = true;
 				return;
 			}
@@ -1025,13 +1041,13 @@
 			},'remote');
 		}else{
 			if ( CustomerModRs.statusCode=="3231" ){
-					message += "Customer " + CustomerModRs.requestID + ":" + statusMessage + "<br>";
+					messagePopup += "Customer " + CustomerModRs.requestID + ":" + statusMessage + "<br>";
 					processNextCustomerModResponse();
 			}else {
 				customerDAO.markSynchronizedError(CustomerModRs.requestID, errorCustomerModDB,function(){
 					currentCustomerModIndex++;
-					message += "Fail to upload customer " + CustomerModRs.requestID + ":" + statusMessage + "<br>";
-					message += "This customer must be corrected and send it again<br>";
+					messagePopup += "Fail to upload customer " + CustomerModRs.requestID + ":" + statusMessage + "<br>";
+					messagePopup += "This customer must be corrected and send it again<br>";
 					processNextCustomerModResponse();
 				});
 			}
@@ -1040,7 +1056,7 @@
 	
 	function processedCustomerMod(){
 		currentCustomerModIndex++;
-		message += "Success upload Customer " + CustomerModRs.CustomerRet.FullName + "<br>";
+		messagePopup += "Success upload Customer " + CustomerModRs.CustomerRet.FullName + "<br>";
 		var msg =  hashRoutedays[CustomerModRs.requestID];
 		console.log("CustomerModRs.requestID=" + CustomerModRs.requestID);
 		if (msg){
@@ -1051,23 +1067,21 @@
 	}
 
 	function	errorCustomerModDB(err) {
-		message += "Fail to store customer " + CustomerAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
+		messagePopup += "Fail to store customer " + CustomerAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
 		currentCustomerModIndex++;
 		processNextCustomeModResponse();
 	}
 	
 	function processNextCustomerAddResponse(){
 		console.log("processNextCustomerAddResponse currentCustomerAddIndex=" +currentCustomerAddIndex + ",ListCustomerAddRs.length=" + ListCustomerAddRs.length);
-		if (message!=null&& message!=""){
-			$("#currentTask").html(message);
+		if (messagePopup!=null&& messagePopup!=""){
+			$("#currentTask").html(messagePopup);
 		}
 			if (typeof ListCustomerAddRs.length == "undefined" && currentCustomerAddIndex>=1){
-				$("#btnSynchDialog").html("Accept");
 				console.log("processNextCustomerAddResponse return");
 				endCustomerAdd = true;
 				return;
 			}else if (currentCustomerAddIndex >= ListCustomerAddRs.length){
-				$("#btnSynchDialog").html("Accept");
 				endCustomerAdd = true;
 				return;
 			}
@@ -1096,13 +1110,13 @@
 			}, 'remote');
 		}else{
 			if ( CustomerAddRs.statusCode=="3231" ){
-					message += "Customer " + CustomerAddRs.requestID + ":" + statusMessage + "<br>";
+					messagePopup += "Customer " + CustomerAddRs.requestID + ":" + statusMessage + "<br>";
 					processNextCustomerAddResponse();
 			}else {
 				customerDAO.markSynchronizedError(CustomerAddRs.requestID, errorCustomerAddDB,function(){
 					currentCustomerAddIndex++;
-					message += "Fail to upload customer " + CustomerAddRs.requestID + ":" + statusMessage + "<br>";
-					message += "This customer must be corrected and send it again<br>";
+					messagePopup += "Fail to upload customer " + CustomerAddRs.requestID + ":" + statusMessage + "<br>";
+					messagePopup += "This customer must be corrected and send it again<br>";
 					processNextCustomerAddResponse();
 				});
 			}
@@ -1111,7 +1125,7 @@
 	
 	function processedCustomerAdd(){
 		currentCustomerAddIndex++;
-		message += "Success upload Customer " + CustomerAddRs.CustomerRet.FullName + "<br>";
+		messagePopup += "Success upload Customer " + CustomerAddRs.CustomerRet.FullName + "<br>";
 		console.log("CustomerAddRs.requestID=" + CustomerAddRs.requestID);
 		var msg = hashRoutedays[CustomerAddRs.requestID];
 		if (msg){
@@ -1124,7 +1138,7 @@
 	}
 
 	function	errorCustomerAddDB(err) {
-		message += "Fail to store customer " + CustomerAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
+		messagePopup += "Fail to store customer " + CustomerAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
 		currentCustomerAddIndex++;
 		processNextCustomeAddResponse();
 	}
