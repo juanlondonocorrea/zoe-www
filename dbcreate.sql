@@ -1,6 +1,6 @@
 ﻿/*
 Created: 29/04/2015
-Modified: 23/10/2015
+Modified: 09/11/2015
 Model: RE SQLite 3.7
 Database: SQLite 3.7
 */
@@ -12,6 +12,9 @@ Database: SQLite 3.7
 
 -- Drop indexes section -------------------------------------------------
 
+DROP INDEX IF EXISTS IX_Relationship35@
+DROP INDEX IF EXISTS IX_Relationship37@
+DROP INDEX IF EXISTS IX_Relationship38@
 DROP INDEX IF EXISTS IX_Relationship26@
 DROP INDEX IF EXISTS IX_Relationship27@
 DROP INDEX IF EXISTS IX_Relationship30@
@@ -51,6 +54,7 @@ DROP INDEX IF EXISTS idx_salesrep_1@
 
 -- Drop tables section ---------------------------------------------------
 
+DROP TABLE IF EXISTS InventoryTransfer@
 DROP TABLE IF EXISTS LinkedToPaymentCreditMemo@
 DROP TABLE IF EXISTS InventorySite@
 DROP TABLE IF EXISTS paymentAppliedTo@
@@ -585,6 +589,33 @@ CREATE TABLE LinkedToPaymentCreditMemo
   CONSTRAINT Relationship32 FOREIGN KEY (id_creditMemo) REFERENCES creditMemo (id_creditMemo),
   CONSTRAINT Relationship33 FOREIGN KEY (TxnID, id_payment) REFERENCES paymentAppliedTo (TxnID, id_payment)
 )@
+
+-- Table InventoryTransfer
+
+CREATE TABLE InventoryTransfer
+(
+  id_InventoryTransfer TEXT NOT NULL,
+  Qty INTEGER NOT NULL,
+  InventorySite_ListID_Origin TEXT NOT NULL,
+  InventorySite_ListID_Target TEXT NOT NULL,
+  Inventory_ListID TEXT NOT NULL,
+  origin TEXT,
+  zoeUpdateDate INTEGER,
+  zoeSyncDate INTEGER,
+  needSync INTEGER,
+  needCorrection INTEGER,
+  CONSTRAINT Key20 PRIMARY KEY (id_InventoryTransfer),
+  CONSTRAINT Attribute1 UNIQUE (id_InventoryTransfer),
+  CONSTRAINT Relationship35 FOREIGN KEY (InventorySite_ListID_Origin) REFERENCES InventorySite (ListID),
+  CONSTRAINT Relationship37 FOREIGN KEY (InventorySite_ListID_Target) REFERENCES InventorySite (ListID),
+  CONSTRAINT Relationship38 FOREIGN KEY (Inventory_ListID) REFERENCES Inventory (ListID)
+)@
+
+CREATE INDEX IX_Relationship35 ON InventoryTransfer (InventorySite_ListID_Origin)@
+
+CREATE INDEX IX_Relationship37 ON InventoryTransfer (InventorySite_ListID_Target)@
+
+CREATE INDEX IX_Relationship38 ON InventoryTransfer (Inventory_ListID)@
 
 
 
