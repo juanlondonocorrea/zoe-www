@@ -10,6 +10,7 @@ var customerDAO = {list:listCustomers,
 		updateVendor:updateCustomerVendor, 
 		deleteAll:deleteAllCustomer, 
 		delete:deleteCustomer,
+		move:moveCustomer,
 		markToSync:markToSyncCustomer, 
 		markSynchronized:markSynchronizedCustomer,
 		markSynchronizedError:markSynchronizedErrorCustomer};
@@ -20,6 +21,8 @@ var customerErrFunc;
 var customerVO;
 var recordCustomer;
 var customerOrigin;
+var oldCustomerListID;
+var newCustomerListID;
 //----------------------
 //metodos hacia afuera
 //----------------------
@@ -81,6 +84,16 @@ function storeCustomer(records,aErrFunc,successCB,origin){
 	customerOrigin = origin;
 	customerErrFunc = aErrFunc;
 	db.transaction(doStoreCustomer, errorCB, successCB);
+}
+
+function moveCustomer(oldListID, newListID,aErrFunc,successCB,origin){
+	db = openDatabaseZoe();
+	logZoe("moveCustomer oldListID=" + oldListID + ", newListID=" + newListID);
+	oldCustomerListID = oldListID;
+	newCustomerListID = newListID;
+	customerOrigin = origin;
+	customerErrFunc = aErrFunc;
+	db.transaction(doMoveCustomer, errorCB, successCB);
 }
 
 function updateCustomerVendor(records,aErrFunc,successCB){
@@ -262,6 +275,23 @@ function doDeleteAllCustomer(tx){
 function doDeleteCustomer(tx){
 	console.log("doDeleteCustomer filterDataCustomer=" + filterDataCustomer);
 	tx.executeSql('DELETE FROM customer where ListID = ?',[filterDataCustomer+""]);
+}
+
+function doMoveCustomer(tx){
+	var where = " SET ListID = '"+ newCustomerListID + "' WHERE ListID = '" + oldCustomerListID + "'";
+	var sql1 = "UPDATE invoice" + where;
+	var sql2 = "UPDATE creditMemo" + where;
+	var sql3 = "UPDATE payment " + where;
+	var sql4 = "DELETE FROM customer WHERE ListID = '" + oldCustomerListID + "'"; 
+		
+	console.log(sql1);
+	tx.executeSql(sql1,	[]);
+	console.log(sql2);
+	tx.executeSql(sql2,	[]);
+	console.log(sql3);
+	tx.executeSql(sql3,	[]);
+	console.log(sql4);
+	tx.executeSql(sql4,	[]);
 }
 
 

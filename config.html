@@ -133,7 +133,7 @@
 		console.log("upNext currentUp=" + currentUp);
 		if (currentUp<whatToUpload.length){
 			console.log("uploading " +  whatToUpload[currentUp]);
-			messagePopup += "<B>" + whatToUpload[currentUp] + "...</B>";
+			messagePopup += "<br><B>" + whatToUpload[currentUp] + "...</B>";
 			$("#currentTask").html(messagePopup);
 			if (whatToUpload[currentUp] == "syncUpInvoices" ){
 				syncUpInvoices();
@@ -924,11 +924,11 @@
 			endCustomerMod = true;
 		}
 		
-		maxWaitEndCustomer = 20;
+		maxWaitEndCustomer = 200;
 		waitEndCustomerMod();
 
 		//send qbxml de routedays
-		maxWaitEndCustomer = 20;
+		maxWaitEndCustomer = 200;
 		setTimeout("waitEndCustomerSyncUp()",200);
 		
 	}
@@ -1105,8 +1105,9 @@
 				customerVO.routeDay6 = routeInfo.routeDay6;
 				customerVO.routeDay7 = routeInfo.routeDay7;
 			}
+			;
 			customerDAO.store([customerVO],errorCustomerAddDB,function(){
-				customerDAO.delete( CustomerAddRs.requestID,errorCustomerAddDB,processedCustomerAdd);
+				customerDAO.move(CustomerAddRs.requestID, customerVO.ListID,errorCustomerAddDB,processedCustomerAdd);
 			}, 'remote');
 		}else{
 			if ( CustomerAddRs.statusCode=="3231" ){
@@ -1125,7 +1126,7 @@
 	
 	function processedCustomerAdd(){
 		currentCustomerAddIndex++;
-		messagePopup += "Success upload Customer " + CustomerAddRs.CustomerRet.FullName + "<br>";
+		messagePopup += "<br>Success upload Customer " + CustomerAddRs.CustomerRet.FullName + "<br>";
 		console.log("CustomerAddRs.requestID=" + CustomerAddRs.requestID);
 		var msg = hashRoutedays[CustomerAddRs.requestID];
 		if (msg){
@@ -1138,7 +1139,7 @@
 	}
 
 	function	errorCustomerAddDB(err) {
-		messagePopup += "Fail to store customer " + CustomerAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
+		messagePopup += "<br>Fail to store customer " + CustomerAddRs.requestID + ":" + JSON.stringify(err) + "<br>";
 		currentCustomerAddIndex++;
 		processNextCustomeAddResponse();
 	}
