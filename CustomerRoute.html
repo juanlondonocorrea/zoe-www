@@ -14,6 +14,7 @@
 		<script type="text/javascript" src="cordova.js"></script>
 		<script src="js/zoe/zoe.js"></script>
 		<script src="js/zoe/customerDAO.js"></script>
+        <script src="js/zoe/vendorDAO.js"></script>
         <script src="js/zoe/termDAO.js"></script>
         <script src="js/zoe/pricelevelDAO.js"></script>
         <script src="js/zoe/invoiceDAO.js"></script>
@@ -66,6 +67,11 @@
 			function errReceiveTerms(err){
 				alert("DB Error terms: "+JSON.stringify(err));
 			}
+			
+			function errReceiveVendors(err){
+				alert("DB Error vendors: "+JSON.stringify(err));
+			}
+			
 			
 			function errPriceLevel(err){
 				alert("DB Error Price Level: "+JSON.stringify(err));
@@ -216,7 +222,7 @@
 				console.log("selectedIndex=" + selectedIndex);
 				console.log("listCustomers[selectedIndex]=" + listCustomers[selectedIndex]);
 				for (var i in arrayTerms) {
-					if (arrayTerms[i].id_term == listCustomers[selectedIndex].id_term){
+					if (listCustomers[selectedIndex] && arrayTerms[i].id_term == listCustomers[selectedIndex].id_term){
 						toSelectIndex=i;
 					}
 					var option='<option value="'+arrayTerms[i].id_term+'">'+arrayTerms[i].name+'</option>'
@@ -225,6 +231,27 @@
 				$('#Terms')[0].selectedIndex = toSelectIndex;
 				$('#Terms').selectmenu('refresh');
 				$('#Terms').trigger("chosen:updated");
+			}
+
+			function receiveVendors(arrayVendors){
+				console.log("receiveVendors selectedIndex=" + selectedIndex);
+				console.log("listCustomers[selectedIndex]=" + listCustomers[selectedIndex]);
+				$('#vendor').empty();
+				for (var i in arrayVendors) {
+					var selected = (listCustomers[selectedIndex] && arrayVendors[i].ListID==listCustomers[selectedIndex].vendor_ListID) ? "selected" : "" ;
+					console.log("listCustomers[selectedIndex].vendor_ListID=" + listCustomers[selectedIndex].vendor_ListID);
+					console.log("arrayVendors[i].ListID=" + arrayVendors[i].ListID);
+					console.log("selected=" + selected);
+					var option='<option value="'+arrayVendors[i].ListID+'" ' + selected + ' >'+arrayVendors[i].name+'</option>'
+					$('#vendor').append(option);					
+				}
+				if (listCustomers[selectedIndex] && listCustomers[selectedIndex].origin=="local") {
+					$('#vendor').selectmenu("enable");
+				}else{
+					$('#vendor').selectmenu("disable");
+				}
+				$('#vendor').selectmenu('refresh');
+				$('#vendor').trigger("chosen:updated");
 			}
 
 			function receivePriceLevel(arrayPriceList){
@@ -382,6 +409,7 @@
 				CustomerPhone = listCustomers[index].workPhone;
 				
 				termDAO.list(receiveTerms,errReceiveTerms);
+				vendorDAO.list(receiveVendors,errReceiveVendors);
 				pricelevelDAO.list(receivePriceLevel,errPriceLevel);
 				invoiceDAO.listByCustomer(listCustomers[index].ListID, receiveInvoices, errListInvoicesByCustomer);
 				creditMemoDAO.listByCustomer(listCustomers[index].ListID, receiveCreditMemos, errListCreditMemosByCustomer);
@@ -453,7 +481,9 @@
 					routeDay7:$('#routeDay7').is(':checked')?1:0,
 					pricelevel_ListID:$('#priceLevel').val(), 
 					needSync:1,
-					zoeUpdateDate:new Date()
+					zoeUpdateDate:new Date(),
+					vendor_ListID:$('#vendor').val()
+
 				};
 				console.log("$('#pricelevel_ListID').val() =======> "+$('#priceLevel').val());
 				logZoe("ListID ========> " +$('#ListID').val());
@@ -693,12 +723,17 @@
 							<fieldset data-role="controlgroup" data-type="vertical" class="control-group">
 								<legend><h4>Sales Representant Info</h4></legend>
 								<div data-role="fieldcontain">
-									<div>
-										<label for="ListID">Sales Representant:</label>
-									</div>
+									<label for="ListID">Sales Representant:</label>
 									<input class="myFormsControl" type="text" data-theme="b" name="SalesRepName" id="SalesRepName" value="" readonly/>
 									<input type="hidden" data-theme="b" name="SalesRep" id="SalesRep" value="" readonly/>
 								</div>
+                                <div data-role="fieldcontain" id="CustomerVendors">
+                                  <div>
+                                    <label for="vendor" class="select">Vendor:</label>
+                                  </div>
+                                  <select  class="myFormsControl"  name="vendor" id="vendor" data-theme="a" >
+                                  </select>
+                                </div>
 							</fieldset>    
 							<!-- Identification Info -->
 							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
@@ -840,28 +875,6 @@
 									</div>  
 								</div>
 							</fieldset> 
-							<!-- Balance Info -->
-							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
-								<legend><h4>Balance Info</h4></legend>
-								<div class="ui-grid-a" style="height:95px">
-									<div class="ui-block-a" style="height:100%"> 
-										<div data-role="fieldcontain">
-											<div>
-												<label for="openBalance">Open:</label>
-											</div>
-											<input type="text" data-theme="b" name="openBalance" id="openBalance" value=""  onClick="overdueBalanceRed();"/>
-										</div>                    
-									</div>
-									<div class="ui-block-b" style="height:100%">            
-										<div data-role="fieldcontain">
-											<div>
-												<label for="overdueBalance">Overdue:</label>
-											</div>
-											<input type="text" data-theme="b" name="overdueBalance" id="overdueBalance" value=""  />
-										</div>                      
-									</div>  
-								</div>
-							</fieldset>           
 							<!-- Terms Info --> 
 							<fieldset data-role="controlgroup" data-type="vertical" class="control-group" style="padding:8px">
 								<div data-role="fieldcontain" id="CustomerTerms">

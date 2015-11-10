@@ -51,6 +51,7 @@
 			$('#syncURL').val(window.localStorage.getItem("syncURL"));	
 			$('#submitConfig').click(submitFormConfig);	
 			$('#createDB').click(submitCreateDatabase);	
+			maxNeedToSyncCheck = 20;
 			fillNeedToSync();
 			logZoe("config.html listo pagebeforecreate");
 		}
@@ -66,11 +67,15 @@
 		logZoe("config localStorage salesRepName=" + window.localStorage.getItem("salesRepName"));
 		return false;
 	}
-	
+	var maxNeedToSyncCheck;
 	function fillNeedToSync(){
 		console.log("fillNeedToSync");
+		maxNeedToSyncCheck--;
 		if (!needToSync) {
-			setTimeout("fillNeedToSync()",100);
+			
+			if (maxNeedToSyncCheck>0){
+				setTimeout("fillNeedToSync()",100);
+			}
 			return;
 		}
 		$('#syncUpSelect').empty();
@@ -867,33 +872,49 @@
 					}else{
 						mensaje +='</CustomerAdd></CustomerAddRq>';
 					}
-					if (rec.routeDay1 + rec.routeDay1 + rec.routeDay3 +rec.routeDay4 + rec.routeDay5 + rec.routeDay6 + rec.routeDay7 >0){
-						var msg = "";
+					if (rec.routeDay1 + rec.routeDay1 + rec.routeDay3 +rec.routeDay4 + rec.routeDay5 + rec.routeDay6 + rec.routeDay7 >0 || (rec.origin=='local' && rec.vendor_ListID!=null)){
+						var msgRoute = "";
+						var msgPayto = "";
+						var inicioMsg = "";
+						var finMsg = "";
+						var fullMsg="";
 						if (rec.origin=="remote"){
-							msg += '<DataExtModRq><DataExtMod>';
+							inicioMsg = '<DataExtModRq><DataExtMod>';
+							finMsg ='</DataExtMod></DataExtModRq>';
 						}else{
-							msg += '<DataExtAddRq><DataExtAdd>';
+							inicioMsg = '<DataExtAddRq><DataExtAdd>';
+							finMsg ='</DataExtAdd></DataExtAddRq>';
 						}
-						msg +='<OwnerID>0</OwnerID>'
-								+'<DataExtName>RouteDay</DataExtName>'
-								+'<ListDataExtType>Customer</ListDataExtType>'
-								+'<ListObjRef><ListID>' + rec.ListID +  '</ListID></ListObjRef>'
-								+'<DataExtValue>'+(rec.routeDay1==1?'SUN,':'')+(rec.routeDay2==1?'MON,':'')+(rec.routeDay3==1?'TUE,':'')+(rec.routeDay4==1?'WED,':'')+(rec.routeDay5==1?'THU,':'')+(rec.routeDay6==1?'FRI,':'')+(rec.routeDay7==1?'SAT':'')+'</DataExtValue>';
-						if (rec.origin=="remote"){
-							msg+='</DataExtMod></DataExtModRq>';
-						}else{
-							msg+='</DataExtAdd></DataExtAddRq>';
+						msgRoute ='<OwnerID>0</OwnerID>';
+						if (rec.routeDay1 + rec.routeDay1 + rec.routeDay3 +rec.routeDay4 + rec.routeDay5 + rec.routeDay6 + rec.routeDay7 >0){
+							msgRoute += '<DataExtName>RouteDay</DataExtName>'
+									+'<ListDataExtType>Customer</ListDataExtType>'
+									+'<ListObjRef><ListID>' + rec.ListID +  '</ListID></ListObjRef>'
+									+'<DataExtValue>'+(rec.routeDay1==1?'SUN,':'')+(rec.routeDay2==1?'MON,':'')+(rec.routeDay3==1?'TUE,':'')+(rec.routeDay4==1?'WED,':'')+(rec.routeDay5==1?'THU,':'')+(rec.routeDay6==1?'FRI,':'')+(rec.routeDay7==1?'SAT':'')+'</DataExtValue>';
 						}
-						console.log("add hashRoutedays=" + msg);
+						if (rec.origin=="local"){
+							msgPayto ='<OwnerID>0</OwnerID>';
+							msgPayto += '<DataExtName>Pay to</DataExtName>'
+									+'<ListDataExtType>Customer</ListDataExtType>'
+									+'<ListObjRef><ListID>' + rec.ListID +  '</ListID></ListObjRef>'
+									+'<DataExtValue>'+ rec.vendor_name +'</DataExtValue>';
+						}
+						if (rec.routeDay1 + rec.routeDay1 + rec.routeDay3 +rec.routeDay4 + rec.routeDay5 + rec.routeDay6 + rec.routeDay7 >0){
+							fullMsg += inicioMsg + msgRoute + finMsg;
+						}
+						if (msgPayto!=""){
+							fullMsg += inicioMsg + msgPayto + finMsg;
+						}
 						var routeInfo = {
-							qbxml: msg,
+							qbxml: fullMsg,
 							routeDay1:rec.routeDay1,
 							routeDay2:rec.routeDay2,
 							routeDay3:rec.routeDay3,
 							routeDay4:rec.routeDay4,
 							routeDay5:rec.routeDay5,
 							routeDay6:rec.routeDay6,
-							routeDay7:rec.routeDay7
+							routeDay7:rec.routeDay7,
+							payTo:rec.vendor_name
 						}
 						hashRoutedays[rec.ListID] = routeInfo;
 					}
@@ -1132,7 +1153,7 @@
 		if (msg){
 			msg = msg.qbxml;
 			
-			qbxmlRouteDays +=  msg.replace(CustomerAddRs.requestID,CustomerAddRs.CustomerRet.ListID);
+			qbxmlRouteDays +=  replaceAll(msg, CustomerAddRs.requestID,CustomerAddRs.CustomerRet.ListID);
 			console.log("add a qbxmlRouteDays=" + msg);
 		}
 		processNextCustomerAddResponse();

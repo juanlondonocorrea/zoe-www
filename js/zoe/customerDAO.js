@@ -254,7 +254,7 @@ function doListAddedCustomersToUpload(tx){
  }
 
 function doListAllCustomersToUpload(tx){
-	var selectStr = "SELECT * FROM customer WHERE needSync = 1";
+	var selectStr = "SELECT customer.*, vendor.name as vendor_name  FROM customer LEFT JOIN vendor on customer.vendor_ListID = vendor.ListID WHERE needSync = 1";
 	logZoe("doListAllCustomersToUpload select= " + selectStr);
 	tx.executeSql(selectStr,[], customerLocalListReceiveFunction, invoiceErrFunc);
  }
