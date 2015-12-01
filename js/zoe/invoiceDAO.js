@@ -452,8 +452,23 @@ function doStoreOneInvoice(tx, rec){
 }
 
 function doDeleteAllInvoices(tx){
-	tx.executeSql('DELETE FROM invoice_item',[]);
-	tx.executeSql('DELETE FROM invoice',[]);
+		logZoe("desactivando triggers invoice_item");
+		
+		tx.executeSql("SELECT name,sql FROM sqlite_master WHERE tbl_name='invoice_item'",[],function(tx,triggers){	
+			tx.executeSql("DROP TABLE invoice_item");
+			//create triggers
+			for (i=0;i<triggers.rows.length;i++){
+				var trigger = triggers.rows.item(i)
+				logZoe("sql=" + trigger.sql);
+				if (trigger.sql)
+					tx.executeSql(trigger.sql);
+			}
+	});
+	
+	tx.executeSql('DELETE FROM invoice');
+	
+	
+	
 }
 
 function doDeleteInvoice(tx){

@@ -211,13 +211,13 @@
 				syncInventorySite();
 			}else if (whatToDownload[currentDown] == "syncDownPricelevel" ){
 				syncPricelevel();
+			}else if (whatToDownload[currentDown] == "syncDownCustomers" ){
+				whatToDownload[whatToDownload.length]="syncDownVendors";
+				syncCustomers();
 			}else if (whatToDownload[currentDown] == "syncDownInvoices" ){
 				syncInvoices();
 			}else if (whatToDownload[currentDown] == "syncDownCreditMemos" ){
 				syncCreditMemos();
-			}else if (whatToDownload[currentDown] == "syncDownCustomers" ){
-				whatToDownload[whatToDownload.length]="syncDownVendors";
-				syncCustomers();
 			}else if (whatToDownload[currentDown] == "syncCustomerMsgs" ){
 				syncCustomerMsgs();
 			}else if (whatToDownload[currentDown] == "syncDownVendors" ){
@@ -226,9 +226,8 @@
 			
 		}else{
 			console.log("Synch down finish!");
-			$("#currentTask").html("Finish!!");
-			setTimeout(function(){ $("#synchDialog").popup("close"); }, 3000);
-			; 
+			$("#currentTask").html($("#currentTask").html()+"<br><b>Finish!!</b>");
+			$("#btnSynchDialog").html("Accept");
 		}
 	}
 
@@ -334,7 +333,7 @@
 		var customers = message.CustomerQueryRs.CustomerRet;
 		var i;
 		var customersVO = [];
-		for (i=0;i<customers.length;i++){
+		for (i=0; customers && i<customers.length;i++){
 			var customer = customers[i];
 			customerVO = convertCustomerQB(customer);
 			logZoe("customerVO=" + JSON.stringify(customerVO));
@@ -437,13 +436,19 @@
 	function syncInvoices(form){
 		console.log("entre a syncInvoices");
 		salesRepDAO.getByName(window.localStorage.getItem("salesRepName"), function(salesrepVO){
-		logZoe("en syncInvoices salesrepVO = " + JSON.stringify(salesrepVO));
-		var mensaje = 	
-		'<InvoiceQueryRq requestID="invoice"></InvoiceQueryRq>';
-		var cache="invoice";
-		var xpathExp = '//InvoiceRet[SalesRepRef/ListID="'+ salesrepVO.id_salesrep + '"]';
-		
-		consumeWS(mensaje, "JSON", receiveInvoicesMessage, cache, xpathExp);
+			logZoe("en syncInvoices salesrepVO = " + JSON.stringify(salesrepVO));
+			customerDAO.listBySalesRep(salesrepVO.id_salesrep, function(customers){
+				var listCustomers="";
+				for (var i in customers){
+					listCustomers+=","+customers[i].ListID;
+				}
+				var mensaje = 	
+				'<InvoiceQueryRq requestID="invoice"></InvoiceQueryRq>';
+				var cache="invoice";
+				var xpathExp = '//InvoiceRet[contains("' + listCustomers + '",CustomerRef.ListID)]';
+				
+				consumeWS(mensaje, "JSON", receiveInvoicesMessage, cache, xpathExp);
+			});
 		});
 		return false;
 	}
@@ -1168,15 +1173,23 @@
 //SYNCHRONIZATION CreditMemos	
 	function syncCreditMemos(form){
 		console.log("entre a syncCreditMemos");
-		salesRepDAO.getByName(window.localStorage.getItem("salesRepName"), function(salesrepVO){
-		logZoe("en syncCreditMemos salesrepVO = " + JSON.stringify(salesrepVO));
-		var mensaje = 	
-		'<CreditMemoQueryRq requestID="creditMemo001"></CreditMemoQueryRq>';
-		var cache="creditMemo";
-		var xpathExp = '//CreditMemoRet[SalesRepRef/ListID="'+ salesrepVO.id_salesrep + '"]';
 		
-		consumeWS(mensaje, "JSON", receiveCreditMemosMessage, cache, xpathExp);
+		salesRepDAO.getByName(window.localStorage.getItem("salesRepName"), function(salesrepVO){
+			logZoe("en syncInvoices salesrepVO = " + JSON.stringify(salesrepVO));
+			customerDAO.listBySalesRep(salesrepVO.id_salesrep, function(customers){
+				var listCustomers="";
+				for (var i in customers){
+					listCustomers+=","+customers[i].ListID;
+				}
+				var mensaje = 	
+				'<CreditMemoQueryRq requestID="creditMemo001"></CreditMemoQueryRq>';
+				var cache="creditMemo";
+				var xpathExp = '//CreditMemoRet[contains("' + listCustomers + '",CustomerRef.ListID)]';
+				
+				consumeWS(mensaje, "JSON", receiveCreditMemosMessage, cache, xpathExp);
+			});
 		});
+		
 		return false;
 	}
 	
@@ -1254,12 +1267,12 @@
 					var itemVO = {
 							LineID:line.TxnLineID,
 							id_creditMemo:creditMemoVO.id_creditMemo,
-							Inventory_ListID:line.ItemRef.ListID,
+							Inventory_ListID:line.ItemRef?line.ItemRef.ListID:null,
 							Desc:line.Desc,
 							Quantity:line.Quantity,
 							Rate:line.Rate,
 							Amount:line.Amount,
-							SalesTax_ListID:line.SalesTaxCodeRef.ListID,
+							SalesTax_ListID:line.SalesTaxCodeRef?line.SalesTaxCodeRef.ListID:null,
 							class_ListID: typeof line.ClassRef != "undefined"?line.ClassRef.ListID:null,
 					}
 					creditMemoVO.items[j] = itemVO;

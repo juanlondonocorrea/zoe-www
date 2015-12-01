@@ -1,6 +1,7 @@
 // JavaScript Document
 
 var customerDAO = {list:listCustomers, 
+		listBySalesRep:listCustomersBySalesRep,
 		listByRouteDay:listCustomersByRouteDay,
 		listModifiedToUpload:listModifiedCustomersToUpload,
 		listAddedToUpload:listAddedCustomersToUpload,
@@ -76,6 +77,14 @@ function listCustomersByRouteDay(aDay, aReceiveFunction,aErrFunc){
 	db.transaction(doListCustomersByRouteDay, customerErrFunc);
 }
 
+function listCustomersBySalesRep(id_salesRep, aReceiveFunction,aErrFunc){
+	db = openDatabaseZoe();
+	logZoe("listCustomersBySalesRep db=" + db);
+	customerReceiveListFunction = aReceiveFunction;
+	customerErrFunc = aErrFunc;
+	filterDataCustomer = id_salesRep;
+	db.transaction(doListCustomersBySalesRep, customerErrFunc);
+}
 
 function storeCustomer(records,aErrFunc,successCB,origin){
 	db = openDatabaseZoe();
@@ -175,6 +184,12 @@ function doListCustomersByRouteDay(tx){
 	tx.executeSql(query,[],customerLocalListReceiveFunction, customerErrFunc);
 }
 
+function doListCustomersBySalesRep(tx){
+	logZoe("doListCustomersBySalesRep")
+	var query = "SELECT ListID FROM customer WHERE id_salesRep=?";
+	console.log("doListCustomersByRouteDay query=" + query);
+	tx.executeSql(query,[filterDataCustomer],customerLocalListReceiveFunction, customerErrFunc);
+}
 
 function customerLocalReceiveFunction(tx,results){
 	logZoe("customerLocalReceiveFunction");

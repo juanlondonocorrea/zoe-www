@@ -2,6 +2,7 @@
 
 var creditMemoDAO = {listBySalesrep:listCreditMemosBySalesrep, 
 				listByCustomer:listCreditMemosByCustomer,
+				getDDL:getCreditMemoDDL,
 				listToUpload:listCreditMemosToUpload,
 				creditMemosByCustomerDateRange:listCreditMemosByCustomerDateRange,
 				itemsReturnedByDateRange: listItemsReturnedByDateRange,
@@ -63,6 +64,14 @@ function getCreditMemoById(aId,includeDetail,aReceiveFunction,aErrFunc){
 	includeCreditMemoDetails = includeDetail;
 	creditMemoErrFunc = aErrFunc;
 	db.transaction(doSelectCreditMemo, creditMemoErrFunc);
+}
+
+function getCreditMemoDDL(aReceiveFunction,aErrFunc){
+	db = openDatabaseZoe();
+	logZoe("getCreditMemoDDL db=" + db);
+	creditMemoReceiveFunction = aReceiveFunction;
+	creditMemoErrFunc = aErrFunc;
+	db.transaction(doGetCreditMemoDDL, creditMemoErrFunc);
 }
 
 function listCreditMemosBySalesrep(salesrep_ListID, aReceiveFunction,aErrFunc){
@@ -130,7 +139,7 @@ function storeCreditMemoPhoto(record,aErrFunc,successCB){
 
 function deleteAllCreditMemos(aErrFunc,successCB){
 	db = openDatabaseZoe();
-	logZoe("deleteAllCreditMemo db=" + db);
+	logZoe("deleteAllCreditMemo dbxxx=" + db);
 	creditMemoErrFunc = aErrFunc;
 	db.transaction(doDeleteAllCreditMemos, errorCB, successCB);
 }
@@ -425,9 +434,34 @@ function doStoreOneCreditMemo(tx, rec){
 	 }
 }
 
+function doGetCreditMemoDDL(tx){
+		console.log("desactivando triggers creditMemo_item");
+		var sqls;		
+		var j=0;
+		tx.executeSql("SELECT name,sql FROM sqlite_master WHERE tbl_name='creditMemo_item' or tbl_name='creditMemo'",[],function(tx,triggers){	
+			for (i=0;i<triggers.rows.length;i++){
+				var trigger = triggers.rows.item(i)
+				console.log("sql=" + trigger.sql);
+				if (trigger.sql)
+					sqls[j++] = trigger.sql;
+			}
+	});
+}
+
 function doDeleteAllCreditMemos(tx){
-	tx.executeSql('DELETE FROM creditMemo_item',[]);
-	tx.executeSql('DELETE FROM creditMemo',[]);
+		console.log("desactivando triggers creditMemo_item");
+		
+		tx.executeSql("SELECT name,sql FROM sqlite_master WHERE tbl_name='creditMemo_item'",[],function(tx,triggers){	
+			tx.executeSql("DROP TABLE creditMemo_item");
+			//create triggers
+			for (i=0;i<triggers.rows.length;i++){
+				var trigger = triggers.rows.item(i)
+				console.log("sql=" + trigger.sql);
+				if (trigger.sql)
+					tx.executeSql(trigger.sql);
+			}
+	});
+	tx.executeSql('DELETE FROM creditMemo');
 }
 
 function doDeleteCreditMemo(tx){

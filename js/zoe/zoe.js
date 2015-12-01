@@ -69,6 +69,9 @@ logZoe("actualiza lastAccess="+window.localStorage.getItem('lastAccess'));
 var db=null;			
 function openDatabaseZoe(){
 	logZoe("openDatabaseZoe");
+	if (db!=null){
+		db==null;
+	}
 	if (db==null){
 		db = window.openDatabase("Database", "1.0", "Zoe Database", 2*1024*1024);
 	}
@@ -128,6 +131,21 @@ function openDatabaseZoe(){
 				tx.executeSql(sql);
 			}
 		}
+	}
+	
+	function executeSQLS(sqls, successFn, errorFn){
+		logZoe("executeSQLS");
+		db = openDatabaseZoe();
+		db.transaction(function(tx){
+			for (var index = 0; index < sqls.length; ++index) {
+				var sql = sqls[index].trim();
+				if (sql!=""){
+					logZoe("tx " +  tx);
+					logZoe("executing " +  sql);
+					tx.executeSql(sql);
+				}
+			}
+		}, errorFN, successFn);
 	}
 
 	function dropDB(tx) {
@@ -206,7 +224,14 @@ function openDatabaseZoe(){
 	}             
 	
 	function logZoe(message){
-	  console.log(message);
+		var currentdate = new Date(); 
+		var datetime = "Last Sync: " + currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1)  + "/" 
+                + currentdate.getFullYear() + " @ "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds();		
+	  console.log(datetime + "->" + message);
 	}
 
 
