@@ -1,20 +1,30 @@
 <!DOCTYPE html> 
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Payments</title>
+<meta http-equiv="Content-Security-Policy" content="
+    default-src *; 
+    style-src * 'unsafe-inline'; 
+    script-src * 'unsafe-inline'; 
+    media-src *; img-src * data:; 
+" />
+    <meta charset="UTF-8"/>
+    <title>Payments</title>
   
   <link rel="stylesheet" href="css/themes/zoe.min.css" />
   <link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
   <link rel="stylesheet" href="js/jquery-mobile/jquery.mobile.structure-1.4.5.min.css" />
+    <link rel="stylesheet" href="css/angular/app.min.css" />
+    <link rel="stylesheet" href="css/angular/responsive.min.css" />
 
   <script type="text/javascript" src="cordova.js"></script>
   <script src="js/jquery-mobile/jquery-2.1.4.js"></script>
   <script src="js/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+  <script src="js/angular/app.min.js"></script>
   <script src="js/zoe/zoe.js"></script>
   <script src="js/zoe/salesRepDAO.js"></script>
   <script src="js/zoe/paymentDAO.js"></script>
   <script src="js/zoe/invoiceDAO.js"></script>
+  <script src="js/zoe/creditMemoDAO.js"></script>
   <script src="js/zoe/paymentMethodDAO.js"></script>
   <script src="js/zoe/inventoryDAO.js"></script>
   <script src="js/zoe/customerDAO.js"></script>
@@ -102,40 +112,68 @@
 				customerSelectedIndex = $( "#selCustomer" )[0].selectedIndex-1;
 				console.log("selCustomerChange custseleccionado=" + JSON.stringify(listCustomers[customerSelectedIndex]));
 				invoiceDAO.listByCustomerPending($( "#selCustomer" ).val(),receiveInvoices,errReceive);
+				creditMemoDAO.listByCustomerPending($( "#selCustomer" ).val(),receiveCreditMemos,errReceive);
 			}
 
 
 			var listPendingInvoices = new Array();	
+			var listInUseInvoices = new Array();	
+            var receivedInvoices;
 			function receiveInvoices(list){
+				console.log("receiveInvoices length="+list.length); 
 				if (list && list.length){
 					listPendingInvoices = list;
 				}else if (list && !list.length){
 					listPendingInvoices = [list];
 				}
-				console.log("receiveInvoices length="+list.length); 
-				var html = '';
-				var plantilla = $("#invoiceSelTemplate").html();
-				for (var i in listPendingInvoices) {
-					var text = plantilla;
-					text = replaceAll(text, "@id_invoice",listPendingInvoices[i].id_invoice);
-					text = replaceAll(text, "@refNumber",listPendingInvoices[i].refNumber);
-					text = replaceAll(text, "@dueDate",listPendingInvoices[i].dueDate);
-					text = replaceAll(text, "@balanceRemaining",NumberCast(listPendingInvoices[i].balanceRemaining,2,0));
-					text = replaceAll(text, "@paymentAmount",NumberCast(listPendingInvoices[i].paymentAmount,2,0));
-					text = replaceAll(text, "@i",i);
-					html += text;
-				}
-				$('#ui-listInvoices').html(html);
+                receivedInvoices=true;
+				waitInvoicesCreditmemos();
 				
-/*				 $('[type=checkbox]').checkboxradio().trigger('create');
-				 $('.group').controlgroup().trigger('create');*/
-				 $('#ui-listInvoices').trigger('create');
-				 
-				 
-
-				console.log("html=" +  html);
 			}
+
+  			var listPendingCreditMemos = new Array();
+			var listInUseCreditMemos = new Array();	
+            var receivedCreditMemos;
+			function receiveCreditMemos(list){
+				console.log("receiveCreditMemos length="+list.length); 
+				if (list && list.length){
+					listPendingCreditMemos = list;
+				}else if (list && !list.length){
+					listPendingCreditMemos = [list];
+				}
+                receiveCreditMemos=true;
+				waitInvoicesCreditmemos();
+			}
+      
+            function waitInvoicesCreditmemos(){
+                if (receivedInvoices && receivedInvoices){
+                    receiveCreditMemos=true;
+                    receivedInvoices=true;
+                    repaintLists();
+                }else{
+                    setTimeout("waitInvoicesCreditmemos()",100);
+                }
+            }
 			
+
+			function repaintLists(){
+				//alert("repaintLists");
+				$('#selPendingInvoices').empty();
+				$('#selPendingInvoices').append('<option>add a invoice</option>');
+				for (var i in listPendingInvoices) {
+					$('#selPendingInvoices').append('<option value="' + listPendingInvoices[i].ListID +'">('+ listPendingInvoices[i].refNumber +  ')-' + listPendingInvoices[i].txnDate+ ' - $' + listPendingInvoices[i].balanceRemaining + '</option>');
+				}
+				$('#selPendingInvoices')[0].selectedIndex = 0;
+				$('#selPendingInvoices').trigger("chosen:updated");
+
+				$('#selPendingCreditMemos').empty();
+				$('#selPendingCreditMemos').append('<option>add a creditmemo</option>');
+				for (var i in listPendingCreditMemos) {
+					$('#selPendingCreditMemos').append('<option value="' + listPendingCreditMemos[i].ListID +'">('+ listPendingCreditMemos[i].refNumber +  ')-' + listPendingCreditMemos[i].txnDate+ ' - $' + listPendingCreditMemos[i].balanceRemaining + '</option>');
+				}
+				$('#selPendingCreditMemos')[0].selectedIndex = 0;
+				$('#selPendingCreditMemos').trigger("chosen:updated");
+			}
 			
 			var allLoaded = false;
 			function waitAllLoad(){
@@ -328,6 +366,28 @@
 			recalcAll();
 		}
 		
+		function selPendingInvoicesChange(event){
+            console.log("selPendingInvoicesChange1")
+			var selectedIndex = $("#selPendingInvoices")[0].selectedIndex-1;
+            console.log("selPendingInvoicesChange1 selectedIndex=" + selectedIndex)
+			if (selectedIndex<1){
+				return
+			}
+			listInUseInvoices[listInUseInvoices.length] = listPendingInvoices[selectedIndex]
+			listPendingInvoices.splice(selectedIndex,1);
+			repaintLists();
+            app.element($("#myCtrl_id")).scope().repaintTables();
+		}
+		
+		function selPendingCreditMemosChange(event){
+			var selectedIndex = $("#selPendingCreditMemos")[0].selectedIndex-1;
+			listInUseCreditMemos[listInUseCreditMemos.length] = listPendingCreditMemos[selectedIndex]
+			listPendingCreditMemos.splice(selectedIndex,1);
+			repaintLists();
+            app.element($("#myCtrl_id")).scope().repaintTables();
+			
+		}
+
 		function onChangePaymentAmount(event){
 			recalcAll();
 		}
@@ -343,6 +403,19 @@
 			$("#sumPaymentAmount").val(NumberCast(sumPaymentAmount, 2,0));
  			$("#unapplied").val(NumberCast($("#totalAmount").val()*1 - sumPaymentAmount, 2,0));
 		}
+      
+      var app = angular.module('myApp', []);
+      app.controller('myCtrl', function($scope) {
+          $scope.listInUseCreditMemos= [];
+          $scope.listInUseInvoices= [];
+          $scope.repaintTables = repaintTables;
+      });
+      function repaintTables(){
+          console.log("repaintTables 1");
+          $scope.listInUseCreditMemos= listInUseCreditMemos;
+          $scope.listInUseInvoices= listInUseInvoices;
+          console.log("repaintTables 1");
+      }
 		
 		
   </script>
@@ -421,10 +494,43 @@ table, th, td {
                 </div>
               </div>
            </div>
+           
+           <div class="ui-grid-a">
+           		<div class="ui-block-a" >
+                	<select id="selPendingInvoices" onChange="selPendingInvoicesChange(event)">
+                    </select>
+                </div>
+                <div class="ui-block-b">
+                	<input type="button" value="Add">
+                </div>
+           </div>
     
+           <div class="ui-grid-a">
+           		<div class="ui-block-a" >
+                	<select id="selPendingCreditMemos" onChange="selPendingCreditMemosChange(event)">
+                    </select>
+                </div>
+                <div class="ui-block-b">
+                	<input type="button" value="Add">
+                </div>
+           </div>
+
     	<ul data-role="listview" id="ui-listInvoices" data-filter="true" data-filter-placeholder="Invoices..." data-inset="true">
         	<!--inject-->
         </ul>
+            
+            <div id="myCtrl_id" ng-app="myApp" ng-controller="myCtrl">
+                <table>
+                  <tr>
+                    <th>Id</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                  </tr>
+                  <tr ng-repeat="invoice in listInUseInvoices">
+                      
+                  </tr>
+                </table>
+            </div>
 
 		   <!-- plantilla detalle de payment -->
            <div id="invoiceSelTemplate" style="display:none">

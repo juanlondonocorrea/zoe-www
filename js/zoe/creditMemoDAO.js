@@ -2,6 +2,7 @@
 
 var creditMemoDAO = {listBySalesrep:listCreditMemosBySalesrep, 
 				listByCustomer:listCreditMemosByCustomer,
+				listByCustomerPending:listCreditMemosByCustomerPending,
 				getDDL:getCreditMemoDDL,
 				listToUpload:listCreditMemosToUpload,
 				creditMemosByCustomerDateRange:listCreditMemosByCustomerDateRange,
@@ -90,6 +91,15 @@ function listCreditMemosByCustomer(customer_ListID, aReceiveFunction,aErrFunc){
 	creditMemoErrFunc = aErrFunc;
 	filterDataCreditMemo = customer_ListID;
 	db.transaction(doCustomerCreditMemos, creditMemoErrFunc);
+}
+
+function listCreditMemosByCustomerPending(customer_ListID, aReceiveFunction,aErrFunc){
+	db = openDatabaseZoe();
+	logZoe("listCreditMemosByCustomerPending db=" + db);
+	creditMemoReceiveListFunction = aReceiveFunction;
+	invoiceErrFunc = aErrFunc;
+	filterDataInvoice = customer_ListID;
+	db.transaction(doCustomerCreditMemosPending, invoiceErrFunc);
 }
 
 function listCreditMemosByCustomerDateRange(initDate, finalDate, aReceiveFunction,aErrFunc){
@@ -463,6 +473,12 @@ function doDeleteAllCreditMemos(tx){
 	});
 	tx.executeSql('DELETE FROM creditMemo');
 }
+
+function doCustomerCreditMemosPending(tx){
+	logZoe("doCustomerCreditMemosPending");
+	tx.executeSql("SELECT * FROM creditMemo WHERE ListID = ? AND balanceRemaining>0", [filterDataInvoice],creditMemoLocalListReceiveFunction, invoiceErrFunc);
+}
+
 
 function doDeleteCreditMemo(tx){
 	tx.executeSql('DELETE FROM creditMemo_item where id_creditMemo=?',[filterDataCreditMemo+""]);

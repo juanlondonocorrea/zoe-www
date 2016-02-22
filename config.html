@@ -211,8 +211,10 @@
 				syncInventorySite();
 			}else if (whatToDownload[currentDown] == "syncDownPricelevel" ){
 				syncPricelevel();
+			}else if (whatToDownload[currentDown] == "syncDownVendors" ){
+				syncDownVendors();
 			}else if (whatToDownload[currentDown] == "syncDownCustomers" ){
-				whatToDownload[whatToDownload.length]="syncDownVendors";
+				whatToDownload.splice(currentDown+1,1,"syncDownVendors");
 				syncCustomers();
 			}else if (whatToDownload[currentDown] == "syncDownInvoices" ){
 				syncInvoices();
@@ -220,8 +222,6 @@
 				syncCreditMemos();
 			}else if (whatToDownload[currentDown] == "syncCustomerMsgs" ){
 				syncCustomerMsgs();
-			}else if (whatToDownload[currentDown] == "syncDownVendors" ){
-				syncDownVendors();
 			}
 			
 		}else{
@@ -519,8 +519,11 @@
 				if (invoice.InvoiceLineRet.length){
 					for (j=0;j<invoice.InvoiceLineRet.length;j++){
 						var line = invoice.InvoiceLineRet[j];
-						var itemVO = convertInvoiceLineToItem(invoiceVO,line);
-						invoiceVO.items[j] = itemVO;
+                        if (line.ItemRef){
+                            var itemVO = convertInvoiceLineToItem(invoiceVO,line);
+                            invoiceVO.items[invoiceVO.items.length] = itemVO;
+                        }
+                            
 					}
 				}else{
 					var line = invoice.InvoiceLineRet;
