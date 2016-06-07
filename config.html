@@ -46,7 +46,7 @@
 	function initThisPage(event){
 			$('#salesRepName').val(window.localStorage.getItem("salesRepName"));	
 			if (!window.localStorage.getItem("syncURL")){
-				window.localStorage.setItem("syncURL","http://24.234.187.107:54320/SyncService");
+				window.localStorage.setItem("syncURL","http://174.71.200.174:54320/SyncService");
 			}
 			$('#syncURL').val(window.localStorage.getItem("syncURL"));	
 			$('#submitConfig').click(submitFormConfig);	
