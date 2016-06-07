@@ -71,10 +71,12 @@
 				var htmlString1 = "";
 				listInventory = arrayInventory; // Copy local array to global array
 				for(var i=0; i< arrayInventory.length; i++) {
-					var li =  '<li data-filtertext="' + arrayInventory[i].salesDesc + '"><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '" ><h3>'+ arrayInventory[i].salesDesc +'</h3><p></p><span class="ui-li-count">'+arrayInventory[i].QuantityOnHand+'</span></a><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
-					
-					htmlString1 += li;
-					console.log("li=" + li);					
+                    if (arrayInventory[i].QuantityOnHand != 0){
+					   var li =  '<li data-filtertext="' + arrayInventory[i].salesDesc + '"><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '" ><h3>'+ arrayInventory[i].salesDesc +'</h3><p></p><span class="ui-li-count">'+arrayInventory[i].QuantityOnHand+'</span></a><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
+                    
+					   htmlString1 += li;
+					   console.log("li=" + li);
+                    }
 					}
 					try{$('#InvList').html(htmlString1).listview('refresh');}catch(e){}
 					$(".linkDetail").click(goInventoryDetail); 				

@@ -214,7 +214,7 @@
 			}else if (whatToDownload[currentDown] == "syncDownVendors" ){
 				syncDownVendors();
 			}else if (whatToDownload[currentDown] == "syncDownCustomers" ){
-				whatToDownload.splice(currentDown+1,1,"syncDownVendors");
+				whatToDownload.splice(currentDown+1,0,"syncDownVendors");
 				syncCustomers();
 			}else if (whatToDownload[currentDown] == "syncDownInvoices" ){
 				syncInvoices();
