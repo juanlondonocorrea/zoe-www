@@ -340,7 +340,7 @@
 			customersVO[i] = customerVO;
 		}
 			
-		customerDAO.deleteAll(errCustomerInsert);
+		//customerDAO.deleteAll(errCustomerInsert);
 		customerDAO.store(customersVO, errCustomerInsert, successCustomerInsert,'remote');
 		
 	}
@@ -1744,7 +1744,7 @@
         
             <div data-role="content"> 
                 <form method="post" id="configForm" data-ajax="true">
-                    <lable for="salesRepName">Piloch Sales Rep Full Name</lable><input type="text" id="salesRepName" name="salesRepName" placeholder="salesRepName"><br>
+                    <lable for="salesRepName">Sales Rep Full Name</lable><input type="text" id="salesRepName" name="salesRepName" placeholder="salesRepName"><br>
 
                     <lable for="syncURL">Synchronization URL</lable><input type="text" id="syncURL" name="syncURL" placeholder="syncURL"><br>
                                  

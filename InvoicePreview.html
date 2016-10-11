@@ -147,9 +147,9 @@
 				var invoiceItems = '<table class="tblItems" border="1" width="100%">'
 				  +'<tbody>'
 					+'<tr>' 
+					  +'<td style="vertical-align:top"><div class="TinyFont">Quantity</div></td>'
 					  +'<td style="vertical-align:top"><div class="TinyFont">Description</div></td>'
 					  +'<td style="vertical-align:top"><div class="TinyFont">Unit Cost</div></td>'
-					  +'<td style="vertical-align:top"><div class="TinyFont">Quantity</div></td>'
 					  +'<td style="vertical-align:top"><div class="TinyFont">Amount</div></td>'
 					  +'<td style="vertical-align:top"><div class="TinyFont">Tax</div></td>'
 					+'</tr>';
@@ -159,9 +159,9 @@
 					for (var i=0; i < InvoiceVO.items.length; i++) {
 						invoiceItems +=
 						'<tr>'
+						  +'<td style="vertical-align:top"><div align="right" class="SmallFont">'+NumberCast(InvoiceVO.items[i].Quantity,0, 0)+'</div></td>'
 						  +'<td style="vertical-align:top"><div class="SmallFont">'+InvoiceVO.items[i].Inventory_FullName+'-'+InvoiceVO.items[i].Desc+'</div></td>'
 						  +'<td style="vertical-align:top"><div align="right" class="SmallFont">$ '+NumberCast(InvoiceVO.items[i].Rate,2, 0.00)+'</div></td>'
-						  +'<td style="vertical-align:top"><div align="right" class="SmallFont">'+NumberCast(InvoiceVO.items[i].Quantity,0, 0)+'</div></td>'
 						  +'<td style="vertical-align:top"><div align="right" class="SmallFont">$ '+NumberCast(InvoiceVO.items[i].Amount,2, 0.00)+'</div></td>';
 						invoiceItems += '<td style="vertical-align:top"><div class="SmallFont">'+NumberCast(InvoiceVO.items[i].salesTax_Name,0, '')+'</div></td>';
 						invoiceItems +='</tr>';
