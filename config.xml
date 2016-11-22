@@ -29,6 +29,7 @@
 
   <gap.plugin name="cordova-plugin-splashscreen" source="npm" spec="~3.2.1" />
   <gap:plugin name="de.appplant.cordova.plugin.printer" source="npm" />
+  <gap:plugin name="cordova-plugin-share" source="npm" />
   <gap.plugin name="cordova-plugin-camera" source="npm" spec="~2.1.1" />   
     
   
