@@ -72,7 +72,20 @@
 			}
 		}			
 
-			// BEGIN Functions on error case
+
+// Cordova Device Ready.
+		function share() {
+			try{
+					 //Enter the page location.
+					 var page = $('#InvoicePreview').html(); //location.href;
+					 navigator.share(page,"Share", "plain/text")
+				}
+        }			            
+            
+            
+            
+            
+            // BEGIN Functions on error case
 			function errReceiveInvoiceDetails(err){
 				alert("DB Error Invoice Details: "+JSON.stringify(err));
 			}
