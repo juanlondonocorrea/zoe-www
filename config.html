@@ -482,7 +482,7 @@
 			if (invoice.TermsRef)
 				logZoe("invoice.TermsRef.ListID=" + JSON.stringify(invoice.TermsRef.ListID));
 			
-			var invoiceVO = {
+			var invoiceVO = { 
 				id_invoice:invoice.TxnID,
 				ListID : invoice.CustomerRef.ListID,
 				po_number : invoice.PONumber,
