@@ -76,8 +76,24 @@
 // Cordova Device Ready.
 		function share() {
 				 //Enter the page location.
-					 var page = $('#InvoicePreview').html(); //location.href;
-					 navigator.share(page,"Share", "application/pdf");
+                	 var page = $('#InvoicePreview').html(); //location.href;
+            
+                      var document.addEventListener('deviceready', function() { 
+        
+                             pdf.htmlToPDF({
+                                    data: page,
+                                    documentSize: "letter",
+                                    landscape: "portrait",
+                                    type: "share" //use share to open the open-with-menu. 
+                                }, this.success, this.failure);
+
+                         });
+
+            
+            
+            
+            
+				//	 navigator.share(page,"Share", "application/pdf");
         }			            
             
             
