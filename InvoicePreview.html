@@ -78,7 +78,7 @@
 				 //Enter the page location.
                 	 var page = $('#InvoicePreview').html(); //location.href;
             
-                      document.addEventListener('deviceready', function() { 
+                    var page2 =  document.addEventListener('deviceready', function() { 
         
                              pdf.htmlToPDF({
                                     data: page,
@@ -89,11 +89,7 @@
 
                          });
 
-            
-            
-            
-            
-				//	 navigator.share(page,"Share", "application/pdf");
+            	 navigator.share(page2,"Share", "application/pdf");
         }			            
             
             
