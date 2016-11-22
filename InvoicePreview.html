@@ -78,7 +78,7 @@
 				 //Enter the page location.
                 	 var page = $('#InvoicePreview').html(); //location.href;
             
-                    var page2 =  document.addEventListener('deviceready', function() { 
+                 /*   var page2 =  document.addEventListener('deviceready', function() { 
         
                              pdf.htmlToPDF({
                                     data: page,
@@ -87,9 +87,9 @@
                                     type: "share" //use share to open the open-with-menu. 
                                 }, this.success, this.failure);
 
-                         });
+                         }); */
 
-            	 navigator.share(page2,"Share", "application/pdf");
+            	 navigator.share(page,"Share", "text/html");
         }			            
             
             
