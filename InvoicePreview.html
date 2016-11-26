@@ -76,20 +76,20 @@
 // Cordova Device Ready.
 		function share() {
 				 //Enter the page location.
-                	 var page = $('#InvoicePreview').html(); //location.href;
+                	// var page = $('#InvoicePreview').html(); //location.href;
             
-                 /*   var page2 =  document.addEventListener('deviceready', function() { 
+            //    navigator.share(page,"Share", "text/html");
+            
+            document.addEventListener('deviceready', function() { 
         
-                             pdf.htmlToPDF({
-                                    data: page,
-                                    documentSize: "letter",
-                                    landscape: "portrait",
-                                    type: "share" //use share to open the open-with-menu. 
-                                }, this.success, this.failure);
-
-                         }); */
-
-            	 navigator.share(page,"Share", "text/html");
+     pdf.htmlToPDF({
+            data: "<html> <h1>  Hello World  </h1> </html>",
+            documentSize: "A4",
+            landscape: "portrait",
+            type: "share" //use share to open the open-with-menu. 
+        }, this.success, this.failure);
+ 
+ });
         }			            
             
             
