@@ -72,25 +72,36 @@
 			}
 		}			
 
+		function print2() {
+			if (!cordova.plugins || !cordova.plugins.printer){
+				alert("no printer plugin");
+				return;
+			}
+			
+			try{
+				cordova.plugins.printer.isAvailable(
+				//Check whether the printer is available or not.
+				function (isAvailable) {
+					 //Enter the page location.
+					var page = $('#InvoicePreview').html(); //location.href;
+                    var type = "text/html";
+                    var title = "test.html";
+                    page.replace(/"/g, '\'');
+                    window.plugins.PrintPlugin.print(page,function(){console.log('success')},function(){console.log('fail')},"",type,title);
+				}
+			);
+			}catch(e){
+				console.log("could not print:" + e);
+			}
+		}			
+
+
 
 // Cordova Device Ready.
 		function share() {
 				 //Enter the page location.
-                	// var page = $('#InvoicePreview').html(); //location.href;
-            
-          
-            
-           var page= document.addEventListener('deviceready', function() { 
-        
-     pdf.htmlToPDF({
-            data: "<html> <h1>  Hello World  </h1> </html>",
-            documentSize: "A4",
-            landscape: "portrait",
-            type: "share" //use share to open the open-with-menu. 
-        }, this.success, this.failure);
- 
- });
-               navigator.share(page,"Share", "application/pdf");
+                 var page = $('#InvoicePreview').html(); //location.href;
+                 navigator.share(page,"Share", "multipart/form-data");
             
         }			            
             
