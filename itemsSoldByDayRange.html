@@ -64,6 +64,7 @@
 				var totalItems = 0.00;
 				$("#tableBodyItemsSold").html("");
 				var itemsSoldByDay = '<div class="MediumFont" align="center">Items Sold since '+Date1+' to '+Date2+'</div>'
+                + 'Sales rep:' + window.localStorage.getItem("salesRepName") +'<br>'
 				+'<table class="tblItemsSold" width="100%">'
 				  +'<tbody>'
 					+'<tr>' 
