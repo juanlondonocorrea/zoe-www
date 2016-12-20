@@ -28,7 +28,7 @@
 
 
   <gap.plugin name="cordova-plugin-splashscreen" source="npm" spec="~3.2.1" />
-  <gap:plugin name="de.appplant.cordova.plugin.printer" spec="~0.7.3" source="npm"/>
+  <gap:plugin name="de.appplant.cordova.plugin.printer" spec="~0.7.1" source="npm"/>
 
   <gap:plugin name="com-badrit-printplugin" source="npm" />
 
