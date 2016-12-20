@@ -79,16 +79,14 @@
 			}
 			
 			try{
-				cordova.plugins.printer.isAvailable(
-				//Check whether the printer is available or not.
-				function (isAvailable) {
-					 //Enter the page location.
+                //Enter the page location.
 					var page = $('#InvoicePreview').html(); //location.href;
                     var type = "text/html";
                     var title = "test.html";
                     page.replace(/"/g, '\'');
-                    window.plugins.PrintPlugin.print(page,function(){console.log('success')},function(){console.log('fail')},"",type,title);
-				}
+                   cordova.plugins.printer.pick(function (uri) {
+                                cordova.plugins.printer.print(page, { printerId: uri });
+                            });
 			);
 			}catch(e){
 				console.log("could not print:" + e);
