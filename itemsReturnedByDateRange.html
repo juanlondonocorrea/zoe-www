@@ -72,6 +72,7 @@
 				var totalItemsRetDamaged = 0.00;
 				$("#tableBodyItemsReturned").html("");
 				var itemsReturnedByDay = '<div class="MediumFont" align="center">Items Sold since '+Date1+' to '+Date2+'</div>'
+                + 'Sales rep:' + window.localStorage.getItem("salesRepName") +'<br>'
 				+'<table class="tblItemsSold" width="100%" border="1">'
 				  +'<tbody>'
 					+'<tr>' 
