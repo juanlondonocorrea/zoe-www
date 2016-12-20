@@ -72,38 +72,7 @@
 			}
 		}			
 
-		function print2() {
-			if (!cordova.plugins || !cordova.plugins.printer){
-				alert("no printer plugin");
-				return;
-			}
-			
-			try{
-                //Enter the page location.
-					var page = $('#InvoicePreview').html(); //location.href;
-                    var type = "text/html";
-                    var title = "test.html";
-                    page.replace(/"/g, '\'');
-                   cordova.plugins.printer.pick(function (uri) {
-                                cordova.plugins.printer.print(page, { printerId: uri });
-                            });
-			);
-			}catch(e){
-				console.log("could not print:" + e);
-			}
-		}			
-
-
-
-// Cordova Device Ready.
-		function share() {
-				 //Enter the page location.
-                 var page = $('#InvoicePreview').html(); //location.href;
-                 navigator.share(page,"Share", "multipart/form-data");
-            
-        }			            
-            
-            
+		            
             
             
             // BEGIN Functions on error case
