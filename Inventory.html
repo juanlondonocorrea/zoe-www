@@ -113,20 +113,22 @@
 				$("#tableInventoryItems").html("");
 				if (listInventory){
 					for (var i=0; i < listInventory.length; i++) {
-						inventoryItems +=
-						'<tr>'
-						  +'<td style="vertical-align:top" align="left" class="SmallFont"><div id="FullNameP" class="SmallFont">'+ listInventory[i].salesDesc + '</div></td>'
-						  +'<td style="vertical-align:top" align="right"><div id="QuantityOnHandP" class="SmallFont">'+listInventory[i].QuantityOnHand+'</div></td>'
-						  +'<td style="vertical-align:top" align="right"><div id="salesPriceP" class="SmallFont">$ '+listInventory[i].salesPrice+'</div></td>';
-							if (listInventory[i].desc != null) {
-								inventoryItems += '<td style="vertical-align:top" align="left"><div id="salesTaxP" class="SmallFont">'+listInventory[i].desc+'</div></td>';
-							}
-							else{
-						  		inventoryItems += '<td>&nbsp;</td>';
-							}
-						inventoryItems +='<td style="vertical-align:top" align="right"><div id="AmountP" class="SmallFont">'+NumberCast(listInventory[i].QuantityOnHand*listInventory[i].salesPrice,2,"0.0")+'</div></td>'
+						if (listInventory[i].QuantityOnHand != 0){
+                            inventoryItems +=
+                            '<tr>'
+                              +'<td style="vertical-align:top" align="left" class="SmallFont"><div id="FullNameP" class="SmallFont">'+ listInventory[i].salesDesc + '</div></td>'
+                              +'<td style="vertical-align:top" align="right"><div id="QuantityOnHandP" class="SmallFont">'+listInventory[i].QuantityOnHand+'</div></td>'
+                              +'<td style="vertical-align:top" align="right"><div id="salesPriceP" class="SmallFont">$ '+listInventory[i].salesPrice+'</div></td>';
+                                if (listInventory[i].desc != null) {
+                                    inventoryItems += '<td style="vertical-align:top" align="left"><div id="salesTaxP" class="SmallFont">'+listInventory[i].desc+'</div></td>';
+                                }
+                                else{
+                                    inventoryItems += '<td>&nbsp;</td>';
+                                }
+                            inventoryItems +='<td style="vertical-align:top" align="right"><div id="AmountP" class="SmallFont">'+NumberCast(listInventory[i].QuantityOnHand*listInventory[i].salesPrice,2,"0.0")+'</div></td>'
 
-						inventoryItems +='<td>&nbsp;</td></tr>';
+                            inventoryItems +='<td>&nbsp;</td></tr>';
+                        }
 					}						  
 				}
 				else {
