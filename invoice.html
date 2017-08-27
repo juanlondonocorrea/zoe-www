@@ -232,6 +232,23 @@ $(document).ready(function() {
 					$('#selProduct').append('<option value="' + list[i].ListID +'">('+ list[i].QuantityOnHand + ') ' + list[i].salesDesc+ '</option>');
 				}
 				$('#selProduct').trigger("chosen:updated");
+                
+                
+                //lo nuevo
+                listInventory = list; // Copy local array to global array
+				// Build Inventory list with <ol> <li>
+				var htmlString1 = "";
+				listInventory = list; // Copy local array to global array
+				for(var i=0; i< list.length; i++) {
+                    if (list[i].QuantityOnHand != 0){
+					   var li =  '<li data-filtertext="' + list[i].salesDesc + '"><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '" ><h3>'+ list[i].salesDesc +'</h3><p></p><span class="ui-li-count">'+list[i].QuantityOnHand+'</span></a><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
+                    
+					   htmlString1 += li;
+					   console.log("li=" + li);
+                    }
+					}
+					try{$('#InvList').html(htmlString1).listview('refresh');}catch(e){}
+					$(".linkDetail").click(goInventoryDetail); 		
 			}
 			
      
@@ -239,6 +256,15 @@ $(document).ready(function() {
       var listInventory = new Array();
 			var selectedIndex;			
 			function receiveInventory(arrayInventory){
+                listItems = list;
+				console.log("receiveItems length="+list.length); 
+				$('#selProduct').empty();
+				$('#selProduct').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');				
+				for (var i in list) {
+					$('#selProduct').append('<option value="' + list[i].ListID +'">('+ list[i].QuantityOnHand + ') ' + list[i].salesDesc+ '</option>');
+				}
+				$('#selProduct').trigger("chosen:updated");
+                
 				listInventory = arrayInventory; // Copy local array to global array
 				// Build Inventory list with <ol> <li>
 				var htmlString1 = "";
