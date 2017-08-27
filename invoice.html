@@ -222,11 +222,12 @@ $(document).ready(function() {
 				console.log("$('#selTerm')[0].selectedIndex" + $('#selTerm')[0].selectedIndex);
 			}
 		
-       	var listItems = new Array();	
-			function receiveItems(list){
+       	var listItems = new Array();
+        var selectedIndex;		
+        function receiveItems(list){
 				//listItems = list;
 				// console.log("receiveItems length="+list.length); 
-				//$('#selProduct').empty();
+			//	$('#selProduct').empty();
 			//	$('#selProduct').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');				
 				//for (var i in list) {
 					//$('#selProduct').append('<option value="' + list[i].ListID +'">('+ list[i].QuantityOnHand + ') ' + list[i].salesDesc+ '</option>');
@@ -238,10 +239,9 @@ $(document).ready(function() {
               listItems = list; // Copy local array to global array
 				// Build Inventory list with <ol> <li>
 				var htmlString1 = "";
-				listItems = list; // Copy local array to global array
 				for(var i=0; i< list.length; i++) {
                     if (list[i].QuantityOnHand != 0){
-					   var li =  '<li data-filtertext="' + list[i].salesDesc + '"><a class="linkDetail" href="#selProductChange?event=' + i + '" id="link_' + i + '" ><h3>'+ list[i].salesDesc +'</h3><p></p><span class="ui-li-count">'+list[i].QuantityOnHand+'</span></a><a class="linkDetail" href="#selProductChange?event=' + i + '" id="link_' + i + '">Predet.</a></li>';
+					  	   var li =  '<li data-filtertext="' + list[i].salesDesc + '"><a class="linkDetail" href="#selProductChange?index=' + i + '" id="link_' + i + '" ><h3>'+ list[i].salesDesc +'</h3><p></p><span class="ui-li-count">'+list[i].QuantityOnHand+'</span></a><a class="linkDetail" href="#selProductChange?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
                     
 					   htmlString1 += li;
 					   console.log("li=" + li);
@@ -250,9 +250,18 @@ $(document).ready(function() {
 					try{$('#InvList').html(htmlString1).listview('refresh');}catch(e){}
 					$(".linkDetail").click(goInventoryDetail); 		
 			}
+			function goInventoryDetail(event){
+				var index =  event.currentTarget.id;
+				index = index.substring(index.indexOf("_")+1);
+				selectedIndex = index;
+				inventoryDetails(index);
+			}			
 			
-     
-      
+			function inventoryDetails(index){
+				$('#FullName').val(listItems[index].salesDesc);
+				$('#QuantityOnHand').val(listItems[index].QuantityOnHand);
+				$('#salesPrice').val(listItems[index].salesPrice);
+			}
   
 			var productSelectedIndex;
 			function selProductChange(event, ui){
