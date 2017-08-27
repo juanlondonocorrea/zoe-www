@@ -222,26 +222,26 @@ $(document).ready(function() {
 				console.log("$('#selTerm')[0].selectedIndex" + $('#selTerm')[0].selectedIndex);
 			}
 		
-			var listItems = new Array();	
+       	var listItems = new Array();	
 			function receiveItems(list){
-				listItems = list;
-				console.log("receiveItems length="+list.length); 
-				$('#selProduct').empty();
-				$('#selProduct').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');				
-				for (var i in list) {
-					$('#selProduct').append('<option value="' + list[i].ListID +'">('+ list[i].QuantityOnHand + ') ' + list[i].salesDesc+ '</option>');
-				}
-				$('#selProduct').trigger("chosen:updated");
+				//listItems = list;
+				// console.log("receiveItems length="+list.length); 
+				//$('#selProduct').empty();
+			//	$('#selProduct').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');				
+				//for (var i in list) {
+					//$('#selProduct').append('<option value="' + list[i].ListID +'">('+ list[i].QuantityOnHand + ') ' + list[i].salesDesc+ '</option>');
+				//}
+				//$('#selProduct').trigger("chosen:updated");
                 
                 
                 //lo nuevo
-                listInventory = list; // Copy local array to global array
+              listItems = list; // Copy local array to global array
 				// Build Inventory list with <ol> <li>
 				var htmlString1 = "";
-				listInventory = list; // Copy local array to global array
+				listItems = list; // Copy local array to global array
 				for(var i=0; i< list.length; i++) {
                     if (list[i].QuantityOnHand != 0){
-					   var li =  '<li data-filtertext="' + list[i].salesDesc + '"><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '" ><h3>'+ list[i].salesDesc +'</h3><p></p><span class="ui-li-count">'+list[i].QuantityOnHand+'</span></a><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
+					   var li =  '<li data-filtertext="' + list[i].salesDesc + '"><a class="linkDetail" href="#selProductChange?event=' + i + '" id="link_' + i + '" ><h3>'+ list[i].salesDesc +'</h3><p></p><span class="ui-li-count">'+list[i].QuantityOnHand+'</span></a><a class="linkDetail" href="#selProductChange?event=' + i + '" id="link_' + i + '">Predet.</a></li>';
                     
 					   htmlString1 += li;
 					   console.log("li=" + li);
@@ -253,34 +253,7 @@ $(document).ready(function() {
 			
      
       
-      var listInventory = new Array();
-			var selectedIndex;			
-			function receiveInventory(arrayInventory){
-                listItems = list;
-				console.log("receiveItems length="+list.length); 
-				$('#selProduct').empty();
-				$('#selProduct').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');				
-				for (var i in list) {
-					$('#selProduct').append('<option value="' + list[i].ListID +'">('+ list[i].QuantityOnHand + ') ' + list[i].salesDesc+ '</option>');
-				}
-				$('#selProduct').trigger("chosen:updated");
-                
-				listInventory = arrayInventory; // Copy local array to global array
-				// Build Inventory list with <ol> <li>
-				var htmlString1 = "";
-				listInventory = arrayInventory; // Copy local array to global array
-				for(var i=0; i< arrayInventory.length; i++) {
-                    if (arrayInventory[i].QuantityOnHand != 0){
-					   var li =  '<li data-filtertext="' + arrayInventory[i].salesDesc + '"><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '" ><h3>'+ arrayInventory[i].salesDesc +'</h3><p></p><span class="ui-li-count">'+arrayInventory[i].QuantityOnHand+'</span></a><a class="linkDetail" href="#InventoryDetails?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
-                    
-					   htmlString1 += li;
-					   console.log("li=" + li);
-                    }
-					}
-					try{$('#InvList').html(htmlString1).listview('refresh');}catch(e){}
-					$(".linkDetail").click(goInventoryDetail); 				
-			} 
-      
+  
 			var productSelectedIndex;
 			function selProductChange(event, ui){
 				console.log("selProductChange val=" + $( "#selProduct" ).val());
