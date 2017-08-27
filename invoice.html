@@ -248,9 +248,9 @@ $(document).ready(function() {
                     }
 					}
 					try{$('#InvList').html(htmlString1).listview('refresh');}catch(e){}
-					$(".linkDetail").click(goInventoryDetail); 		
+				//	$(".linkDetail").click(goInventoryDetail); 		
 			}
-			function goInventoryDetail(event){
+	/*		function goInventoryDetail(event){
 				var index =  event.currentTarget.id;
 				index = index.substring(index.indexOf("_")+1);
 				selectedIndex = index;
@@ -261,12 +261,12 @@ $(document).ready(function() {
 				$('#FullName').val(listItems[index].salesDesc);
 				$('#QuantityOnHand').val(listItems[index].QuantityOnHand);
 				$('#salesPrice').val(listItems[index].salesPrice);
-			}
+			} */
   
 			var productSelectedIndex;
 			function selProductChange(event, ui){
 				console.log("selProductChange val=" + $( "#selProduct" ).val());
-				productSelectedIndex = $( "#selProduct" )[0].selectedIndex-1;
+				productSelectedIndex = $( "#selProduct" )[0].selectedIndex;
 				console.log("selProductChange productSelectedIndex=" + productSelectedIndex);
 				console.log("selProductChange customPrice=" + listItems[productSelectedIndex].customprice);
 				console.log("selProductChange salesPrice=" + listItems[productSelectedIndex].salesPrice);
