@@ -224,7 +224,7 @@ $(document).ready(function() {
 		
        	var listItems = new Array();
         var selectedIndex;	
-        var htmlString1;
+       
         function receiveItems(list){
 				listItems = list;
 				// console.log("receiveItems length="+list.length); 
@@ -239,7 +239,7 @@ $(document).ready(function() {
                 //lo nuevo
               listItems = list; // Copy local array to global array
 				// Build Inventory list with <ol> <li>
-				htmlString1 = "";
+				var htmlString1 = "";
 				for(var i in list) {
                 //    if (list[i].QuantityOnHand != 0){
 					  	   var li =  '<li data-filtertext="' + list[i].salesDesc + '"><a class="linkDetail" href="#goInventoryDetail?index=' + i + '" id="link_' + i + '" ><h3>'+ list[i].salesDesc +'</h3><p></p><span class="ui-li-count">'+list[i].QuantityOnHand+' es '+i+' </span></a><a class="linkDetail" href="#goInventoryDetail?index=' + i + '" id="link_' + i + '">Predet.</a></li>';
@@ -289,7 +289,7 @@ $(document).ready(function() {
 //				$("#RatePrice").trigger("change");
 				calcItem(event);
 				console.log("RatePrice=" + $("#RatePrice").val());
-                htmlString1 = "";
+               
 			}
 			
 			function calcItem(event){
