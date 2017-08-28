@@ -227,17 +227,17 @@ $(document).ready(function() {
        
         function receiveItems(list){
 				listItems = list;
-				// console.log("receiveItems length="+list.length); 
-				//$('#selProduct').empty();
-			  //  $('#selProduct').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');				
-				//for (var i in list) {
-					//$('#selProduct').append('<option value="' + list[i].ListID +'">('+ list[i].QuantityOnHand + ') ' + list[i].salesDesc+ '</option>');
-				//}
-				//$('#selProduct').trigger("chosen:updated");
+				 console.log("receiveItems length="+list.length); 
+				$('#selProduct').empty();
+			    $('#selProduct').append('<option value="choose-one" data-placeholder="true">Choose one...</option>');				
+				for (var i in list) {
+				    $('#selProduct').append('<option value="' + list[i].ListID +'">('+ list[i].QuantityOnHand + ') ' + list[i].salesDesc+ '</option>');
+				}
+				$('#selProduct').trigger("chosen:updated");
                 
                 
                 //lo nuevo
-              listItems = list; // Copy local array to global array
+             /* listItems = list; // Copy local array to global array
 				// Build Inventory list with <ol> <li>
 				var htmlString1 = "";
 				for(var i in list) {
@@ -247,22 +247,22 @@ $(document).ready(function() {
 					   console.log("li=" + li);
                   //  }
 					}
-        //  $('#selProduct').trigger("chosen:updated");
 					try{$('#InvList').html(htmlString1).listview('refresh');}catch(e){}
-					$(".linkDetail").click(goInventoryDetail); 		
-			}
+					$(".linkDetail").click(goInventoryDetail); 		*/
+          $('#selProduct').trigger("chosen:updated");
+
+        }
 			function goInventoryDetail(event){
 				var index =  event.currentTarget.id;
 				index = index.substring(index.indexOf("_")+1);
 				selectedIndex = index;
 				selProductChange(event,index);
-                		try{$('#InvList').html('').listview('refresh');}catch(e){}
 			}			 
   
 			var productSelectedIndex;
 			function selProductChange(event, ui){
 				console.log("selProductChange val=" + $( "#selProduct" ).val());
-				productSelectedIndex = ui; //$( "#selProduct" )[0].selectedIndex+1;
+				productSelectedIndex =$( "#selProduct" )[0].selectedIndex+1; // ui;
 				console.log("selProductChange productSelectedIndex=" + productSelectedIndex);
 				console.log("selProductChange customPrice=" + listItems[productSelectedIndex].customprice);
 				console.log("selProductChange salesPrice=" + listItems[productSelectedIndex].salesPrice);
@@ -637,14 +637,14 @@ table, th, td {
                 <h4>Add Item</h4>
                 <p>Add items to the invoice one by one.</p>
 				<div data-role="fieldcontain">					
-             <!--       <div>
+                  <div>
 						<label for="selProduct" class="select">Select a Product:</label>
 					</div>
 					<select name="selProduct" id="selProduct" onChange="selProductChange(event)">
 						<option value="option1"></option>
 					</select> 
-                    -->
-                     <ul id="InvList" data-role="listview" data-filter="true" data-filter-placeholder="Search Inventory..." data-inset="true"> </ul>
+                    
+            <!--           <ul id="InvList" data-role="listview" data-filter="true" data-filter-placeholder="Search Inventory..." data-inset="true"> </ul> -->
                     
 				</div>
 
