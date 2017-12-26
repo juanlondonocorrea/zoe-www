@@ -117,9 +117,9 @@
 						  if (ico!=""){
 						  	salesByCustomer +='<td style="border: none;"><img src="css/themes/images/' + ico + '" height="10" width="10"></td>';
 						  }
-						  if (sales[i].origin=="local"){
+						 // if (sales[i].origin=="local"){
 							  salesByCustomer +=  '<td style="border: none;"><a href="invoice.html?id_invoice=' + sales[i].id_invoice + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-edit"  data-ajax="false"></a></td>';
-						  }
+						 // }
 					  	salesByCustomer +=  '<td style="border: none;"><a href="InvoicePreview.html?id_invoice=' + sales[i].id_invoice + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-print"  data-ajax="false"></a></td>';
 						salesByCustomer +='</tr></table></td></tr>';
 						console.log("salesByCustomer=" + salesByCustomer);
@@ -128,7 +128,7 @@
 						
 						totalOpenBalance += NumberCast(sales[i].OpenBalance,2,0)*1;
 						}
-				}
+				} 
 				else  {
 					salesByCustomer +=
 						'<tr>'
