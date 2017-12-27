@@ -478,7 +478,7 @@ function doDeleteInvoice(tx){
 }
 
 function doMarkToSyncInvoice(tx){
-	logZoe ("doMarkToSyncInvoice datafiler=" + filterDataInvoice);
+	//logZoe ("doMarkToSyncInvoice datafiler=" + filterDataInvoice);
     tx.executeSql("UPDATE invoice SET needSync=0, zoeSycDate=datetime('now', 'localtime'), needCorrection=1 where id_invoice = ?",[filterDataInvoice+""]);
     //tx.executeSql("UPDATE invoice SET needSync=1, zoeUpdateDate=datetime('now', 'localtime'), needCorrection=0 where id_invoice = ?",[filterDataInvoice+""]);
 }
