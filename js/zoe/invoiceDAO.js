@@ -226,7 +226,7 @@ function doListInvoicesToUpload(tx){
 	var selectStr = "SELECT invoice.*, invoice_item.*, inventorySite_ListID, customer.FullName as companyName " +
 	"FROM invoice LEFT JOIN invoice_item ON invoice.id_invoice = invoice_item.id_invoice " +
 	"LEFT JOIN inventory ON invoice_item.inventory_ListID = inventory.ListID " +
-	"LEFT JOIN customer ON customer.ListID = invoice.ListID WHERE invoice.needSync = 0";
+	"LEFT JOIN customer ON customer.ListID = invoice.ListID WHERE invoice.needSync = 1";
 	logZoe("doListInvoicesToUpload select= " + selectStr);
 	tx.executeSql(selectStr,[], invoiceLocalListToUploadReceiveFunction, invoiceErrFunc);
  }
@@ -479,7 +479,8 @@ function doDeleteInvoice(tx){
 
 function doMarkToSyncInvoice(tx){
 	logZoe ("doMarkToSyncInvoice datafiler=" + filterDataInvoice);
-	tx.executeSql("UPDATE invoice SET needSync=1, zoeUpdateDate=datetime('now', 'localtime'), needCorrection=0 where id_invoice = ?",[filterDataInvoice+""]);
+    tx.executeSql("UPDATE invoice SET needSync=0, zoeSycDate=datetime('now', 'localtime'), needCorrection=1 where id_invoice = ?",[filterDataInvoice+""]);
+    //tx.executeSql("UPDATE invoice SET needSync=1, zoeUpdateDate=datetime('now', 'localtime'), needCorrection=0 where id_invoice = ?",[filterDataInvoice+""]);
 }
 
 function doMarkSyncErrorInvoice(tx){
