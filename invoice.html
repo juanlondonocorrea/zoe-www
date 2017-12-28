@@ -477,6 +477,7 @@ $(document).ready(function() {
 			
 				invoiceVO.items = currentItems;
 				invoiceVO.origin = "local";
+                  alert (JSON.stringify(invoiceVO));
 				console.log("storeInvoice invoiceVO=" + JSON.stringify(invoiceVO));
 				var invoicesVO = [invoiceVO];
 				invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert);
@@ -484,7 +485,7 @@ $(document).ready(function() {
 			}
 		
 		function successInvoiceInsert(){
-            alert ("ok");
+          
 			if ($("#isPersisted").val() == "false"){
 				invoiceDAO.confirmGeneratedRefNum();
 			}
