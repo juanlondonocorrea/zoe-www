@@ -474,7 +474,7 @@ $(document).ready(function() {
 					signaturePNG:"data:"+ datapairPNG[0] + "," + datapairPNG[1],
 					items: new Array()
 				}
-				alert("ok");
+			
 				invoiceVO.items = currentItems;
 				invoiceVO.origin = "local";
 				console.log("storeInvoice invoiceVO=" + JSON.stringify(invoiceVO));
@@ -484,6 +484,7 @@ $(document).ready(function() {
 			}
 		
 		function successInvoiceInsert(){
+            	alert("ok");
 			if ($("#isPersisted").val() == "false"){
 				invoiceDAO.confirmGeneratedRefNum();
 			}
