@@ -185,11 +185,11 @@ function openDatabaseZoe(){
 		}
 		console.log("needToSync=" + JSON.stringify(needToSync));
 		console.log("needToSync itemsToSync=" + itemsToSync);
-		if (itemsToSync>0){
-			$("#iconSync").html('<a class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-icon-nosync"></a>');
-		}else{
+		//if (itemsToSync>0){
+		//	$("#iconSync").html('<a class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-icon-nosync"></a>');
+	//	}else{
 			$("#iconSync").html('<a class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-icon-sync"></a>');
-		}
+	//	}
 	}
 	
 	function errCheckNeedToSync(){
