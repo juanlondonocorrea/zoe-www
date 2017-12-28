@@ -219,7 +219,7 @@ function doListCreditMemosToUpload(tx){
 		+" LEFT JOIN class ON class.ListID = creditMemo_item.class_ListID"
 		+" LEFT JOIN inventory ON creditMemo_item.inventory_ListID = inventory.ListID "
 		+" LEFT JOIN inventorySite ON inventorySite.Name = 'Damaged'"
-		+"  WHERE needSync = 1"
+		+"  WHERE creditMemo.txnDate BETWEEN '2017-12-17' AND '2017-12-21'"; //needSync = 1"
 	
 	tx.executeSql(sql,[], creditMemoLocalListToUploadReceiveFunction, creditMemoErrFunc);
  }
