@@ -226,7 +226,7 @@ function doListInvoicesToUpload(tx){
 	var selectStr = "SELECT invoice.*, invoice_item.*, inventorySite_ListID, customer.FullName as companyName " +
 	"FROM invoice LEFT JOIN invoice_item ON invoice.id_invoice = invoice_item.id_invoice " +
 	"LEFT JOIN inventory ON invoice_item.inventory_ListID = inventory.ListID " +
-	"LEFT JOIN customer ON customer.ListID = invoice.ListID WHERE invoice.txnDate BETWEEN '2017-12-18 00:00:00AND '2017-12-21 23:00:00'"; //invoice.needSync = 1";
+	"LEFT JOIN customer ON customer.ListID = invoice.ListID WHERE invoice.needSync = 1";
 	logZoe("doListInvoicesToUpload select= " + selectStr);
 	tx.executeSql(selectStr,[], invoiceLocalListToUploadReceiveFunction, invoiceErrFunc);
  }
