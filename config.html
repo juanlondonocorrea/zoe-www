@@ -121,8 +121,7 @@
 	var currentUp = 0;
 	var messagePopup = "";
 	function syncUp(){
-        ALERT ("ITEM SYNC "+itemsToSync);
-		if (itemsToSync==0){
+      if (itemsToSync==0){
 			alert("Nothing to do");
 	        return;
 		}
@@ -197,8 +196,7 @@
 			console.log("downloading " +  whatToDownload[currentDown]);
 			messagePopup += whatToDownload[currentDown] + "...<br>";
 			$("#currentTask").html(messagePopup);
-            alert("PRIMERO"+currentDown);
-			if (whatToDownload[currentDown] == "syncDownSalesRep" ){
+            if (whatToDownload[currentDown] == "syncDownSalesRep" ){
 				syncSalesRep();
 			}else if (whatToDownload[currentDown] == "syncTaxes" ){
 				syncTaxes();
@@ -253,7 +251,6 @@
 		var cache = "employee";
 		var xpathExp = '//EmployeeRet[translate(Name,"abcdefghjiklmnopqrstuvwxyz","ABCDEFGHJIKLMNOPQRSTUVWXYZ")="' + window.localStorage.getItem("salesRepName").toUpperCase() + '"]';				
 		consumeWS(mensaje, "JSON", receiveMessageEmployee,cache, xpathExp);
-		alert("EMP");
 		return false;
 	}
 	
