@@ -195,7 +195,7 @@
 			console.log("downloading " +  whatToDownload[currentDown]);
 			messagePopup += whatToDownload[currentDown] + "...<br>";
 			$("#currentTask").html(messagePopup);
-            alert("PRIMERO");
+            alert("PRIMERO"+currentDown);
 			if (whatToDownload[currentDown] == "syncDownSalesRep" ){
 				syncSalesRep();
 			}else if (whatToDownload[currentDown] == "syncTaxes" ){
