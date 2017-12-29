@@ -195,6 +195,7 @@
 			console.log("downloading " +  whatToDownload[currentDown]);
 			messagePopup += whatToDownload[currentDown] + "...<br>";
 			$("#currentTask").html(messagePopup);
+            alert("PRIMERO");
 			if (whatToDownload[currentDown] == "syncDownSalesRep" ){
 				syncSalesRep();
 			}else if (whatToDownload[currentDown] == "syncTaxes" ){
@@ -250,7 +251,7 @@
 		var cache = "employee";
 		var xpathExp = '//EmployeeRet[translate(Name,"abcdefghjiklmnopqrstuvwxyz","ABCDEFGHJIKLMNOPQRSTUVWXYZ")="' + window.localStorage.getItem("salesRepName").toUpperCase() + '"]';				
 		consumeWS(mensaje, "JSON", receiveMessageEmployee,cache, xpathExp);
-		alert('hol');
+		alert("EMP");
 		return false;
 	}
 	
