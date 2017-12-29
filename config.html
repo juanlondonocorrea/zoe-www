@@ -250,7 +250,7 @@
 		var cache = "employee";
 		var xpathExp = '//EmployeeRet[translate(Name,"abcdefghjiklmnopqrstuvwxyz","ABCDEFGHJIKLMNOPQRSTUVWXYZ")="' + window.localStorage.getItem("salesRepName").toUpperCase() + '"]';				
 		consumeWS(mensaje, "JSON", receiveMessageEmployee,cache, xpathExp);
-		
+		alert('hol');
 		return false;
 	}
 	
