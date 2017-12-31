@@ -121,7 +121,7 @@
 	var currentUp = 0;
 	var messagePopup = "";
 	function syncUp(){
-      if (itemsToSync==0){
+		if (itemsToSync==0){
 			alert("Nothing to do");
 	        return;
 		}
@@ -163,7 +163,6 @@
 	var whatToDownload = new Array();
 	var currentDown = 0;
 	function syncDown(){
-        
 		if (itemsToSync>0){
 			var willcontinue = confirm("Items to sync found (" + itemsToSync + ").  Are you really sure to download server data?"  + itemsToSync);
 			if (!willcontinue)
@@ -196,7 +195,7 @@
 			console.log("downloading " +  whatToDownload[currentDown]);
 			messagePopup += whatToDownload[currentDown] + "...<br>";
 			$("#currentTask").html(messagePopup);
-            if (whatToDownload[currentDown] == "syncDownSalesRep" ){
+			if (whatToDownload[currentDown] == "syncDownSalesRep" ){
 				syncSalesRep();
 			}else if (whatToDownload[currentDown] == "syncTaxes" ){
 				syncTaxes();
@@ -251,6 +250,7 @@
 		var cache = "employee";
 		var xpathExp = '//EmployeeRet[translate(Name,"abcdefghjiklmnopqrstuvwxyz","ABCDEFGHJIKLMNOPQRSTUVWXYZ")="' + window.localStorage.getItem("salesRepName").toUpperCase() + '"]';				
 		consumeWS(mensaje, "JSON", receiveMessageEmployee,cache, xpathExp);
+		
 		return false;
 	}
 	
