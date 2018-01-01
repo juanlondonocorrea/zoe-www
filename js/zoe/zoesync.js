@@ -4,6 +4,7 @@ var xhrSync;
 var receiveSyncCallback;
 function consumeWS(mensaje, format, receiveFunction, acache, axpathExp, aExtraData){
 	receiveSyncCallback = receiveFunction;
+    alert ("receiveFunction "+receiveFunction);
 	if (synchronizing==true){
 		alert("Synchronizing in process");
 		return;
