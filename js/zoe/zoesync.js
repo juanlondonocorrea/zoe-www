@@ -134,7 +134,7 @@ function errSync(jqXHR, textStatus){
 	console.log("en errSync");
 	console.log("synchronizing errSync: " + textStatus);              
 	console.log("synchronizing error jqXHR: " + JSON.stringify(jqXHR));              
-	alert("Synch error: empty response"+  textStatus); 
+	alert("Synch error: empty response"+  textStatus + JSON.stringify(jqXHR)); 
 }
 
 function log(msg){
