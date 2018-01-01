@@ -112,7 +112,7 @@ function recibeSyncResponse(data, textStatus, jqXHR )
 					receiveSyncCallback(obj);
 				}else{
 					console.log("Synch error: empty response");
-					alert("Synch error: empty response");
+					alert("Synch error: empty response"+ msgObj);
 				}
 			}
 		}else{
@@ -134,7 +134,7 @@ function errSync(jqXHR, textStatus){
 	console.log("en errSync");
 	console.log("synchronizing errSync: " + textStatus);              
 	console.log("synchronizing error jqXHR: " + JSON.stringify(jqXHR));              
-	alert("Synch error: empty response");
+	alert("Synch error: empty response"+  textStatus); 
 }
 
 function log(msg){
