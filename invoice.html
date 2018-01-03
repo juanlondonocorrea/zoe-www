@@ -479,7 +479,7 @@ $(document).ready(function() {
 				invoiceVO.origin = "local";
 				console.log("storeInvoice invoiceVO=" + JSON.stringify(invoiceVO));
 				var invoicesVO = [invoiceVO];
-				alert ("va a cambiar")
+				alert ("va a cambiar"+ invoicesVO)
 				invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert);
 				return false;
 			}
@@ -488,6 +488,7 @@ $(document).ready(function() {
 			if ($("#isPersisted").val() == "false"){
 				invoiceDAO.confirmGeneratedRefNum();
 			}
+			alert ("va a cambiar2"+ invoicesVO)
 			$("#isPersisted").val("true");
 			invoiceDAO.markToSync($('#refNumber').val(), errInvoiceInsert, successInvoiceInsertMark);
 			alert ("cambio")
