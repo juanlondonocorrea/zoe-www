@@ -479,6 +479,7 @@ $(document).ready(function() {
 				invoiceVO.origin = "local";
 				console.log("storeInvoice invoiceVO=" + JSON.stringify(invoiceVO));
 				var invoicesVO = [invoiceVO];
+				alert ("va a cambiar")
 				invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert);
 				return false;
 			}
@@ -489,6 +490,7 @@ $(document).ready(function() {
 			}
 			$("#isPersisted").val("true");
 			invoiceDAO.markToSync($('#refNumber').val(), errInvoiceInsert, successInvoiceInsertMark);
+			alert ("cambio")
 			isPersistedChange();
 		}
 		
