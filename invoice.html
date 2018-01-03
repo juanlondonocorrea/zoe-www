@@ -433,6 +433,7 @@ $(document).ready(function() {
 					return false;
 				}
 				//first remove all invoice if exist
+				alert ("va a update"+ $('#refNumber').val());
 				invoiceDAO.delete($('#refNumber').val(),errInvoiceInsert, storeInvoiceCallback);
 			}
 			function storeInvoiceCallback(){
@@ -472,27 +473,27 @@ $(document).ready(function() {
 					customerMsg_ListID:($("#selCustomerMsg").val()=="choose-one")?null:$("#selCustomerMsg").val(),
 					signature:"data:"+ datapair[0] + "," + datapair[1],
 					signaturePNG:"data:"+ datapairPNG[0] + "," + datapairPNG[1],
-					items: new Array()
+					items: new Array();
 				}
 			
 				invoiceVO.items = currentItems;
 				invoiceVO.origin = "local";
 				console.log("storeInvoice invoiceVO=" + JSON.stringify(invoiceVO));
 				var invoicesVO = [invoiceVO];
-				alert ("va a cambiar"+ invoicesVO)
+				alert ("va a cambiar"+ invoicesVO);
 				invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert);
 				return false;
 			}
 		
 		function successInvoiceInsert(){
-			alert ("va a cambiar22"+ invoicesVO)
+			alert ("va a cambiar22"+ invoicesVO);
 			if ($("#isPersisted").val() == "false"){
 				invoiceDAO.confirmGeneratedRefNum();
 			}
 			alert ("va a cambiar2"+ invoicesVO)
 			$("#isPersisted").val("true");
 			invoiceDAO.markToSync($('#refNumber').val(), errInvoiceInsert, successInvoiceInsertMark);
-			alert ("cambio")
+			alert ("cambio");
 			isPersistedChange();
 		}
 		
