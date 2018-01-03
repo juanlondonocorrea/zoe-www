@@ -433,7 +433,6 @@ $(document).ready(function() {
 					return false;
 				}
 				//first remove all invoice if exist
-				alert ("va a update"+ $('#refNumber').val());
 				invoiceDAO.delete($('#refNumber').val(),errInvoiceInsert, storeInvoiceCallback);
 			}
 			function storeInvoiceCallback(){
@@ -473,7 +472,7 @@ $(document).ready(function() {
 					customerMsg_ListID:($("#selCustomerMsg").val()=="choose-one")?null:$("#selCustomerMsg").val(),
 					signature:"data:"+ datapair[0] + "," + datapair[1],
 					signaturePNG:"data:"+ datapairPNG[0] + "," + datapairPNG[1],
-					items: new Array();
+					items: new Array()
 				}
 			
 				invoiceVO.items = currentItems;
@@ -490,10 +489,10 @@ $(document).ready(function() {
 			if ($("#isPersisted").val() == "false"){
 				invoiceDAO.confirmGeneratedRefNum();
 			}
-			alert ("va a cambiar2"+ invoicesVO)
+			alert ("va a cambiar2"+ invoicesVO);
 			$("#isPersisted").val("true");
 			invoiceDAO.markToSync($('#refNumber').val(), errInvoiceInsert, successInvoiceInsertMark);
-			alert ("cambio");
+			alert ("cambio")
 			isPersistedChange();
 		}
 		
