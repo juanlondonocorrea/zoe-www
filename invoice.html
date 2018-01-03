@@ -433,6 +433,7 @@ $(document).ready(function() {
 					return false;
 				}
 				//first remove all invoice if exist
+				alert("hola "+$('#refNumber').val())
 				invoiceDAO.delete($('#refNumber').val(),errInvoiceInsert, storeInvoiceCallback);
 			}
 			function storeInvoiceCallback(){
@@ -479,20 +480,16 @@ $(document).ready(function() {
 				invoiceVO.origin = "local";
 				console.log("storeInvoice invoiceVO=" + JSON.stringify(invoiceVO));
 				var invoicesVO = [invoiceVO];
-				alert ("va a cambiar"+ invoicesVO);
 				invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert);
 				return false;
 			}
 		
 		function successInvoiceInsert(){
-			alert ("va a cambiar22"+ invoicesVO);
 			if ($("#isPersisted").val() == "false"){
 				invoiceDAO.confirmGeneratedRefNum();
 			}
-			alert ("va a cambiar2"+ invoicesVO);
 			$("#isPersisted").val("true");
 			invoiceDAO.markToSync($('#refNumber').val(), errInvoiceInsert, successInvoiceInsertMark);
-			alert ("cambio")
 			isPersistedChange();
 		}
 		
