@@ -433,7 +433,6 @@ $(document).ready(function() {
 					return false;
 				}
 				//first remove all invoice if exist
-				
 				invoiceDAO.delete($('#refNumber').val(),errInvoiceInsert, storeInvoiceCallback);
 			}
 			function storeInvoiceCallback(){
@@ -480,19 +479,11 @@ $(document).ready(function() {
 				invoiceVO.origin = "local";
 				console.log("storeInvoice invoiceVO=" + JSON.stringify(invoiceVO));
 				var invoicesVO = [invoiceVO];
-				
-				$("#isPersisted").val("true");
-			invoiceDAO.markToSync($('#refNumber').val(), errInvoiceInsert, successInvoiceInsertMark);
-			isPersistedChange();
-				
-				
 				invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert);
-				
 				return false;
 			}
 		
 		function successInvoiceInsert(){
-			alert("hola3 "+$('#refNumber').val())
 			if ($("#isPersisted").val() == "false"){
 				invoiceDAO.confirmGeneratedRefNum();
 			}
@@ -788,7 +779,7 @@ table, th, td {
             </fieldset>
                              
             <fieldset class="ui-grid-a">
-                <div class="ui-block-a"><button type="button" id="submit" data-theme="c" onClick="storeInvoice(); return false;">Done</button></div>
+                <div class="ui-block-a"><button type="button" id="submit" data-theme="c" onClick="successInvoiceInsert(); return false;">Done</button></div>
                 <div class="ui-block-b"><button type="button" id="cancel" data-rel="back" data-theme="b">Cancel</button></div>	   
             </fieldset>    
             
