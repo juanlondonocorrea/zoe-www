@@ -488,6 +488,7 @@ $(document).ready(function() {
 				invoiceDAO.confirmGeneratedRefNum();
 			}
 			$("#isPersisted").val("true");
+			alert ("invoice"+$('#refNumber').val())
 			invoiceDAO.markToSync($('#refNumber').val(), errInvoiceInsert, successInvoiceInsertMark);
 			isPersistedChange();
 		}
