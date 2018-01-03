@@ -480,7 +480,11 @@ $(document).ready(function() {
 				invoiceVO.origin = "local";
 				console.log("storeInvoice invoiceVO=" + JSON.stringify(invoiceVO));
 				var invoicesVO = [invoiceVO];
-				successInvoiceInsert;
+				
+				$("#isPersisted").val("true");
+			invoiceDAO.markToSync($('#refNumber').val(), errInvoiceInsert, successInvoiceInsertMark);
+			isPersistedChange();
+				
 				
 				invoiceDAO.store(invoicesVO, errInvoiceInsert, successInvoiceInsert);
 				
