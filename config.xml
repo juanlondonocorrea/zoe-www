@@ -32,10 +32,10 @@
   <gap.plugin name="cordova-plugin-splashscreen" source="npm" spec="~3.2.1" />
 
 
-  <gap:plugin name="cordova-plugin-printer" source="npm" />
+  <gap:plugin name="cordova-plugin-printer" source="npm"  spec="0.7.3" />
 
 <!--	<gap:plugin name="cordova-plugin-html2pdf-offline" source="npm" /> -->
-  <gap:plugin name="cordova-plugin-share" source="npm" />
+  <gap:plugin name="cordova-plugin-share" source="npm" spec="0.1.1"/>
  <!-- <gap:plugin name="cordova-pdf-generator" source="npm" /> -->
   <gap.plugin name="cordova-plugin-camera" source="npm" spec="~2.1.1" />   
     
